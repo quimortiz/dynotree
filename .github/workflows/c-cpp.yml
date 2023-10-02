@@ -36,4 +36,4 @@ jobs:
     - name: Check Python
       run: |
            cd build
-           python3 -c "import dynkdtree"
+           python3 -c "import pykdtree"
