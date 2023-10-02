@@ -26,5 +26,14 @@ jobs:
           cd build
           cmake ..
     - name: Make
-      run: make
-    
+      run: |
+           cd build
+           make
+    - name: Check C++
+      run: |
+           cd build
+           ./main
+    - name: Check Python
+      run: |
+           cd build
+           python3 -c "import dynkdtree"
