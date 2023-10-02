@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "KDTree.h"
+#include "dynkdtree/KDTree.h"
 
 int main() {
 
