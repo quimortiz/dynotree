@@ -37,6 +37,9 @@ jobs:
       run: |
            cd build
            python3 -c "import pykdtree"
+    - name: Python Install Dependencies
+      run: |
+           pip3 install numpy
     - name: Run Python
       run: |
            cd build
