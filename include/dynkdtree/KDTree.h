@@ -132,9 +132,24 @@ template <class T> using cref = const Eigen::Ref<const T> &;
 namespace jk {
 namespace tree {
 
+template <typename T, typename Scalar>
+void choose_split_dimension_default(T lb, T ub, int &ii, Scalar &width) {
+  for (std::size_t i = 0; i < lb.size(); i++) {
+    Scalar dWidth = ub[i] - lb[i];
+    if (dWidth > width) {
+      ii = i;
+      width = dWidth;
+    }
+  }
+}
+
 template <typename Scalar, int Dimensions> struct L1 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
 
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
@@ -175,6 +190,11 @@ template <typename Scalar, int Dimensions> struct L1 {
 template <typename Scalar> struct SO2 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 1, 1>> &;
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
   Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
     assert(location1(0) >= -M_PI);
@@ -230,6 +250,10 @@ template <typename Scalar> struct SO2Squared {
 
   SO2<Scalar> so2;
 
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
   Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
     double d = so2.distanceToRect(location1, lb, ub);
@@ -247,16 +271,14 @@ template <typename Scalar, int Dimensions> struct L2Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
 
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     double d = 0;
     double dist = 0;
-
-    // if constexpr (Dimensions == Eigen::Dynamic) {
-    //   std::cout << "rect: dynamic" << std::endl;
-    // } else {
-    //   std::cout << "rect: " << std::endl;
-    // }
 
     if constexpr (Dimensions == Eigen::Dynamic) {
 
@@ -300,6 +322,10 @@ template <typename Scalar, int Dimensions> struct L2 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
 
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     double d = L2Squared<Scalar, Dimensions>::distanceToRect(location1, lb, ub);
@@ -315,6 +341,10 @@ template <typename Scalar, int Dimensions> struct L2 {
 template <typename Scalar> struct R2SO2Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
 
   double angular_weight = 1.0;
 
@@ -347,6 +377,10 @@ template <typename Scalar> struct SO3Squared {
 
   L2Squared<Scalar, 4> l2squared;
 
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     assert(std::abs(location1.norm() - 1) < 1e-6);
@@ -376,6 +410,10 @@ template <typename Scalar> struct SO3 {
 
   SO3Squared<Scalar> so3squared;
 
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     return std::sqrt(so3squared.distanceToRect(location1, lb, ub));
@@ -394,6 +432,10 @@ template <typename Scalar> struct R9SO3Squared {};
 template <typename Scalar> struct R3SO3Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 7, 1>> &;
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
 
   L2Squared<Scalar, 3> l2;
   SO3Squared<Scalar> so3;
@@ -432,6 +474,10 @@ template <typename Scalar> struct Combined {
       : types(types), dims(dims) {
 
     assert(types.size() == dims.size());
+  }
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
   }
 
   double distance(cref_t location1, cref_t location2) const {
@@ -780,14 +826,9 @@ private:
     Node &splitNode = m_nodes[index];
     splitNode.m_splitDimension = m_dimensions;
     Scalar width(0);
-    // select widest dimension
-    for (std::size_t i = 0; i < m_dimensions; i++) {
-      Scalar dWidth = splitNode.m_ub[i] - splitNode.m_lb[i];
-      if (dWidth > width) {
-        splitNode.m_splitDimension = i;
-        width = dWidth;
-      }
-    }
+    distance_fun.choose_split_dimension(splitNode.m_lb, splitNode.m_ub,
+                                        splitNode.m_splitDimension, width);
+
     if (splitNode.m_splitDimension == m_dimensions) {
       return false;
     }
@@ -964,7 +1005,8 @@ private:
 //
 // class
 
-// template <class Payload, std::size_t Dimensions, std::size_t BucketSize = 32,
+// template <class Payload, std::size_t Dimensions, std::size_t BucketSize =
+// 32,
 //           class Distance = L2Squared, typename Scalar = double>
 
 template class KDTree<size_t, 4, 32, double, SO3Squared<double>>;
