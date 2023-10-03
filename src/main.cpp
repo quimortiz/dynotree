@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(t_hello3)
     int counter = 0;
     for (size_t ii = 0; ii < points.size(); ++ii) {
       double d =
-        tree.getDistanceFun().distance(points[ii], lazyMonsterLocation);
+          tree.getDistanceFun().distance(points[ii], lazyMonsterLocation);
       if (d < radius) {
         counter++;
       }
@@ -539,7 +539,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
   {
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < num_experiments; i++) {
-      nnt = tree4.searchKnn(x, num_neighs);
+      nnt = tree4.searchKnn(x4, num_neighs);
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
