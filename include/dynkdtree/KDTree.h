@@ -136,7 +136,7 @@ template <typename Scalar, int Dimensions> struct L1 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
 
-  static Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) {
+  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     double d = 0;
     double dist = 0;
@@ -164,7 +164,7 @@ template <typename Scalar, int Dimensions> struct L1 {
     return dist;
   }
 
-  static Scalar distance(cref_t &location1, cref_t &location2) {
+  Scalar distance(cref_t &location1, cref_t &location2) {
 
     assert(location1.size());
     assert(location2.size());
@@ -175,7 +175,7 @@ template <typename Scalar, int Dimensions> struct L1 {
 template <typename Scalar> struct SO2 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 1, 1>> &;
-  static Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) {
+  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
     assert(location1(0) >= -M_PI);
     assert(location1(0) <= M_PI);
@@ -205,7 +205,7 @@ template <typename Scalar> struct SO2 {
     }
   }
 
-  static Scalar distance(cref_t location1, cref_t location2) {
+  Scalar distance(cref_t location1, cref_t location2) const {
 
     assert(location1(0) >= -M_PI);
     assert(location2(0) >= -M_PI);
@@ -227,15 +227,18 @@ template <typename Scalar> struct SO2 {
 template <typename Scalar> struct SO2Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 1, 1>> &;
-  static Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) {
 
-    double d = SO2<Scalar>::distanceToRect(location1, lb, ub);
+  SO2<Scalar> so2;
+
+  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
+
+    double d = so2.distanceToRect(location1, lb, ub);
     return d * d;
   }
 
-  static Scalar distance(cref_t location1, cref_t location2) {
+  Scalar distance(cref_t location1, cref_t location2) const {
 
-    double d = SO2<Scalar>::distance(location1, location2);
+    double d = so2.distance(location1, location2);
     return d * d;
   }
 };
@@ -244,18 +247,16 @@ template <typename Scalar, int Dimensions> struct L2Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
 
-  static Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) {
+  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     double d = 0;
     double dist = 0;
 
-
     // if constexpr (Dimensions == Eigen::Dynamic) {
     //   std::cout << "rect: dynamic" << std::endl;
     // } else {
-    //   std::cout << "rect: static" << std::endl;
+    //   std::cout << "rect: " << std::endl;
     // }
-
 
     if constexpr (Dimensions == Eigen::Dynamic) {
 
@@ -280,7 +281,7 @@ template <typename Scalar, int Dimensions> struct L2Squared {
     return dist;
   }
 
-  static Scalar distance(cref_t &location1, cref_t &location2) {
+  Scalar distance(cref_t &location1, cref_t &location2) const {
 
     assert(location1.size());
     assert(location2.size());
@@ -288,7 +289,7 @@ template <typename Scalar, int Dimensions> struct L2Squared {
     // if constexpr (Dimensions == Eigen::Dynamic) {
     //   std::cout << "dynamic" << std::endl;
     // } else {
-    //   std::cout << "static" << std::endl;
+    //   std::cout << "" << std::endl;
     // }
 
     return (location1 - location2).squaredNorm();
@@ -299,13 +300,13 @@ template <typename Scalar, int Dimensions> struct L2 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
 
-  static Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) {
+  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     double d = L2Squared<Scalar, Dimensions>::distanceToRect(location1, lb, ub);
     return std::sqrt(d);
   };
 
-  static Scalar distance(cref_t &location1, cref_t &location2) {
+  Scalar distance(cref_t &location1, cref_t &location2) const {
     double d = L2Squared<Scalar, Dimensions>::distance(location1, location2);
     return std::sqrt(d);
   }
@@ -315,24 +316,28 @@ template <typename Scalar> struct R2SO2Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
 
-  static Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) {
+  double angular_weight = 1.0;
 
-    double d1 = L2Squared<Scalar, 2>::distanceToRect(
-        location1.template head<2>(), lb.template head<2>(),
-        ub.template head<2>());
-    double d2 = SO2Squared<Scalar>::distanceToRect(location1.template tail<1>(),
-                                                   lb.template tail<1>(),
-                                                   ub.template tail<1>());
-    return d1 + d2;
+  L2Squared<Scalar, 2> l2squared;
+  SO2Squared<Scalar> so2squared;
+  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
+
+    double d1 =
+        l2squared.distanceToRect(location1.template head<2>(),
+                                 lb.template head<2>(), ub.template head<2>());
+    double d2 =
+        so2squared.distanceToRect(location1.template tail<1>(),
+                                  lb.template tail<1>(), ub.template tail<1>());
+    return d1 + angular_weight * d2;
   }
 
-  static Scalar distance(cref_t location1, cref_t location2) {
+  Scalar distance(cref_t location1, cref_t location2) const {
 
-    double d1 = L2Squared<Scalar, 2>::distance(location1.template head<2>(),
-                                               location2.template head<2>());
-    double d2 = SO2Squared<Scalar>::distance(location1.template tail<1>(),
-                                             location2.template tail<1>());
-    return d1 + d2;
+    double d1 = l2squared.distance(location1.template head<2>(),
+                                   location2.template head<2>());
+    double d2 = so2squared.distance(location1.template tail<1>(),
+                                    location2.template tail<1>());
+    return d1 + angular_weight * d2;
   };
 };
 
@@ -340,16 +345,18 @@ template <typename Scalar> struct SO3Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 4, 1>> &;
 
-  static Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) {
+  L2Squared<Scalar, 4> l2squared;
+
+  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     assert(std::abs(location1.norm() - 1) < 1e-6);
 
-    double d1 = L2Squared<Scalar, 4>::distanceToRect(location1, lb, ub);
-    double d2 = L2Squared<Scalar, 4>::distanceToRect(-1. * location1, lb, ub);
+    double d1 = l2squared.distanceToRect(location1, lb, ub);
+    double d2 = l2squared.distanceToRect(-1. * location1, lb, ub);
     return std::min(d1, d2);
   }
 
-  static double distance(cref_t location1, cref_t location2) {
+  double distance(cref_t location1, cref_t location2) const {
 
     assert(location1.size() == 4);
     assert(location2.size() == 4);
@@ -357,8 +364,8 @@ template <typename Scalar> struct SO3Squared {
     assert(std::abs(location1.norm() - 1) < 1e-6);
     assert(std::abs(location2.norm() - 1) < 1e-6);
 
-    double d1 = L2Squared<Scalar, 4>::distance(location1, location2);
-    double d2 = L2Squared<Scalar, 4>::distance(-location1, location2);
+    double d1 = l2squared.distance(location1, location2);
+    double d2 = l2squared.distance(-location1, location2);
     return std::min(d1, d2);
   };
 };
@@ -367,43 +374,48 @@ template <typename Scalar> struct SO3 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 4, 1>> &;
 
-  static Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) {
+  SO3Squared<Scalar> so3squared;
 
-    return std::sqrt(SO3Squared<Scalar>::distanceToRect(location1, lb, ub));
+  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
+
+    return std::sqrt(so3squared.distanceToRect(location1, lb, ub));
   }
 
-  static double distance(cref_t location1, cref_t location2) {
+  double distance(cref_t location1, cref_t location2) const {
 
-    return std::sqrt(SO3Squared<Scalar>::distance(location1, location2));
+    return std::sqrt(so3squared.distance(location1, location2));
   };
 };
 
 // Rigid Body: Pose and Velocities
 template <typename Scalar> struct R9SO3Squared {};
 
+// SE3
 template <typename Scalar> struct R3SO3Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 7, 1>> &;
 
-  static Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) {
+  L2Squared<Scalar, 3> l2;
+  SO3Squared<Scalar> so3;
 
-    double d1 = L2Squared<Scalar, 3>::distanceToRect(
-        location1.template head<3>(), lb.template head<3>(),
-        ub.template head<3>());
+  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
-    double d2 = SO3Squared<Scalar>::distanceToRect(location1.template tail<4>(),
-                                                   lb.template tail<4>(),
-                                                   ub.template tail<4>());
+    double d1 = l2.distanceToRect(location1.template head<3>(),
+                                  lb.template head<3>(), ub.template head<3>());
+
+    double d2 =
+        so3.distanceToRect(location1.template tail<4>(), lb.template tail<4>(),
+                           ub.template tail<4>());
 
     return d1 + d2;
   }
 
-  static double distance(cref_t location1, cref_t location2) {
+  double distance(cref_t location1, cref_t location2) const {
 
-    double d1 = L2Squared<Scalar, 3>::distance(location1.template head<3>(),
-                                               location2.template head<3>());
-    double d2 = SO3Squared<Scalar>::distance(location1.template tail<4>(),
-                                             location2.template tail<4>());
+    double d1 =
+        l2.distance(location1.template head<3>(), location2.template head<3>());
+    double d2 = so3.distance(location1.template tail<4>(),
+                             location2.template tail<4>());
     return d1 + d2;
   };
 };
@@ -422,7 +434,7 @@ template <typename Scalar> struct Combined {
     assert(types.size() == dims.size());
   }
 
-  double distance(cref_t location1, cref_t location2) {
+  double distance(cref_t location1, cref_t location2) const {
 
     double d = 0;
     int counter = 0;
@@ -473,7 +485,7 @@ template <typename Scalar> struct Combined {
     return d;
   }
 
-  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) {
+  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
     double d = 0;
     int counter = 0;
@@ -542,6 +554,7 @@ private:
   struct Node;
   std::vector<Node> m_nodes;
   std::set<std::size_t> waitingForSplit;
+  Distance distance_fun;
 
 public:
   using distance_t = Distance;
@@ -553,34 +566,19 @@ public:
   // TODO: I also want Dimensions at runtime!!
   using tree_t = KDTree<Payload, Dimensions, BucketSize, Scalar, Distance>;
 
-  KDTree(int runtime_dimension = -1) {
+  Distance &getDistanceFun() { return distance_fun; }
+
+  KDTree(int runtime_dimension = -1, Distance distance_fun = Distance())
+      : distance_fun(distance_fun) {
 
     if constexpr (Dimensions == Eigen::Dynamic) {
       assert(runtime_dimension > 0);
       m_dimensions = runtime_dimension;
       m_nodes.emplace_back(BucketSize, m_dimensions);
-      // m_nodes.front().m_splitDimension = m_dimensions;
     } else {
       m_nodes.emplace_back(BucketSize, -1);
     }
-  } // initialize the root node
-  //
-  //
-  //
-
-  // KDTree(int t_dimensions) {
-  //   assert(m_dimensions < 0 || t_dimensions == m_dimensions);
-  //   m_dimensions = t_dimensions;
-  //   m_nodes.emplace_back(BucketSize);
-  // }
-
-  // void setDimensions(int t_dimensions) {
-  //   assert(m_dimensions == -1);
-  //   m_dimensions = t_dimensions;
-  //   m_nodes.clear();
-  //   m_nodes.emplace_back(BucketSize, m_dimensions);
-  //   m_nodes.front().m_splitDimension = m_dimensions;
-  // }
+  }
 
   size_t size() const { return m_nodes[0].m_entries; }
 
@@ -636,19 +634,20 @@ public:
   std::vector<DistancePayload> searchKnn(const point_t &location,
                                          std::size_t maxPoints) const {
     return searcher().search(location, std::numeric_limits<Scalar>::max(),
-                             maxPoints);
+                             maxPoints, distance_fun);
   }
 
   std::vector<DistancePayload> searchBall(const point_t &location,
                                           Scalar maxRadius) const {
     return searcher().search(location, maxRadius,
-                             std::numeric_limits<std::size_t>::max());
+                             std::numeric_limits<std::size_t>::max(),
+                             distance_fun);
   }
 
   std::vector<DistancePayload>
   searchCapacityLimitedBall(const point_t &location, Scalar maxRadius,
                             std::size_t maxPoints) const {
-    return searcher().search(location, maxRadius, maxPoints);
+    return searcher().search(location, maxRadius, maxPoints, distance_fun);
   }
 
   DistancePayload search(const point_t &location) const {
@@ -666,10 +665,10 @@ public:
         std::size_t nodeIndex = searchStack.back();
         searchStack.pop_back();
         const Node &node = m_nodes[nodeIndex];
-        if (result.distance > node.pointRectDist(location)) {
+        if (result.distance > node.pointRectDist(location, distance_fun)) {
           if (node.m_splitDimension == m_dimensions) {
             for (const auto &lp : node.m_locationPayloads) {
-              Scalar nodeDist = Distance::distance(location, lp.location);
+              Scalar nodeDist = distance_fun.distance(location, lp.location);
               if (nodeDist < result.distance) {
                 result = DistancePayload{nodeDist, lp.payload};
               }
@@ -690,8 +689,10 @@ public:
 
     // NB! this method is not const. Do not call this on same instance from
     // different threads simultaneously.
-    const std::vector<DistancePayload> &
-    search(const point_t &location, Scalar maxRadius, std::size_t maxPoints) {
+    const std::vector<DistancePayload> &search(const point_t &location,
+                                               Scalar maxRadius,
+                                               std::size_t maxPoints,
+                                               Distance distance_fun) {
       // clear results from last time
       m_results.clear();
 
@@ -710,7 +711,8 @@ public:
       }
 
       m_tree.searchCapacityLimitedBall(location, maxRadius, maxPoints,
-                                       m_searchStack, m_prioqueue, m_results);
+                                       m_searchStack, m_prioqueue, m_results,
+                                       distance_fun);
 
       m_prioqueueCapacity = std::max(m_prioqueueCapacity, m_results.size());
       return m_results;
@@ -741,7 +743,7 @@ private:
       std::vector<std::size_t> &searchStack,
       std::priority_queue<DistancePayload, std::vector<DistancePayload>>
           &prioqueue,
-      std::vector<DistancePayload> &results) const {
+      std::vector<DistancePayload> &results, Distance distance_fun) const {
     std::size_t numSearchPoints = std::min(maxPoints, m_nodes[0].m_entries);
 
     if (numSearchPoints > 0) {
@@ -750,12 +752,12 @@ private:
         std::size_t nodeIndex = searchStack.back();
         searchStack.pop_back();
         const Node &node = m_nodes[nodeIndex];
-        Scalar minDist = node.pointRectDist(location);
+        Scalar minDist = node.pointRectDist(location, distance_fun);
         if (maxRadius > minDist && (prioqueue.size() < numSearchPoints ||
                                     prioqueue.top().distance > minDist)) {
           if (node.m_splitDimension == m_dimensions) {
             node.searchCapacityLimitedBall(location, maxRadius, numSearchPoints,
-                                           prioqueue);
+                                           prioqueue, distance_fun);
           } else {
             node.queueChildren(location, searchStack);
           }
@@ -867,21 +869,12 @@ private:
 
       m_lb.setConstant(std::numeric_limits<Scalar>::max());
       m_ub.setConstant(std::numeric_limits<Scalar>::lowest());
-      // m_bounds.fill(Range{std::numeric_limits<Scalar>::max(),
-      //                     std::numeric_limits<Scalar>::lowest()});
       m_locationPayloads.reserve(std::max(BucketSize, capacity));
     }
 
     void expandBounds(const point_t &location) {
-      int dimension = m_lb.size();
-      for (std::size_t i = 0; i < dimension; i++) {
-        if (m_lb[i] > location[i]) {
-          m_lb[i] = location[i];
-        }
-        if (m_ub[i] < location[i]) {
-          m_ub[i] = location[i];
-        }
-      }
+      m_lb = m_lb.cwiseMin(location);
+      m_ub = m_ub.cwiseMax(location);
       m_entries++;
     }
 
@@ -892,15 +885,18 @@ private:
 
     bool shouldSplit() const { return m_entries >= BucketSize; }
 
-    void searchCapacityLimitedBall(
-        const point_t &location, Scalar maxRadius, std::size_t K,
-        std::priority_queue<DistancePayload> &results) const {
+    void
+    searchCapacityLimitedBall(const point_t &location, Scalar maxRadius,
+                              std::size_t K,
+                              std::priority_queue<DistancePayload> &results,
+                              Distance distance_fun) const {
+
       std::size_t i = 0;
 
       // this fills up the queue if it isn't full yet
       for (; results.size() < K && i < m_entries; i++) {
         const auto &lp = m_locationPayloads[i];
-        Scalar distance = Distance::distance(location, lp.location);
+        Scalar distance = distance_fun.distance(location, lp.location);
         if (distance < maxRadius) {
           results.emplace(DistancePayload{distance, lp.payload});
         }
@@ -909,7 +905,7 @@ private:
       // this adds new things to the queue once it is full
       for (; i < m_entries; i++) {
         const auto &lp = m_locationPayloads[i];
-        Scalar distance = Distance::distance(location, lp.location);
+        Scalar distance = distance_fun.distance(location, lp.location);
         if (distance < maxRadius && distance < results.top().distance) {
           results.pop();
           results.emplace(DistancePayload{distance, lp.payload});
@@ -928,12 +924,8 @@ private:
       }
     }
 
-    Scalar pointRectDist(const point_t &location) const {
-      // auto clamp = [](Scalar v, Range r) {
-      //   return std::max(r.min, std::min(r.max, v));
-      // };
-
-      return Distance::distanceToRect(location, m_lb, m_ub);
+    Scalar pointRectDist(const point_t &location, Distance distance) const {
+      return distance.distanceToRect(location, m_lb, m_ub);
     }
 
     std::size_t m_entries = 0; /// size of the tree, or subtree

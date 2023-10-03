@@ -13,6 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Eigen3 REQUIRED)
 
 
+
+find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 add_subdirectory(deps/pybind11)
 
 
@@ -21,8 +23,8 @@ cmake_minimum_required(VERSION 3.0)
 add_executable(main src/main.cpp)
 
 
-target_include_directories(main PUBLIC include)
-target_link_libraries(main Eigen3::Eigen)
+target_include_directories(main PUBLIC include deps/nigh/src)
+target_link_libraries(main PUBLIC Eigen3::Eigen Boost::unit_test_framework)
 
 
 pybind11_add_module(pykdtree src/pykdtree.cpp)

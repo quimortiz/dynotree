@@ -102,7 +102,6 @@ toc = time.time()
 print("elapsed time: ", toc - tic)
 print(o[0].payload)
 
-# TODO: check against nearest neighbor 
 
 
 
