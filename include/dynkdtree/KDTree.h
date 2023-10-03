@@ -249,6 +249,14 @@ template <typename Scalar, int Dimensions> struct L2Squared {
     double d = 0;
     double dist = 0;
 
+
+    // if constexpr (Dimensions == Eigen::Dynamic) {
+    //   std::cout << "rect: dynamic" << std::endl;
+    // } else {
+    //   std::cout << "rect: static" << std::endl;
+    // }
+
+
     if constexpr (Dimensions == Eigen::Dynamic) {
 
       assert(location1.size());
@@ -276,6 +284,13 @@ template <typename Scalar, int Dimensions> struct L2Squared {
 
     assert(location1.size());
     assert(location2.size());
+
+    // if constexpr (Dimensions == Eigen::Dynamic) {
+    //   std::cout << "dynamic" << std::endl;
+    // } else {
+    //   std::cout << "static" << std::endl;
+    // }
+
     return (location1 - location2).squaredNorm();
   }
 };
@@ -396,7 +411,7 @@ template <typename Scalar> struct R3SO3Squared {
 enum class DistanceType { L1, L2, L2Squared, SO2, SO2Squared, SO3, SO3Squared };
 
 template <typename Scalar> struct Combined {
-  // TODO: test this!! How i am going to give this as input? -- it is not a 
+  // TODO: test this!! How i am going to give this as input? -- it is not a
   // static function anymore...
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, -1, 1>> &;
 
@@ -538,15 +553,34 @@ public:
   // TODO: I also want Dimensions at runtime!!
   using tree_t = KDTree<Payload, Dimensions, BucketSize, Scalar, Distance>;
 
-  KDTree() { m_nodes.emplace_back(BucketSize); } // initialize the root node
+  KDTree(int runtime_dimension = -1) {
+
+    if constexpr (Dimensions == Eigen::Dynamic) {
+      assert(runtime_dimension > 0);
+      m_dimensions = runtime_dimension;
+      m_nodes.emplace_back(BucketSize, m_dimensions);
+      // m_nodes.front().m_splitDimension = m_dimensions;
+    } else {
+      m_nodes.emplace_back(BucketSize, -1);
+    }
+  } // initialize the root node
   //
   //
   //
 
-  KDTree(int t_dimensions) {
-    assert(m_dimensions < 0 || t_dimensions == m_dimensions);
-    m_dimensions = t_dimensions;
-  }
+  // KDTree(int t_dimensions) {
+  //   assert(m_dimensions < 0 || t_dimensions == m_dimensions);
+  //   m_dimensions = t_dimensions;
+  //   m_nodes.emplace_back(BucketSize);
+  // }
+
+  // void setDimensions(int t_dimensions) {
+  //   assert(m_dimensions == -1);
+  //   m_dimensions = t_dimensions;
+  //   m_nodes.clear();
+  //   m_nodes.emplace_back(BucketSize, m_dimensions);
+  //   m_nodes.front().m_splitDimension = m_dimensions;
+  // }
 
   size_t size() const { return m_nodes[0].m_entries; }
 
@@ -773,9 +807,9 @@ private:
 
     splitNode.m_children = std::make_pair(m_nodes.size(), m_nodes.size() + 1);
     std::size_t entries = splitNode.m_entries;
-    m_nodes.emplace_back(m_bucketRecycle, entries);
+    m_nodes.emplace_back(m_bucketRecycle, entries, m_dimensions);
     Node &leftNode = m_nodes.back();
-    m_nodes.emplace_back(entries);
+    m_nodes.emplace_back(entries, m_dimensions);
     Node &rightNode = m_nodes.back();
 
     for (const auto &lp : splitNode.m_locationPayloads) {
@@ -812,14 +846,25 @@ private:
   }
 
   struct Node {
-    Node(std::size_t capacity) { init(capacity); }
-
-    Node(std::vector<LocationPayload> &recycle, std::size_t capacity) {
-      std::swap(m_locationPayloads, recycle);
-      init(capacity);
+    Node(std::size_t capacity, int runtime_dimension = -1) {
+      init(capacity, runtime_dimension);
     }
 
-    void init(std::size_t capacity) {
+    Node(std::vector<LocationPayload> &recycle, std::size_t capacity,
+         int runtime_dimension) {
+      std::swap(m_locationPayloads, recycle);
+      init(capacity, runtime_dimension);
+    }
+
+    void init(std::size_t capacity, int runtime_dimension) {
+
+      if constexpr (Dimensions == Eigen::Dynamic) {
+        assert(runtime_dimension > 0);
+        m_lb.resize(runtime_dimension);
+        m_ub.resize(runtime_dimension);
+        m_splitDimension = runtime_dimension;
+      }
+
       m_lb.setConstant(std::numeric_limits<Scalar>::max());
       m_ub.setConstant(std::numeric_limits<Scalar>::lowest());
       // m_bounds.fill(Range{std::numeric_limits<Scalar>::max(),
@@ -893,8 +938,8 @@ private:
 
     std::size_t m_entries = 0; /// size of the tree, or subtree
 
-    std::size_t m_splitDimension = Dimensions; /// split dimension of this node
-    Scalar m_splitValue = 0;                   /// split value of this node
+    int m_splitDimension = Dimensions; /// split dimension of this node
+    Scalar m_splitValue = 0;           /// split value of this node
 
     // struct Range {
     //   Scalar min, max;

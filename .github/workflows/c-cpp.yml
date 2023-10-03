@@ -37,3 +37,7 @@ jobs:
       run: |
            cd build
            python3 -c "import pykdtree"
+    - name: Run Python
+      run: |
+           cd build
+           python3 ../test/python/main.py
