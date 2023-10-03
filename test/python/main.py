@@ -1,5 +1,12 @@
 
 
+
+import sys
+
+sys.path.append('.')
+
+
+
 import pykdtree
 import numpy as np
 import  time 
