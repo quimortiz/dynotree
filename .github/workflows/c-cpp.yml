@@ -20,11 +20,19 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
     
+    - name: Install latest ompl for benchmark
+      run: |
+        mkdir __local
+        git clone https://github.com/ompl/ompl
+        cd ompl && mkdir build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=~/__local
+        make install -j8
+
     - name: Run CMake
       run: |
           mkdir build
           cd build
-          cmake ..
+          cmake -DCMAKE_PREFIX_PATH="~/__local;" ..
+
     - name: Make
       run: |
            cd build
