@@ -365,6 +365,8 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < num_experiments; i++) {
       nnt = tree4.searchKnn(x, num_neighs);
+      // nnt = tree4.searchBall(x, 0.0162168 + 1e-4);
+      // 0.0162168
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -417,20 +419,23 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
 BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
   // compare the two SO3 Implementations
 
+  std::srand(0);
   nigh::Nigh<MyNodeQuat, nigh::SO3Space<double>, MyNodeKeyQuat,
              nigh::NoThreadSafety, nigh::KDTreeBatch<32>>
       nn;
 
-  std::srand(0);
-  using TreeR4 = jk::tree::KDTree<int, 4, 32, double, jk::tree::SO3<double>>;
+  // using TreeQuat = jk::tree::KDTree<int, 4, 32, double,
+  // jk::tree::SO3<double>>;
+  using TreeQuat =
+      jk::tree::KDTree<int, 4, 32, double, jk::tree::SO3Squared<double>>;
 
-  TreeR4 tree4(-1);
+  TreeQuat tree4(-1);
 
   Eigen::VectorXd x = Eigen::VectorXd::Random(4);
   Eigen::Vector4d x4 = x;
   x4.normalize();
 
-  Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, 100000);
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, 1000000);
 
   bool real_part_positive = true;
   int index_real_part = 3;
@@ -466,7 +471,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     double dist = std::numeric_limits<double>::max();
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < X.cols(); ++i) {
-      double d = std::min((X.col(i) - x).norm(), (X.col(i) + x).norm());
+      double d = std::min((X.col(i) - x4).norm(), (X.col(i) + x4).norm());
       if (d < dist) {
         dist = d;
         best = i;
@@ -504,17 +509,20 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     }
     std::cout << "dt nigh:" << dt << std::endl;
   }
-  std::vector<TreeR4::DistancePayload> nnt;
+  std::vector<TreeQuat::DistancePayload> nnt;
   {
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < num_experiments; i++) {
-      nnt = tree4.searchKnn(x4, num_neighs);
+      // nnt = tree4.searchKnn(x4, num_neighs);
+      nnt = tree4.searchBall(x4, 0.000695807 + 1e-8);
+      // 0.0263781 + 1e-5);
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+
     for (size_t j = 0; j < nnt.size(); ++j) {
       std::cout << nnt[j].payload << " " << nnt[j].distance << std::endl;
     }
@@ -565,10 +573,13 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     std::vector<ompl::base::State *> nbh;
 
     // free memory...
+    // tt->nearestK(query, num_neighs, nbh);
+    // ompl tree:5.4935e-05
 
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < num_experiments; i++) {
-      tt->nearestK(query, num_neighs, nbh);
+      // tt->nearestR(query, 0.0263789 + 1e-5, nbh);
+      tt->nearestK(query, 10, nbh);
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -578,6 +589,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     std::cout << "nns " << std::endl;
     for (size_t j = 0; j < nbh.size(); ++j) {
       space->printState(nbh[j]);
+      std::cout << tt->getDistanceFunction()(nbh[j], query) << std::endl;
     }
     //
     std::cout << "ompl tree:" << dt << std::endl;
@@ -594,6 +606,13 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     //
     // using state_t = ompl::base::ScopedState<ompl::base::SO3StateSpace> ;
   }
+}
 
-  // TODO: try R3 x SO(3) and R9 x SO(3)
+// TODO: try R3 x SO(3) and R9 x SO(3)
+BOOST_AUTO_TEST_CASE(t_se3)
+{
+  // and high dims!
+
+
+
 }
