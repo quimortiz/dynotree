@@ -1,6 +1,9 @@
 #include "nigh/nigh_forward.hpp"
 #define BOOST_TEST_MODULE test_0
 #define BOOST_TEST_DYN_LINK
+#include "ompl/base/ScopedState.h"
+#include "ompl/base/spaces/SO3StateSpace.h"
+#include "ompl/datastructures/NearestNeighborsGNAT.h"
 #include <boost/test/unit_test.hpp>
 
 #include <chrono>
@@ -120,56 +123,6 @@ BOOST_AUTO_TEST_CASE(t_hello3)
     }
   }
 }
-
-// SO3
-
-#if 0
-  {
-
-    std::srand(0);
-    using tree_t = jk::tree::KDTree<size_t, 4, 4, double, jk::tree::SO3<double>>;
-
-    using point_t = Eigen::Vector4d;
-    tree_t tree;
-
-    std::vector<point_t> points;
-    size_t N = 100;
-    for (size_t ii = 0; ii < N; ++ii) {
-      Eigen::Vector4d v = Eigen::Vector4d::Random().normalized();
-      points.push_back(point_t(v));
-      tree.addPoint(point_t(v), ii);
-    }
-
-    double radius = .2;
-
-    for (size_t jj = 0; jj < 100; ++jj) {
-
-      Eigen::Vector4d vv = Eigen::Vector4d::Random().normalized();
-      point_t lazyMonsterLocation(vv);
-      auto lazyMonsterVictims = tree.searchBall(lazyMonsterLocation, radius);
-      double min_distance = std::numeric_limits<double>::max();
-      int counter = 0;
-      for (size_t ii = 0; ii < points.size(); ++ii) {
-        double d = jk::tree::SO3<double>::distance(points[ii], lazyMonsterLocation);
-        // double d = jk::tree::SquaredL2::distance(points[ii],
-        // lazyMonsterLocation);
-        if (d < radius) {
-          counter++;
-        }
-      }
-
-      std::cout << "counter/size: " << counter << " "
-                << lazyMonsterVictims.size() << std::endl;
-      if (counter != lazyMonsterVictims.size()) {
-        std::cout << "Error: " << counter << " " << lazyMonsterVictims.size()
-                  << std::endl;
-        throw std::runtime_error("Error");
-      }
-    }
-  }
-#endif
-
-// SE2
 
 BOOST_AUTO_TEST_CASE(t_hello4) {
   std::srand(0);
@@ -479,11 +432,25 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
 
   Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, 100000);
 
-  for (size_t i = 0; i < X.cols(); ++i) {
-    X.col(i).normalize();
+  bool real_part_positive = true;
+  int index_real_part = 3;
+
+  if (real_part_positive) {
+    if (x4(index_real_part) < 0) {
+      x4 *= -1;
+    }
   }
 
-  int num_neighs = 1;
+  for (size_t i = 0; i < X.cols(); ++i) {
+    X.col(i).normalize();
+    if (real_part_positive) {
+      if (X.col(i)(index_real_part) < 0) {
+        X.col(i) *= -1;
+      }
+    }
+  }
+
+  int num_neighs = 10;
 
   for (size_t i = 0; i < X.cols(); ++i) {
     Eigen::Vector4d q = X.col(i);
@@ -531,7 +498,9 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
         1.e-9 *
         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     for (size_t j = 0; j < nbh.size(); ++j) {
-      std::cout << nbh[j].first.id << " " << nbh[j].second << std::endl;
+      std::cout << nbh[j].first.id << " "
+                << nbh[j].first.point_.coeffs().transpose() << " "
+                << nbh[j].second << std::endl;
     }
     std::cout << "dt nigh:" << dt << std::endl;
   }
@@ -555,4 +524,76 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
 
   std::cout << "best: " << best << " " << nnt[0].payload << std::endl;
   BOOST_TEST(best == nnt[0].payload);
+
+  // ompl
+  {
+    ompl::base::StateSpacePtr space(new ompl::base::SO3StateSpace());
+
+    std::vector<ompl::base::State *> states;
+
+    for (size_t i = 0; i < X.cols(); ++i) {
+      ompl::base::State *state = space->allocState();
+
+      auto ptr = state->as<ompl::base::SO3StateSpace::StateType>();
+      ptr->x = X.col(i)(0);
+      ptr->y = X.col(i)(1);
+      ptr->z = X.col(i)(2);
+      ptr->w = X.col(i)(3);
+      states.push_back(state);
+    }
+
+    // state->setY(0.2);
+    // state->setYaw(0.0);
+
+    ompl::NearestNeighbors<ompl::base::State *> *tt =
+        new ompl::NearestNeighborsGNAT<ompl::base::State *>();
+
+    tt->setDistanceFunction(
+        [&](auto &a, auto &b) { return space->distance(a, b); });
+
+    for (auto &s : states)
+      tt->add(s);
+
+    ompl::base::State *query = space->allocState();
+
+    auto ptr = query->as<ompl::base::SO3StateSpace::StateType>();
+    ptr->x = x4(0);
+    ptr->y = x4(1);
+    ptr->z = x4(2);
+    ptr->w = x4(3);
+
+    std::vector<ompl::base::State *> nbh;
+
+    // free memory...
+
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < num_experiments; i++) {
+      tt->nearestK(query, num_neighs, nbh);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+    std::cout << "nns " << std::endl;
+    for (size_t j = 0; j < nbh.size(); ++j) {
+      space->printState(nbh[j]);
+    }
+    //
+    std::cout << "ompl tree:" << dt << std::endl;
+
+    for (size_t i = 0; i < states.size(); ++i) {
+      space->freeState(states[i]);
+    }
+
+    space->freeState(query);
+
+    // t
+
+    // ompl::base::SO3StateSpace space;
+    //
+    // using state_t = ompl::base::ScopedState<ompl::base::SO3StateSpace> ;
+  }
+
+  // TODO: try R3 x SO(3) and R9 x SO(3)
 }
