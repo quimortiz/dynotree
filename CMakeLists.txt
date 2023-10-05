@@ -36,8 +36,8 @@ target_include_directories(main PRIVATE include deps/nigh/src ${OMPL_INCLUDE_DIR
 target_link_libraries(main PRIVATE Eigen3::Eigen Boost::unit_test_framework Boost::filesystem ${OMPL_LIBRARIES})
 
 
-pybind11_add_module(pykdtree src/pykdtree.cpp)
-target_include_directories(pykdtree PRIVATE include )
-target_link_libraries(pykdtree PRIVATE Eigen3::Eigen)
+pybind11_add_module(dynotree src/pykdtree.cpp)
+target_include_directories(dynotree PRIVATE include )
+target_link_libraries(dynotree PRIVATE Eigen3::Eigen)
 
-set_property(TARGET pykdtree PROPERTY POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET dynotree PROPERTY POSITION_INDEPENDENT_CODE ON)

@@ -28,7 +28,7 @@ void declare_tree(py::module &m, const std::string &name) {
       .def("searchKnn", &T::searchKnn);    // search
 }
 
-PYBIND11_MODULE(pykdtree, m) {
+PYBIND11_MODULE(dynotree, m) {
   m.doc() = "pybind11 example plugin"; // optional module docstring
 
   m.def("add", &add, "A function that adds two numbers");
