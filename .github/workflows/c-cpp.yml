@@ -44,7 +44,7 @@ jobs:
     - name: Check Python
       run: |
            cd build
-           python3 -c "import pykdtree"
+           python3 -c "import dynotree"
     - name: Python Install Dependencies
       run: |
            pip3 install numpy
