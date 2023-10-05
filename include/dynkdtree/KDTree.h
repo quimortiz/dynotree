@@ -146,6 +146,7 @@ void choose_split_dimension_default(T lb, T ub, int &ii, Scalar &width) {
 template <typename Scalar, int Dimensions> struct L1 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
@@ -190,6 +191,29 @@ template <typename Scalar, int Dimensions> struct L1 {
 template <typename Scalar> struct SO2 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 1, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 1, 1>>;
+
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+
+    assert(t >= 0);
+    assert(t <= 1);
+
+    Eigen::Matrix<Scalar, 1, 1> d = to - from;
+
+    if (d(0) > M_PI) {
+      d(0) -= 2 * M_PI;
+    } else if (d(0) < -M_PI) {
+      d(0) += 2 * M_PI;
+    }
+
+    out = from + t * d;
+
+    if (out(0) > M_PI) {
+      out(0) -= 2 * M_PI;
+    } else if (out(0) < -M_PI) {
+      out(0) += 2 * M_PI;
+    }
+  }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
@@ -247,8 +271,13 @@ template <typename Scalar> struct SO2 {
 template <typename Scalar> struct SO2Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 1, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 1, 1>>;
 
   SO2<Scalar> so2;
+
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    so2.interpolate(from, to, t, out);
+  }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
@@ -270,6 +299,13 @@ template <typename Scalar> struct SO2Squared {
 template <typename Scalar, int Dimensions> struct L2Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    assert(t >= 0);
+    assert(t <= 1);
+    out = from + t * (to - from);
+  }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
@@ -320,7 +356,17 @@ template <typename Scalar, int Dimensions> struct L2Squared {
 
 template <typename Scalar, int Dimensions> struct L2 {
 
+  using L2squared = L2Squared<Scalar, Dimensions>;
+  L2squared l2squared;
+
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    assert(t >= 0);
+    assert(t <= 1);
+    out = from + t * (to - from);
+  }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
@@ -328,14 +374,65 @@ template <typename Scalar, int Dimensions> struct L2 {
 
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
-    double d = L2Squared<Scalar, Dimensions>::distanceToRect(location1, lb, ub);
+    double d = l2squared.distanceToRect(location1, lb, ub);
     return std::sqrt(d);
   };
 
   Scalar distance(cref_t &location1, cref_t &location2) const {
-    double d = L2Squared<Scalar, Dimensions>::distance(location1, location2);
+    double d = l2squared.distance(location1, location2);
     return std::sqrt(d);
   }
+};
+
+template <typename Scalar> struct R2SO2 {
+
+  using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 3, 1>> ;
+
+
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
+  double angular_weight = 1.0;
+
+  L2<Scalar, 2> l2;
+  SO2<Scalar> so2;
+
+
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    assert(t >= 0);
+    assert(t <= 1);
+    l2.interpolate(from.template head<2>(), to.template head<2>(), t,
+                   out.template head<2>());
+    so2.interpolate(from.template tail<1>(), to.template tail<1>(), t,
+                    out.template tail<1>());
+    std::cout << out.transpose() << std::endl;
+
+  }
+
+
+
+
+  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
+
+    double d1 = l2.distanceToRect(location1.template head<2>(),
+                                  lb.template head<2>(), ub.template head<2>());
+    double d2 =
+        so2.distanceToRect(location1.template tail<1>(), lb.template tail<1>(),
+                           ub.template tail<1>());
+    return d1 + angular_weight * d2;
+  }
+
+  Scalar distance(cref_t location1, cref_t location2) const {
+
+    double d1 =
+        l2.distance(location1.template head<2>(), location2.template head<2>());
+    double d2 = so2.distance(location1.template tail<1>(),
+                             location2.template tail<1>());
+    return d1 + angular_weight * d2;
+  };
 };
 
 template <typename Scalar> struct R2SO2Squared {
@@ -374,8 +471,13 @@ template <typename Scalar> struct R2SO2Squared {
 template <typename Scalar> struct SO3Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 4, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 4, 1>>;
 
   L2Squared<Scalar, 4> l2squared;
+
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    throw std::runtime_error("not implemented interpolate in so3");
+  }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
@@ -607,10 +709,18 @@ public:
   using scalar_t = Scalar;
   using payload_t = Payload;
   using point_t = Eigen::Matrix<Scalar, Dimensions, 1>;
+  using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
   int m_dimensions = Dimensions;
   static const std::size_t bucketSize = BucketSize;
   // TODO: I also want Dimensions at runtime!!
   using tree_t = KDTree<Payload, Dimensions, BucketSize, Scalar, Distance>;
+
+  void interpolate(cref_t from, cref_t to, Scalar t,
+                   ref_t out) const {
+    distance_fun.interpolate(from, to, t, out);
+    std::cout << "out is 2 " << out.transpose() << std::endl;
+  }
 
   Distance &getDistanceFun() { return distance_fun; }
 

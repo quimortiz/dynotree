@@ -48,7 +48,12 @@ jobs:
     - name: Python Install Dependencies
       run: |
            pip3 install numpy
-    - name: Run Python
+           pip3 install matplotlib
+    - name: Run Python Basic
       run: |
            cd build
            python3 ../test/python/main.py
+    - name: Run Python RRT
+      run: |
+           cd build
+           python3 ../test/python/rrt.py
