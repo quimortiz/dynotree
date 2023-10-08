@@ -5,6 +5,50 @@ C++ with Python Bindings
 
 The KD-tree implementation is based on [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree)
 
+
+# Try out 
+
+```bash
+pip3 install dynotree
+```
+
+A first example:
+
+
+```python
+
+TODO
+```
+
+
+# C++
+
+instructions here
+
+
+# DEV
+
+
+## Testing
+
+
+
+## Create wheels
+
+for publishing in pypy
+```bash
+docker pull quay.io/pypa/manylinux2014_x86_64
+docker run -it -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 /io/build-wheels.sh
+python3 -m twine upload --repository testpypi wheelhouse/*
+```
+
+
+for creating local package:
+```bash
+TODO
+```
+
+
 # Why dyn_kdtree?
 
 * Faster than OMPL and simpler than NIGH
