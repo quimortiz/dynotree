@@ -47,5 +47,3 @@ if (BUILD_TESTING)
   target_include_directories(main PRIVATE include deps/nigh/src ${OMPL_INCLUDE_DIRS})
   target_link_libraries(main PRIVATE Eigen3::Eigen Boost::unit_test_framework Boost::filesystem ${OMPL_LIBRARIES})
 ENDIF (BUILD_TESTING)
-
-

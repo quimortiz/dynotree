@@ -1,6 +1,6 @@
-
 import sys
-sys.path.append('.')
+
+sys.path.append(".")
 
 import numpy as np
 from typing import Tuple, List
@@ -11,10 +11,7 @@ np.random.seed(0)
 
 
 # ref: https://paulbourke.net/geometry/pointlineplane/
-def distance_point_to_segment(
-        p1: np.ndarray,
-        p2: np.ndarray,
-        p3: np.ndarray) -> float:
+def distance_point_to_segment(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> float:
     """
     p1, p2: two points defining the segment
     p3: the point
@@ -28,8 +25,8 @@ def distance_point_to_segment(
 # a robot is a segment.
 
 
-length = .5
-radius = .01
+length = 0.5
+radius = 0.01
 
 
 def compute_two_points(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -47,13 +44,12 @@ def compute_two_points(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
 xlim = [0, 3]
 ylim = [0, 3]
 
-obstacles = [(np.array([1, .4]), 0.5),
-             (np.array([1, 2]), 0.5)]
+obstacles = [(np.array([1, 0.4]), 0.5), (np.array([1, 2]), 0.5)]
 
 
 def plot_env(ax, env):
     for obs in obstacles:
-        ax.add_patch(plt.Circle((obs[0]), obs[1], color='blue', alpha=0.5))
+        ax.add_patch(plt.Circle((obs[0]), obs[1], color="blue", alpha=0.5))
 
 
 def plot_robot(ax, x, color="black", alpha=1.0):
@@ -76,7 +72,7 @@ def is_collision(x: np.ndarray) -> bool:
 
 fig, ax = plt.subplots()
 start = np.array([0.1, 0.1, np.pi / 2])
-goal = np.array([2., .2, 0])
+goal = np.array([2.0, 0.2, 0])
 
 
 plot_env(ax, obstacles)
@@ -88,7 +84,7 @@ plot_robot(ax, goal, "red")
 
 ax.set_xlim(xlim)
 ax.set_ylim(ylim)
-ax.set_aspect('equal')
+ax.set_aspect("equal")
 ax.set_title("env, start and goal configurations")
 
 
@@ -102,8 +98,7 @@ fig, ax = plt.subplots()
 N = 100
 
 for i in range(N):
-    x = np.random.rand(
-        3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
+    x = np.random.rand(3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
     is_col = is_collision(x)
     if is_col:
         plot_robot(ax, x, color="gray")
@@ -118,7 +113,7 @@ plot_env(ax, obstacles)
 
 ax.set_xlim(xlim)
 ax.set_ylim(ylim)
-ax.set_aspect('equal')
+ax.set_aspect("equal")
 ax.set_title("random configurations - collisions")
 
 plt.show()
@@ -132,7 +127,7 @@ plot_robot(ax, goal, "red")
 plot_env(ax, obstacles)
 ax.set_xlim(xlim)
 ax.set_ylim(ylim)
-ax.set_aspect('equal')
+ax.set_aspect("equal")
 ax.set_title("interpolation")
 
 
@@ -148,7 +143,7 @@ for i in range(N):
 plt.show()
 
 # now lets solve rrt!
-goal_bias = .1
+goal_bias = 0.1
 max_steps = 1000
 
 check_cols = 10
@@ -162,19 +157,18 @@ valid_configs.append(start)
 parents.append(-1)
 # num_points_in_tree += 1
 
-max_expansion = 1.
+max_expansion = 1.0
 
 solved = False
 for i in range(max_steps):
-    xrand = np.random.rand(
-        3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
+    xrand = np.random.rand(3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
     if np.random.rand() < goal_bias:
         xrand = np.copy(goal)
     # find nearest neighbor
     nn = tree.searchKnn(xrand, 1)[0]
     xnear = valid_configs[nn.payload]
-    advance_rate = min( max_expansion / nn.distance , 1.)
-    print("advance_rate", advance_rate )
+    advance_rate = min(max_expansion / nn.distance, 1.0)
+    print("advance_rate", advance_rate)
     xnew = np.zeros(3)
     interpolate_fun(xnear, xrand, advance_rate, xnew)
     collision = False
@@ -198,7 +192,7 @@ fig, ax = plt.subplots()
 plot_env(ax, obstacles)
 ax.set_xlim(xlim)
 ax.set_ylim(ylim)
-ax.set_aspect('equal')
+ax.set_aspect("equal")
 
 
 print("done")
@@ -216,8 +210,12 @@ for p, i in enumerate(parents):
     if i != -1:
         # plot_robot(ax, valid_configs[i], color="gray")
         # plot_robot(ax, valid_configs[p], color="gray")
-        ax.plot([valid_configs[i][0], valid_configs[p][0]], [
-                valid_configs[i][1], valid_configs[p][1]], color="yellow", linestyle="dashed")
+        ax.plot(
+            [valid_configs[i][0], valid_configs[p][0]],
+            [valid_configs[i][1], valid_configs[p][1]],
+            color="yellow",
+            linestyle="dashed",
+        )
 
 
 # trace back the solution
@@ -240,9 +238,9 @@ for i in range(len(path) - 1):
     for i in range(N):
         out = np.zeros(3)
         interpolate_fun(_start, _goal, i / N, out)
-        plot_robot(ax, out, color="gray", alpha=.5)
+        plot_robot(ax, out, color="gray", alpha=0.5)
 # add the last configuration
-plot_robot(ax, path[-1], color="gray", alpha=.5)
+plot_robot(ax, path[-1], color="gray", alpha=0.5)
 
 
 for p in path:
@@ -256,5 +254,3 @@ plt.show()
 
 
 # just build rrt
-
-

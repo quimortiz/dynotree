@@ -6,7 +6,7 @@ C++ with Python Bindings
 The KD-tree implementation is based on [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree)
 
 
-# Try out 
+# Try out
 
 ```bash
 pip3 install dynotree
@@ -83,17 +83,15 @@ Develop: Eigen and Boost Testing
 
 See this for examples.
 
-# Benchmark 
+# Benchmark
 
-Check this repo for benchmark against 
+Check this repo for benchmark against
 * [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree)
 * OMPL
 * Nigh
-* ... 
- 
+* ...
+
 
 # Roadmap
 
 Code is Stable, currently used in ...
-
-

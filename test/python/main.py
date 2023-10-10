@@ -1,14 +1,11 @@
-
-
-
 import sys
 
-sys.path.append('.')
+sys.path.append(".")
 
 
 import dynotree
 import numpy as np
-import  time 
+import time
 
 
 num_points = 10000
@@ -43,13 +40,13 @@ for i in range(num_points):
 k = np.array([0.81, 0.15])
 
 tic = time.time()
-o = a.searchKnn(k,5)
+o = a.searchKnn(k, 5)
 toc = time.time()
 print("elapsed time: ", toc - tic)
 # print(o[0].payload)
 
 tic = time.time()
-oo = b.searchKnn(k,5)
+oo = b.searchKnn(k, 5)
 toc = time.time()
 print("elapsed time: ", toc - tic)
 
@@ -63,20 +60,19 @@ for i in range(num_points):
     a.addPoint(x, i, True)
     b.addPoint(x, i, True)
 
-k = np.array([0.81, 0.15, .1, .2])
+k = np.array([0.81, 0.15, 0.1, 0.2])
 
 tic = time.time()
-o = a.searchKnn(k,2)
+o = a.searchKnn(k, 2)
 toc = time.time()
 print("elapsed time: ", toc - tic)
 print(o[0].payload)
 
 tic = time.time()
-o = b.searchKnn(k,2)
+o = b.searchKnn(k, 2)
 toc = time.time()
 print("elapsed time: ", toc - tic)
 print(o[0].payload)
-
 
 
 a = dynotree.TreeRX(7)
@@ -87,21 +83,16 @@ for i in range(num_points):
     a.addPoint(x, i, True)
     b.addPoint(x, i, True)
 
-k = np.array([0.81, 0.15, .1, .2, 0.1 , 0.1, .5])
+k = np.array([0.81, 0.15, 0.1, 0.2, 0.1, 0.1, 0.5])
 
 tic = time.time()
-o = a.searchKnn(k,2)
+o = a.searchKnn(k, 2)
 toc = time.time()
 print("elapsed time: ", toc - tic)
 print(o[0].payload)
 
 tic = time.time()
-o = b.searchKnn(k,2)
+o = b.searchKnn(k, 2)
 toc = time.time()
 print("elapsed time: ", toc - tic)
 print(o[0].payload)
-
-
-
-
-
