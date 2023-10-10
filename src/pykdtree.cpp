@@ -7,8 +7,6 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-
-
 int add(int i, int j) { return i + j; }
 
 // PYBIND11_MODULE(example, m) {

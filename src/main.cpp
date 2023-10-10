@@ -609,10 +609,6 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
 }
 
 // TODO: try R3 x SO(3) and R9 x SO(3)
-BOOST_AUTO_TEST_CASE(t_se3)
-{
+BOOST_AUTO_TEST_CASE(t_se3) {
   // and high dims!
-
-
-
 }

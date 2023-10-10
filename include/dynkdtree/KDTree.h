@@ -387,9 +387,7 @@ template <typename Scalar, int Dimensions> struct L2 {
 template <typename Scalar> struct R2SO2 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
-  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 3, 1>> ;
-
-
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 3, 1>>;
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
@@ -400,7 +398,6 @@ template <typename Scalar> struct R2SO2 {
   L2<Scalar, 2> l2;
   SO2<Scalar> so2;
 
-
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     assert(t >= 0);
     assert(t <= 1);
@@ -409,11 +406,7 @@ template <typename Scalar> struct R2SO2 {
     so2.interpolate(from.template tail<1>(), to.template tail<1>(), t,
                     out.template tail<1>());
     std::cout << out.transpose() << std::endl;
-
   }
-
-
-
 
   Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
@@ -716,8 +709,7 @@ public:
   // TODO: I also want Dimensions at runtime!!
   using tree_t = KDTree<Payload, Dimensions, BucketSize, Scalar, Distance>;
 
-  void interpolate(cref_t from, cref_t to, Scalar t,
-                   ref_t out) const {
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     distance_fun.interpolate(from, to, t, out);
     std::cout << "out is 2 " << out.transpose() << std::endl;
   }
