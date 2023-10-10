@@ -13,8 +13,10 @@ pip3 install dynotree
 ```
 
 A first example:
+[rrt_free.py](test/python/rrt_free.py)
 
-Check [rrt_free.py](test/python/rrt_free.py)
+A second example:
+[rrt.py](https://github.com/quimortiz/dyn_kdtree/blob/main/test/python/rrt.py)
 
 
 
