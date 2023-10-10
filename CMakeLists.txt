@@ -12,8 +12,11 @@ cmake_minimum_required(VERSION 3.0)
 find_package(Eigen3 REQUIRED)
 
 
-set(BUILD_PYTHON ON)
-set(BUILD_TESTING OFF)
+option(BUILD_PYTHON ON)
+option(BUILD_TESTING OFF)
+
+message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
+message(STATUS "BUILD_PYTHON: ${BUILD_PYTHON}")
 
 
 IF (BUILD_PYTHON)

@@ -39,6 +39,11 @@ for publishing in pypy
 ```bash
 docker pull quay.io/pypa/manylinux2014_x86_64
 docker run -it -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 /io/build-wheels.sh
+python3 -m twine upload wheelhouse/*
+```
+
+using testpypi
+```bash
 python3 -m twine upload --repository testpypi wheelhouse/*
 ```
 
