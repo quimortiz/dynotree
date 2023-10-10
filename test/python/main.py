@@ -6,15 +6,14 @@ import sys
 sys.path.append('.')
 
 
-
-import pykdtree
+import dynotree
 import numpy as np
 import  time 
 
 
 num_points = 10000
 
-a = pykdtree.TreeRX(2)
+a = dynotree.TreeRX(2)
 
 a.addPoint(np.array([0, 0]), 0, True)
 a.addPoint(np.array([0, 1]), 1, True)
@@ -24,7 +23,7 @@ print(nn)
 print(nn.distance)
 print(nn.payload)
 
-b = pykdtree.TreeR2(-1)
+b = dynotree.TreeR2(-1)
 b.addPoint(np.array([0, 0]), 0, True)
 b.addPoint(np.array([0, 1]), 1, True)
 b.addPoint(np.array([0, 2]), 2, True)
@@ -33,8 +32,8 @@ print(nn)
 print(nn.distance)
 print(nn.payload)
 
-a = pykdtree.TreeRX(2)
-b = pykdtree.TreeR2(-1)
+a = dynotree.TreeRX(2)
+b = dynotree.TreeR2(-1)
 
 for i in range(num_points):
     x = np.random.rand(2)
@@ -56,8 +55,8 @@ print("elapsed time: ", toc - tic)
 
 # print(o[0].payload)
 
-a = pykdtree.TreeRX(4)
-b = pykdtree.TreeR4(-1)
+a = dynotree.TreeRX(4)
+b = dynotree.TreeR4(-1)
 
 for i in range(num_points):
     x = np.random.rand(4)
@@ -80,8 +79,8 @@ print(o[0].payload)
 
 
 
-a = pykdtree.TreeRX(7)
-b = pykdtree.TreeR7(-1)
+a = dynotree.TreeRX(7)
+b = dynotree.TreeR7(-1)
 
 for i in range(num_points):
     x = np.random.rand(7)

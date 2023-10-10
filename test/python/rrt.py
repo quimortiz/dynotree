@@ -1,4 +1,7 @@
 
+import sys
+sys.path.append('.')
+
 import numpy as np
 from typing import Tuple, List
 import matplotlib.pyplot as plt
@@ -159,6 +162,7 @@ valid_configs.append(start)
 parents.append(-1)
 # num_points_in_tree += 1
 
+max_expansion = 1.
 
 solved = False
 for i in range(max_steps):
@@ -169,15 +173,15 @@ for i in range(max_steps):
     # find nearest neighbor
     nn = tree.searchKnn(xrand, 1)[0]
     xnear = valid_configs[nn.payload]
-    # interpolate
-    out = np.zeros(3)
-    interpolate_fun(xnear, xrand, 1, out)
-    xnew = out
+    advance_rate = min( max_expansion / nn.distance , 1.)
+    print("advance_rate", advance_rate )
+    xnew = np.zeros(3)
+    interpolate_fun(xnear, xrand, advance_rate, xnew)
     collision = False
+    __tmp = np.zeros(3)
     for j in range(check_cols + 1):
-        out = np.zeros(3)
-        interpolate_fun(xnear, xrand, j / check_cols, out)
-        if is_collision(out):
+        interpolate_fun(xnear, xnew, j / check_cols, __tmp)
+        if is_collision(__tmp):
             collision = True
             break
     if not collision:
@@ -249,3 +253,8 @@ print("path", path)
 
 ax.set_title("rrt solution")
 plt.show()
+
+
+# just build rrt
+
+

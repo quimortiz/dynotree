@@ -57,3 +57,4 @@ jobs:
       run: |
            cd build
            python3 ../test/python/rrt.py
+           python3 ../test/python/rrt_free.py

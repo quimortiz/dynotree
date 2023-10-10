@@ -14,11 +14,8 @@ pip3 install dynotree
 
 A first example:
 
+Check [rrt_free.py](test/python/rrt_free.py)
 
-```python
-
-TODO
-```
 
 
 # C++
