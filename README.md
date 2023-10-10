@@ -34,7 +34,7 @@ make
 ./main
 ```
 
-use 
+use
 ```
 ./main --run_test=NAME_OF_TEST
 ```
@@ -92,6 +92,7 @@ TODO
 # Dependencies
 
 Python: No dependencies
+
 
 C++ Code: Eigen
 
