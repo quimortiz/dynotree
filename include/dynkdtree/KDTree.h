@@ -246,6 +246,7 @@ template <typename Scalar> struct SO2 {
       return std::min(d1, d2);
     } else {
       assert(false);
+      return 0;
     }
   }
 
@@ -534,6 +535,39 @@ template <typename Scalar> struct R3SO3Squared {
 
   L2Squared<Scalar, 3> l2;
   SO3Squared<Scalar> so3;
+
+  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
+
+    double d1 = l2.distanceToRect(location1.template head<3>(),
+                                  lb.template head<3>(), ub.template head<3>());
+
+    double d2 =
+        so3.distanceToRect(location1.template tail<4>(), lb.template tail<4>(),
+                           ub.template tail<4>());
+
+    return d1 + d2;
+  }
+
+  double distance(cref_t location1, cref_t location2) const {
+
+    double d1 =
+        l2.distance(location1.template head<3>(), location2.template head<3>());
+    double d2 = so3.distance(location1.template tail<4>(),
+                             location2.template tail<4>());
+    return d1 + d2;
+  };
+};
+
+template <typename Scalar> struct R3SO3 {
+
+  using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 7, 1>> &;
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
+  L2<Scalar, 3> l2;
+  SO3<Scalar> so3;
 
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
