@@ -8,6 +8,8 @@ The KD-tree implementation is based on [bucket-pr-kdtree](https://github.com/jkf
 
 # Try out
 
+## PYTHON
+
 ```bash
 pip3 install dynotree
 ```
@@ -18,11 +20,24 @@ A first example:
 A second example:
 [rrt.py](https://github.com/quimortiz/dyn_kdtree/blob/main/test/python/rrt.py)
 
+## C++
 
+Test and examples are in  [main.cpp](https://github.com/quimortiz/dyn_kdtree/blob/main/src/main.cpp)
 
-# C++
-
-instructions here
+```bash
+git clone --recurse-submodules https://github.com/quimortiz/dyn_kdtree
+cd dyn_kdtree
+mkdir build
+cd build
+cmake ..
+make
+./main
+```
+use 
+```
+./main --run_test=NAME_OF_TEST
+```
+to run only one example or test
 
 
 # DEV
