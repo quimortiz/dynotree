@@ -6,7 +6,7 @@ C++ with Python Bindings
 The KD-tree implementation is based on [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree)
 
 
-# Try out
+# Try it out!
 
 ## PYTHON
 
