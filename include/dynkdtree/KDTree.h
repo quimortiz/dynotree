@@ -149,6 +149,12 @@ template <typename Scalar, int Dimensions = -1> struct L1 {
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
 
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    assert(t >= 0);
+    assert(t <= 1);
+    out = from + t * (to - from);
+  }
+
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
   }
@@ -503,11 +509,16 @@ template <typename Scalar> struct SO3Squared {
 template <typename Scalar> struct SO3 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 4, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 4, 1>>;
 
   SO3Squared<Scalar> so3squared;
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
+  }
+
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    throw std::runtime_error("not implemented interpolate in so3");
   }
 
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
@@ -625,6 +636,7 @@ template <typename Scalar> struct Combined {
   // TODO: test this!! How i am going to give this as input? -- it is not a
   // static function anymore...
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, -1, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, -1, 1>>;
 
   using Space =
       std::variant<L1<Scalar>, L2<Scalar>, L2Squared<Scalar>, SO2<Scalar>,
@@ -681,6 +693,24 @@ template <typename Scalar> struct Combined {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+
+    assert(spaces.size() == dims.size());
+    assert(spaces.size());
+    double d = 0;
+    int counter = 0;
+    for (size_t i = 0; i < spaces.size(); i++) {
+      std::visit(
+          [&](const auto &obj) {
+            obj.interpolate(from.segment(counter, dims[i]),
+                            to.segment(counter, dims[i]), t,
+                            out.segment(counter, dims[i]));
+          },
+          spaces[i]);
+      counter += dims[i];
+    }
+  }
+
   Scalar distance(cref_t location1, cref_t location2) const {
 
     assert(spaces.size() == dims.size());
@@ -688,62 +718,13 @@ template <typename Scalar> struct Combined {
     double d = 0;
     int counter = 0;
     for (size_t i = 0; i < spaces.size(); i++) {
-
-      // auto &spacei = spaces[i];
-
       auto caller = [&](const auto &obj) {
         return obj.distance(location1.segment(counter, dims[i]),
                             location2.segment(counter, dims[i]));
       };
 
       d += std::visit(caller, spaces[i]);
-
       counter += dims[i];
-
-      //   switch (spaces[i]) {
-      //   case DistanceType::L1: {
-      //     d += L1<Scalar, -1>::distance(
-      //         location1.template segment(counter, dims[i]),
-      //         location2.template segment(counter, dims[i]));
-      //   } break;
-      //   case DistanceType::L2: {
-      //     d += L2<Scalar, -1>::distance(
-      //         location1.template segment(counter, dims[i]),
-      //         location2.template segment(counter, dims[i]));
-      //   } break;
-      //   case DistanceType::L2Squared: {
-      //     d += L2Squared<Scalar, -1>::distance(
-      //         location1.template segment(counter, dims[i]),
-      //         location2.template segment(counter, dims[i]));
-      //   } break;
-      //   case DistanceType::SO2: {
-      //     assert(dims[i] == 1);
-      //     d += SO2<Scalar>::distance(location1.template segment<1>(counter),
-      //                                location2.template segment<1>(counter));
-      //   } break;
-      //   case DistanceType::SO2Squared: {
-      //     assert(dims[i] == 1);
-      //     d += SO2Squared<Scalar>::distance(
-      //         location1.template segment<1>(counter),
-      //         location2.template segment<1>(counter));
-      //   } break;
-      //   case DistanceType::SO3: {
-      //     assert(dims[i] == 4);
-      //     d += SO3<Scalar>::distance(location1.template segment<4>(counter),
-      //                                location2.template segment<4>(counter));
-      //   } break;
-      //   case DistanceType::SO3Squared: {
-      //     assert(dims[i] == 4);
-      //     d += SO3Squared<Scalar>::distance(
-      //         location1.template segment<4>(counter),
-      //         location2.template segment<4>(counter));
-      //   } break;
-      //   default:
-      //     assert(false);
-      //   }
-      //   counter += dims[i];
-      // }
-      // return d;
     }
     return d;
   }

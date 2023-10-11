@@ -130,8 +130,12 @@ ax.set_ylim(ylim)
 ax.set_aspect("equal")
 ax.set_title("interpolation")
 
+static = False
 
-tree = dynotree.TreeR2SO2(-1)
+if static:
+    tree = dynotree.TreeR2SO2(-1)
+else:
+    tree = dynotree.TreeX(3, ["L2:2", "SO2"])
 
 interpolate_fun = tree.interpolate
 N = 10
