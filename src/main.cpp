@@ -624,10 +624,37 @@ BOOST_AUTO_TEST_CASE(t_se3) {
   // jk::tree::SO3<double>>;
   using TreeR3SO3 =
       jk::tree::KDTree<int, 7, 32, double, jk::tree::R3SO3<double>>;
+
+  using TreeR3SO3X =
+      jk::tree::KDTree<int, -1, 32, double, jk::tree::Combined<double>>;
+
+  // template <class Payload, int Dimensions, std::size_t BucketSize = 32,
+  //           typename Scalar = double,
+  //           typename Distance = L2Squared<Scalar, Dimensions>>
+  //
+
   // SE3Squared<double>>;
   // SO3Squared<double>>;
 
   TreeR3SO3 tree(-1);
+
+  using Space = jk::tree::Combined<double>::Space;
+  //
+  // std::vector<Space> spaces;
+
+  // TODO: test this!! How i am going to give this as input? -- it is not a
+
+  std::vector<Space> spaces;
+  spaces.push_back(jk::tree::L2<double>());
+  spaces.push_back(jk::tree::SO3<double>());
+  // jk::tree::L2<double>());
+  //
+  // {jk::tree::L2<double>(), jk::tree::SO3<double>()}
+
+  // jk::tree::Combined<double> combi_space(spaces, {3, 4});
+  jk::tree::Combined<double> combi_space({"L2:3", "SO3"});
+  // spaces, {3, 4});
+  TreeR3SO3X treex(7, combi_space);
 
   int nx = 7;
   Eigen::VectorXd x = Eigen::VectorXd::Random(nx);
@@ -662,6 +689,7 @@ BOOST_AUTO_TEST_CASE(t_se3) {
   for (size_t i = 0; i < X.cols(); ++i) {
     V7d q = X.col(i);
     tree.addPoint(q, i);
+    treex.addPoint(q, i);
   }
 
   int best = -1;
@@ -730,11 +758,53 @@ BOOST_AUTO_TEST_CASE(t_se3) {
       std::cout << nnt[j].payload << " " << nnt[j].distance << std::endl;
     }
 
-    std::cout << "dt tree:" << dt << std::endl;
+    std::cout << "my tree:" << dt << std::endl;
   }
 
   std::cout << "best: " << best << " " << nnt[0].payload << std::endl;
   BOOST_TEST(best == nnt[0].payload);
+
+  // my tree dynamic
+  {
+    std::vector<TreeR3SO3X::DistancePayload> nntx;
+    {
+
+      // std::cout << tree.getDistanceFun().distance(x7, x7) <<std::endl;
+      // std::cout << tree.getDistanceFun().distance(x7, X.col(0)) <<std::endl;
+      std::cout << treex.getDistanceFun().distance(x7, X.col(309717))
+                << std::endl;
+      std::cout << treex.getDistanceFun().distanceToRect(x7, X.col(309717),
+                                                         X.col(309717))
+                << std::endl;
+      // 118527)) <<std::endl;
+
+      auto t0 = std::chrono::high_resolution_clock::now();
+      for (size_t i = 0; i < num_experiments; i++) {
+        // nnt = tree.searchKnn(x7, num_neighs);
+        nntx = treex.searchBall(x7, radius_search);
+      }
+
+      auto t1 = std::chrono::high_resolution_clock::now();
+      auto dt =
+          1.e-9 *
+          std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+
+      for (size_t j = 0; j < nnt.size(); ++j) {
+        std::cout << nntx[j].payload << " " << nntx[j].distance << std::endl;
+      }
+
+      std::cout << "my tree dynamic:" << dt << std::endl;
+    }
+
+    std::cout << "best: " << best << " " << nnt[0].payload << std::endl;
+    BOOST_TEST(best == nntx[0].payload);
+
+    for (size_t k = 0; k < std::min(int(nntx.size()), 5); k++) {
+      BOOST_TEST(nntx[0].payload == nnt[0].payload);
+      BOOST_TEST(nntx[0].distance == nnt[0].distance,
+                 boost::test_tools::tolerance(1e-6));
+    }
+  }
 
   // ompl
   {
