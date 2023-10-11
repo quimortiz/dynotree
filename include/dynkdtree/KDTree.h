@@ -161,8 +161,8 @@ template <typename Scalar, int Dimensions = -1> struct L1 {
 
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
-    double d = 0;
-    double dist = 0;
+    Scalar d = 0;
+    Scalar dist = 0;
 
     if constexpr (Dimensions == Eigen::Dynamic) {
 
@@ -173,14 +173,14 @@ template <typename Scalar, int Dimensions = -1> struct L1 {
       assert(location1.size() == lb.size());
 
       for (size_t i = 0; i < location1.size(); i++) {
-        double xx = std::max(lb(i), std::min(ub(i), location1(i)));
-        double dif = xx - location1(i);
+        Scalar xx = std::max(lb(i), std::min(ub(i), location1(i)));
+        Scalar dif = xx - location1(i);
         dist += std::abs(dif);
       }
     } else {
       for (size_t i = 0; i < Dimensions; i++) {
-        double xx = std::max(lb(i), std::min(ub(i), location1(i)));
-        double dif = xx - location1(i);
+        Scalar xx = std::max(lb(i), std::min(ub(i), location1(i)));
+        Scalar dif = xx - location1(i);
         dist += std::abs(dif);
       }
     }
@@ -240,14 +240,14 @@ template <typename Scalar> struct SO2 {
     if (location1(0) >= lb(0) && location1(0) <= ub(0)) {
       return 0;
     } else if (location1(0) > ub(0)) {
-      double d1 = location1(0) - ub(0);
-      double d2 = lb(0) - (location1(0) - 2 * M_PI);
+      Scalar d1 = location1(0) - ub(0);
+      Scalar d2 = lb(0) - (location1(0) - 2 * M_PI);
       assert(d2 >= 0);
       assert(d1 >= 0);
       return std::min(d1, d2);
     } else if (location1(0) < lb(0)) {
-      double d1 = lb(0) - location1(0);
-      double d2 = (location1(0) + 2 * M_PI) - ub(0);
+      Scalar d1 = lb(0) - location1(0);
+      Scalar d2 = (location1(0) + 2 * M_PI) - ub(0);
       assert(d2 >= 0);
       assert(d1 >= 0);
       return std::min(d1, d2);
@@ -265,13 +265,13 @@ template <typename Scalar> struct SO2 {
     assert(location1(0) <= M_PI);
     assert(location2(0) <= M_PI);
 
-    double dif = location1(0) - location2(0);
+    Scalar dif = location1(0) - location2(0);
     if (dif > M_PI) {
       dif -= 2 * M_PI;
     } else if (dif < -M_PI) {
       dif += 2 * M_PI;
     }
-    double out = std::abs(dif);
+    Scalar out = std::abs(dif);
     return out;
   }
 };
@@ -293,13 +293,13 @@ template <typename Scalar> struct SO2Squared {
 
   Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
-    double d = so2.distanceToRect(location1, lb, ub);
+    Scalar d = so2.distanceToRect(location1, lb, ub);
     return d * d;
   }
 
   Scalar distance(cref_t location1, cref_t location2) const {
 
-    double d = so2.distance(location1, location2);
+    Scalar d = so2.distance(location1, location2);
     return d * d;
   }
 };
@@ -321,8 +321,8 @@ template <typename Scalar, int Dimensions = -1> struct L2Squared {
 
   Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
-    double d = 0;
-    double dist = 0;
+    Scalar d = 0;
+    Scalar dist = 0;
 
     if constexpr (Dimensions == Eigen::Dynamic) {
 
@@ -333,14 +333,14 @@ template <typename Scalar, int Dimensions = -1> struct L2Squared {
       assert(location1.size() == lb.size());
 
       for (size_t i = 0; i < location1.size(); i++) {
-        double xx = std::max(lb(i), std::min(ub(i), location1(i)));
-        double dif = xx - location1(i);
+        Scalar xx = std::max(lb(i), std::min(ub(i), location1(i)));
+        Scalar dif = xx - location1(i);
         dist += dif * dif;
       }
     } else {
       for (size_t i = 0; i < Dimensions; i++) {
-        double xx = std::max(lb(i), std::min(ub(i), location1(i)));
-        double dif = xx - location1(i);
+        Scalar xx = std::max(lb(i), std::min(ub(i), location1(i)));
+        Scalar dif = xx - location1(i);
         dist += dif * dif;
       }
     }
@@ -382,12 +382,12 @@ template <typename Scalar, int Dimensions = -1> struct L2 {
 
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
-    double d = l2squared.distanceToRect(location1, lb, ub);
+    Scalar d = l2squared.distanceToRect(location1, lb, ub);
     return std::sqrt(d);
   };
 
   Scalar distance(cref_t &location1, cref_t &location2) const {
-    double d = l2squared.distance(location1, location2);
+    Scalar d = l2squared.distance(location1, location2);
     return std::sqrt(d);
   }
 };
@@ -401,7 +401,7 @@ template <typename Scalar> struct R2SO2 {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  double angular_weight = 1.0;
+  Scalar angular_weight = 1.0;
 
   L2<Scalar, 2> l2;
   SO2<Scalar> so2;
@@ -417,9 +417,9 @@ template <typename Scalar> struct R2SO2 {
 
   Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
-    double d1 = l2.distanceToRect(location1.template head<2>(),
+    Scalar d1 = l2.distanceToRect(location1.template head<2>(),
                                   lb.template head<2>(), ub.template head<2>());
-    double d2 =
+    Scalar d2 =
         so2.distanceToRect(location1.template tail<1>(), lb.template tail<1>(),
                            ub.template tail<1>());
     return d1 + angular_weight * d2;
@@ -427,9 +427,9 @@ template <typename Scalar> struct R2SO2 {
 
   Scalar distance(cref_t location1, cref_t location2) const {
 
-    double d1 =
+    Scalar d1 =
         l2.distance(location1.template head<2>(), location2.template head<2>());
-    double d2 = so2.distance(location1.template tail<1>(),
+    Scalar d2 = so2.distance(location1.template tail<1>(),
                              location2.template tail<1>());
     return d1 + angular_weight * d2;
   };
@@ -443,16 +443,16 @@ template <typename Scalar> struct R2SO2Squared {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  double angular_weight = 1.0;
+  Scalar angular_weight = 1.0;
 
   L2Squared<Scalar, 2> l2squared;
   SO2Squared<Scalar> so2squared;
   Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
-    double d1 =
+    Scalar d1 =
         l2squared.distanceToRect(location1.template head<2>(),
                                  lb.template head<2>(), ub.template head<2>());
-    double d2 =
+    Scalar d2 =
         so2squared.distanceToRect(location1.template tail<1>(),
                                   lb.template tail<1>(), ub.template tail<1>());
     return d1 + angular_weight * d2;
@@ -460,9 +460,9 @@ template <typename Scalar> struct R2SO2Squared {
 
   Scalar distance(cref_t location1, cref_t location2) const {
 
-    double d1 = l2squared.distance(location1.template head<2>(),
+    Scalar d1 = l2squared.distance(location1.template head<2>(),
                                    location2.template head<2>());
-    double d2 = so2squared.distance(location1.template tail<1>(),
+    Scalar d2 = so2squared.distance(location1.template tail<1>(),
                                     location2.template tail<1>());
     return d1 + angular_weight * d2;
   };
@@ -487,12 +487,12 @@ template <typename Scalar> struct SO3Squared {
 
     assert(std::abs(location1.norm() - 1) < 1e-6);
 
-    double d1 = l2squared.distanceToRect(location1, lb, ub);
-    double d2 = l2squared.distanceToRect(-1. * location1, lb, ub);
+    Scalar d1 = l2squared.distanceToRect(location1, lb, ub);
+    Scalar d2 = l2squared.distanceToRect(-1. * location1, lb, ub);
     return std::min(d1, d2);
   }
 
-  double distance(cref_t location1, cref_t location2) const {
+  Scalar distance(cref_t location1, cref_t location2) const {
 
     assert(location1.size() == 4);
     assert(location2.size() == 4);
@@ -500,8 +500,8 @@ template <typename Scalar> struct SO3Squared {
     assert(std::abs(location1.norm() - 1) < 1e-6);
     assert(std::abs(location2.norm() - 1) < 1e-6);
 
-    double d1 = l2squared.distance(location1, location2);
-    double d2 = l2squared.distance(-location1, location2);
+    Scalar d1 = l2squared.distance(location1, location2);
+    Scalar d2 = l2squared.distance(-location1, location2);
     return std::min(d1, d2);
   };
 };
@@ -526,7 +526,7 @@ template <typename Scalar> struct SO3 {
     return std::sqrt(so3squared.distanceToRect(location1, lb, ub));
   }
 
-  double distance(cref_t location1, cref_t location2) const {
+  Scalar distance(cref_t location1, cref_t location2) const {
 
     return std::sqrt(so3squared.distance(location1, location2));
   };
@@ -549,21 +549,21 @@ template <typename Scalar> struct R3SO3Squared {
 
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
-    double d1 = l2.distanceToRect(location1.template head<3>(),
+    Scalar d1 = l2.distanceToRect(location1.template head<3>(),
                                   lb.template head<3>(), ub.template head<3>());
 
-    double d2 =
+    Scalar d2 =
         so3.distanceToRect(location1.template tail<4>(), lb.template tail<4>(),
                            ub.template tail<4>());
 
     return d1 + d2;
   }
 
-  double distance(cref_t location1, cref_t location2) const {
+  Scalar distance(cref_t location1, cref_t location2) const {
 
-    double d1 =
+    Scalar d1 =
         l2.distance(location1.template head<3>(), location2.template head<3>());
-    double d2 = so3.distance(location1.template tail<4>(),
+    Scalar d2 = so3.distance(location1.template tail<4>(),
                              location2.template tail<4>());
     return d1 + d2;
   };
@@ -582,21 +582,21 @@ template <typename Scalar> struct R3SO3 {
 
   Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
 
-    double d1 = l2.distanceToRect(location1.template head<3>(),
+    Scalar d1 = l2.distanceToRect(location1.template head<3>(),
                                   lb.template head<3>(), ub.template head<3>());
 
-    double d2 =
+    Scalar d2 =
         so3.distanceToRect(location1.template tail<4>(), lb.template tail<4>(),
                            ub.template tail<4>());
 
     return d1 + d2;
   }
 
-  double distance(cref_t location1, cref_t location2) const {
+  Scalar distance(cref_t location1, cref_t location2) const {
 
-    double d1 =
+    Scalar d1 =
         l2.distance(location1.template head<3>(), location2.template head<3>());
-    double d2 = so3.distance(location1.template tail<4>(),
+    Scalar d2 = so3.distance(location1.template tail<4>(),
                              location2.template tail<4>());
     return d1 + d2;
   };
@@ -697,7 +697,7 @@ template <typename Scalar> struct Combined {
 
     assert(spaces.size() == dims.size());
     assert(spaces.size());
-    double d = 0;
+    Scalar d = 0;
     int counter = 0;
     for (size_t i = 0; i < spaces.size(); i++) {
       std::visit(
@@ -715,7 +715,7 @@ template <typename Scalar> struct Combined {
 
     assert(spaces.size() == dims.size());
     assert(spaces.size());
-    double d = 0;
+    Scalar d = 0;
     int counter = 0;
     for (size_t i = 0; i < spaces.size(); i++) {
       auto caller = [&](const auto &obj) {
@@ -734,7 +734,7 @@ template <typename Scalar> struct Combined {
     assert(spaces.size() == dims.size());
     assert(spaces.size());
 
-    double d = 0;
+    Scalar d = 0;
     int counter = 0;
     for (size_t i = 0; i < spaces.size(); i++) {
 

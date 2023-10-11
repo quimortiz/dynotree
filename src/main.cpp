@@ -170,25 +170,25 @@ BOOST_AUTO_TEST_CASE(t_hello4) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(bench_run_vs_compile) {
-  std::srand(0);
-  std::cout << "benchmark in c++" << std::endl;
+template <typename Scalar> void __compile_vs_runtime() {
+  using MatrixX = Eigen::Matrix<Scalar, -1, -1>;
+  using Vector4 = Eigen::Matrix<Scalar, 4, 1>;
 
-  using TreeRX = jk::tree::KDTree<int, -1>;
-  using TreeR4 = jk::tree::KDTree<int, 4>;
+  using TreeRX = jk::tree::KDTree<int, -1, 32, Scalar>;
+  using TreeR4 = jk::tree::KDTree<int, 4, 32, Scalar>;
 
   TreeRX treex(4);
   TreeR4 tree4(-1);
 
-  Eigen::MatrixXd X = Eigen::MatrixXd::Random(10000, 4);
+  MatrixX X = MatrixX::Random(10000, 4);
 
   for (size_t i = 0; i < X.rows(); ++i) {
     treex.addPoint(X.row(i), i);
-    tree4.addPoint(X.row(i).head<4>(), i);
+    tree4.addPoint(X.row(i).template head<4>(), i);
   }
   int num_neighs = 10;
 
-  Eigen::Vector4d x = Eigen::Vector4d::Random();
+  Vector4 x = Vector4::Random();
 
   {
     auto t0 = std::chrono::high_resolution_clock::now();
@@ -215,6 +215,15 @@ BOOST_AUTO_TEST_CASE(bench_run_vs_compile) {
         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt 4:" << dt << std::endl;
   }
+}
+
+BOOST_AUTO_TEST_CASE(bench_run_vs_compile) {
+  std::srand(0);
+  std::cout << "benchmark in c++:double" << std::endl;
+  __compile_vs_runtime<double>();
+  std::cout << "benchmark in c++:float" << std::endl;
+  std::srand(0);
+  __compile_vs_runtime<float>();
 }
 
 // incremental benchmark
