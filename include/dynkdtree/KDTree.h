@@ -61,21 +61,20 @@ public:
 
   size_t size() const { return m_nodes[0].m_entries; }
 
-  void addPoint(const point_t &location, const Id &payload,
-                bool autosplit = true) {
+  void addPoint(const point_t &x, const Id &id, bool autosplit = true) {
     std::size_t addNode = 0;
 
     assert(m_dimensions > 0);
     while (m_nodes[addNode].m_splitDimension != m_dimensions) {
-      m_nodes[addNode].expandBounds(location);
-      if (location[m_nodes[addNode].m_splitDimension] <
+      m_nodes[addNode].expandBounds(x);
+      if (x[m_nodes[addNode].m_splitDimension] <
           m_nodes[addNode].m_splitValue) {
         addNode = m_nodes[addNode].m_children.first;
       } else {
         addNode = m_nodes[addNode].m_children.second;
       }
     }
-    m_nodes[addNode].add(LocationId{location, payload});
+    m_nodes[addNode].add(PointId{x, id});
 
     if (m_nodes[addNode].shouldSplit() &&
         m_nodes[addNode].m_entries % BucketSize == 0) {
@@ -104,32 +103,30 @@ public:
 
   struct DistanceId {
     Scalar distance;
-    Id payload;
+    Id id;
     inline bool operator<(const DistanceId &dp) const {
       return distance < dp.distance;
     }
   };
 
-  std::vector<DistanceId> searchKnn(const point_t &location,
+  std::vector<DistanceId> searchKnn(const point_t &x,
                                     std::size_t maxPoints) const {
-    return searcher().search(location, std::numeric_limits<Scalar>::max(),
-                             maxPoints, state_space);
-  }
-
-  std::vector<DistanceId> searchBall(const point_t &location,
-                                     Scalar maxRadius) const {
-    return searcher().search(location, maxRadius,
-                             std::numeric_limits<std::size_t>::max(),
+    return searcher().search(x, std::numeric_limits<Scalar>::max(), maxPoints,
                              state_space);
   }
 
-  std::vector<DistanceId>
-  searchCapacityLimitedBall(const point_t &location, Scalar maxRadius,
-                            std::size_t maxPoints) const {
-    return searcher().search(location, maxRadius, maxPoints, state_space);
+  std::vector<DistanceId> searchBall(const point_t &x, Scalar maxRadius) const {
+    return searcher().search(
+        x, maxRadius, std::numeric_limits<std::size_t>::max(), state_space);
   }
 
-  DistanceId search(const point_t &location) const {
+  std::vector<DistanceId>
+  searchCapacityLimitedBall(const point_t &x, Scalar maxRadius,
+                            std::size_t maxPoints) const {
+    return searcher().search(x, maxRadius, maxPoints, state_space);
+  }
+
+  DistanceId search(const point_t &x) const {
     DistanceId result;
     result.distance = std::numeric_limits<Scalar>::infinity();
 
@@ -144,16 +141,16 @@ public:
         std::size_t nodeIndex = searchStack.back();
         searchStack.pop_back();
         const Node &node = m_nodes[nodeIndex];
-        if (result.distance > node.pointRectDist(location, state_space)) {
+        if (result.distance > node.pointRectDist(x, state_space)) {
           if (node.m_splitDimension == m_dimensions) {
             for (const auto &lp : node.m_locationId) {
-              Scalar nodeDist = state_space.distance(location, lp.location);
+              Scalar nodeDist = state_space.distance(x, lp.x);
               if (nodeDist < result.distance) {
-                result = DistanceId{nodeDist, lp.payload};
+                result = DistanceId{nodeDist, lp.id};
               }
             }
           } else {
-            node.queueChildren(location, searchStack);
+            node.queueChildren(x, searchStack);
           }
         }
       }
@@ -168,8 +165,7 @@ public:
 
     // NB! this method is not const. Do not call this on same instance from
     // different threads simultaneously.
-    const std::vector<DistanceId> &search(const point_t &location,
-                                          Scalar maxRadius,
+    const std::vector<DistanceId> &search(const point_t &x, Scalar maxRadius,
                                           std::size_t maxPoints,
                                           const StateSpace &state_space) {
       // clear results from last time
@@ -188,9 +184,8 @@ public:
         m_prioqueueCapacity = maxPoints;
       }
 
-      m_tree.searchCapacityLimitedBall(location, maxRadius, maxPoints,
-                                       m_searchStack, m_prioqueue, m_results,
-                                       state_space);
+      m_tree.searchCapacityLimitedBall(x, maxRadius, maxPoints, m_searchStack,
+                                       m_prioqueue, m_results, state_space);
 
       m_prioqueueCapacity = std::max(m_prioqueueCapacity, m_results.size());
       return m_results;
@@ -209,14 +204,14 @@ public:
   Searcher searcher() const { return Searcher(*this); }
 
 private:
-  struct LocationId {
-    point_t location;
-    Id payload;
+  struct PointId {
+    point_t x;
+    Id id;
   };
-  std::vector<LocationId> m_bucketRecycle;
+  std::vector<PointId> m_bucketRecycle;
 
   void searchCapacityLimitedBall(
-      const point_t &location, Scalar maxRadius, std::size_t maxPoints,
+      const point_t &x, Scalar maxRadius, std::size_t maxPoints,
       std::vector<std::size_t> &searchStack,
       std::priority_queue<DistanceId, std::vector<DistanceId>> &prioqueue,
       std::vector<DistanceId> &results, const StateSpace &state_space) const {
@@ -228,14 +223,14 @@ private:
         std::size_t nodeIndex = searchStack.back();
         searchStack.pop_back();
         const Node &node = m_nodes[nodeIndex];
-        Scalar minDist = node.pointRectDist(location, state_space);
+        Scalar minDist = node.pointRectDist(x, state_space);
         if (maxRadius > minDist && (prioqueue.size() < numSearchPoints ||
                                     prioqueue.top().distance > minDist)) {
           if (node.m_splitDimension == m_dimensions) {
-            node.searchCapacityLimitedBall(location, maxRadius, numSearchPoints,
+            node.searchCapacityLimitedBall(x, maxRadius, numSearchPoints,
                                            prioqueue, state_space);
           } else {
-            node.queueChildren(location, searchStack);
+            node.queueChildren(x, searchStack);
           }
         }
       }
@@ -266,7 +261,7 @@ private:
     std::vector<Scalar> splitDimVals;
     splitDimVals.reserve(splitNode.m_entries);
     for (const auto &lp : splitNode.m_locationId) {
-      splitDimVals.push_back(lp.location[splitNode.m_splitDimension]);
+      splitDimVals.push_back(lp.x[splitNode.m_splitDimension]);
     }
     std::nth_element(splitDimVals.begin(),
                      splitDimVals.begin() + splitDimVals.size() / 2 + 1,
@@ -286,7 +281,7 @@ private:
     Node &rightNode = m_nodes.back();
 
     for (const auto &lp : splitNode.m_locationId) {
-      if (lp.location[splitNode.m_splitDimension] < splitNode.m_splitValue) {
+      if (lp.x[splitNode.m_splitDimension] < splitNode.m_splitValue) {
         leftNode.add(lp);
       } else {
         rightNode.add(lp);
@@ -311,7 +306,7 @@ private:
       if (splitNode.m_locationId.capacity() == BucketSize) {
         std::swap(splitNode.m_locationId, m_bucketRecycle);
       } else {
-        std::vector<LocationId> empty;
+        std::vector<PointId> empty;
         std::swap(splitNode.m_locationId, empty);
       }
       return true;
@@ -323,7 +318,7 @@ private:
       init(capacity, runtime_dimension);
     }
 
-    Node(std::vector<LocationId> &recycle, std::size_t capacity,
+    Node(std::vector<PointId> &recycle, std::size_t capacity,
          int runtime_dimension) {
       std::swap(m_locationId, recycle);
       init(capacity, runtime_dimension);
@@ -343,20 +338,20 @@ private:
       m_locationId.reserve(std::max(BucketSize, capacity));
     }
 
-    void expandBounds(const point_t &location) {
-      m_lb = m_lb.cwiseMin(location);
-      m_ub = m_ub.cwiseMax(location);
+    void expandBounds(const point_t &x) {
+      m_lb = m_lb.cwiseMin(x);
+      m_ub = m_ub.cwiseMax(x);
       m_entries++;
     }
 
-    void add(const LocationId &lp) {
-      expandBounds(lp.location);
+    void add(const PointId &lp) {
+      expandBounds(lp.x);
       m_locationId.push_back(lp);
     }
 
     bool shouldSplit() const { return m_entries >= BucketSize; }
 
-    void searchCapacityLimitedBall(const point_t &location, Scalar maxRadius,
+    void searchCapacityLimitedBall(const point_t &x, Scalar maxRadius,
                                    std::size_t K,
                                    std::priority_queue<DistanceId> &results,
                                    const StateSpace &state_space) const {
@@ -366,26 +361,26 @@ private:
       // this fills up the queue if it isn't full yet
       for (; results.size() < K && i < m_entries; i++) {
         const auto &lp = m_locationId[i];
-        Scalar distance = state_space.distance(location, lp.location);
+        Scalar distance = state_space.distance(x, lp.x);
         if (distance < maxRadius) {
-          results.emplace(DistanceId{distance, lp.payload});
+          results.emplace(DistanceId{distance, lp.id});
         }
       }
 
       // this adds new things to the queue once it is full
       for (; i < m_entries; i++) {
         const auto &lp = m_locationId[i];
-        Scalar distance = state_space.distance(location, lp.location);
+        Scalar distance = state_space.distance(x, lp.x);
         if (distance < maxRadius && distance < results.top().distance) {
           results.pop();
-          results.emplace(DistanceId{distance, lp.payload});
+          results.emplace(DistanceId{distance, lp.id});
         }
       }
     }
 
-    void queueChildren(const point_t &location,
+    void queueChildren(const point_t &x,
                        std::vector<std::size_t> &searchStack) const {
-      if (location[m_splitDimension] < m_splitValue) {
+      if (x[m_splitDimension] < m_splitValue) {
         searchStack.push_back(m_children.second);
         searchStack.push_back(m_children.first); // left is popped first
       } else {
@@ -394,9 +389,8 @@ private:
       }
     }
 
-    Scalar pointRectDist(const point_t &location,
-                         const StateSpace &distance) const {
-      return distance.distance_to_rectangle(location, m_lb, m_ub);
+    Scalar pointRectDist(const point_t &x, const StateSpace &distance) const {
+      return distance.distance_to_rectangle(x, m_lb, m_ub);
     }
 
     std::size_t m_entries = 0; /// size of the tree, or subtree
@@ -422,8 +416,8 @@ private:
     Eigen::Matrix<Scalar, Dimensions, 1> m_ub;
 
     std::pair<std::size_t, std::size_t>
-        m_children; /// subtrees of this node (if not a leaf)
-    std::vector<LocationId> m_locationId; /// data held in this node (if a leaf)
+        m_children;                    /// subtrees of this node (if not a leaf)
+    std::vector<PointId> m_locationId; /// data held in this node (if a leaf)
   };
 };
 

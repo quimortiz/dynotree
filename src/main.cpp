@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(t_hello) {
         2; // this monster can eat two people at once
     auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation, monsterHeads);
     for (const auto &victim : lazyMonsterVictims) {
-      std::cout << victim.payload << " closest to lazy monster, with distance "
+      std::cout << victim.id << " closest to lazy monster, with distance "
                 << sqrt(victim.distance) << "!" << std::endl;
     }
   }
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
   const std::size_t monsterHeads = 2; // this monster can eat two people at once
   auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation, monsterHeads);
   for (const auto &victim : lazyMonsterVictims) {
-    std::cout << victim.payload << " closest to lazy monster, with distance "
+    std::cout << victim.id << " closest to lazy monster, with distance "
               << victim.distance << "!" << std::endl;
   }
 }
@@ -375,12 +375,12 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
         1.e-9 *
         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     for (size_t j = 0; j < nnt.size(); ++j) {
-      std::cout << nnt[j].payload << " " << nnt[j].distance << std::endl;
+      std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
     }
     std::cout << "dt tree:" << dt << std::endl;
   }
 
-  BOOST_TEST(best, nnt[0].payload);
+  BOOST_TEST(best, nnt[0].id);
 
   {
 
@@ -525,14 +525,14 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
     for (size_t j = 0; j < nnt.size(); ++j) {
-      std::cout << nnt[j].payload << " " << nnt[j].distance << std::endl;
+      std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
     }
 
     std::cout << "dt tree:" << dt << std::endl;
   }
 
-  std::cout << "best: " << best << " " << nnt[0].payload << std::endl;
-  BOOST_TEST(best == nnt[0].payload);
+  std::cout << "best: " << best << " " << nnt[0].id << std::endl;
+  BOOST_TEST(best == nnt[0].id);
 
   // ompl
   {
@@ -625,7 +625,7 @@ BOOST_AUTO_TEST_CASE(t_se3) {
   using TreeR3SO3X =
       dynotree::KDTree<int, -1, 32, double, dynotree::Combined<double>>;
 
-  // template <class Payload, int Dimensions, std::size_t BucketSize = 32,
+  // template <class id, int Dimensions, std::size_t BucketSize = 32,
   //           typename Scalar = double,
   //           typename Distance = L2Squared<Scalar, Dimensions>>
   //
@@ -752,14 +752,14 @@ BOOST_AUTO_TEST_CASE(t_se3) {
         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
     for (size_t j = 0; j < nnt.size(); ++j) {
-      std::cout << nnt[j].payload << " " << nnt[j].distance << std::endl;
+      std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
     }
 
     std::cout << "my tree:" << dt << std::endl;
   }
 
-  std::cout << "best: " << best << " " << nnt[0].payload << std::endl;
-  BOOST_TEST(best == nnt[0].payload);
+  std::cout << "best: " << best << " " << nnt[0].id << std::endl;
+  BOOST_TEST(best == nnt[0].id);
 
   // my tree dynamic
   {
@@ -787,17 +787,17 @@ BOOST_AUTO_TEST_CASE(t_se3) {
           std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
       for (size_t j = 0; j < nnt.size(); ++j) {
-        std::cout << nntx[j].payload << " " << nntx[j].distance << std::endl;
+        std::cout << nntx[j].id << " " << nntx[j].distance << std::endl;
       }
 
       std::cout << "my tree dynamic:" << dt << std::endl;
     }
 
-    std::cout << "best: " << best << " " << nnt[0].payload << std::endl;
-    BOOST_TEST(best == nntx[0].payload);
+    std::cout << "best: " << best << " " << nnt[0].id << std::endl;
+    BOOST_TEST(best == nntx[0].id);
 
     for (size_t k = 0; k < std::min(int(nntx.size()), 5); k++) {
-      BOOST_TEST(nntx[0].payload == nnt[0].payload);
+      BOOST_TEST(nntx[0].id == nnt[0].id);
       BOOST_TEST(nntx[0].distance == nnt[0].distance,
                  boost::test_tools::tolerance(1e-6));
     }
@@ -889,7 +889,7 @@ BOOST_AUTO_TEST_CASE(t_original_example) {
   const std::size_t monsterHeads = 2; // this monster can eat two people at once
   auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation, monsterHeads);
   for (const auto &victim : lazyMonsterVictims) {
-    std::cout << victim.payload << " closest to lazy monster, with distance "
+    std::cout << victim.id << " closest to lazy monster, with distance "
               << sqrt(victim.distance) << "!" << std::endl;
   }
 
@@ -908,7 +908,7 @@ BOOST_AUTO_TEST_CASE(t_original_example) {
       stationaryMonsterLocation, neckLength * neckLength, monsterHeads);
   std::cout << "The stationary monster will try to eat ";
   for (const auto &victim : actualVictims) {
-    std::cout << victim.payload << " and ";
+    std::cout << victim.id << " and ";
   }
   std::cout << "nobody else." << std::endl;
   std::cout << "Example completed" << std::endl;
@@ -988,8 +988,8 @@ BOOST_AUTO_TEST_CASE(t_orig_accuracy) {
 
     if (bnn.size() > 0) {
       auto nn = tree.search(loc);
-      if (nn.payload != bnn[0].second) {
-        std::cout << "1nn payloads not equal" << std::endl;
+      if (nn.id != bnn[0].second) {
+        std::cout << "1nn id not equal" << std::endl;
       }
       if (std::abs(bnn[0].first - nn.distance) > 1e-10) {
         std::cout << "1nn distances not equal" << std::endl;
@@ -1004,11 +1004,11 @@ BOOST_AUTO_TEST_CASE(t_orig_accuracy) {
       if (std::abs(bnn[i].first - snn[i].distance) > 1e-10) {
         std::cout << "distances not equal" << std::endl;
       }
-      if (bnn[i].second != tnn[i].payload) {
-        std::cout << "payloads not equal" << std::endl;
+      if (bnn[i].second != tnn[i].id) {
+        std::cout << "id not equal" << std::endl;
       }
-      if (bnn[i].second != snn[i].payload) {
-        std::cout << "payloads not equal" << std::endl;
+      if (bnn[i].second != snn[i].id) {
+        std::cout << "id not equal" << std::endl;
       }
     }
 
@@ -1050,8 +1050,8 @@ BOOST_AUTO_TEST_CASE(t_orig_accuracy) {
         std::cout << "distances not equal" << std::endl;
         BOOST_TEST(false);
       }
-      if (bnn[i].second != tnn[i].payload) {
-        std::cout << "payloads not equal" << std::endl;
+      if (bnn[i].second != tnn[i].id) {
+        std::cout << "id not equal" << std::endl;
         BOOST_TEST(false);
       }
     }

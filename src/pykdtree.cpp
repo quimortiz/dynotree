@@ -14,7 +14,7 @@ void declare_tree(py::module &m, const std::string &name) {
   py::class_<typename T::DistanceId>(m, (name + "dp").c_str())
       .def(py::init<>())
       .def_readonly("distance", &T::DistanceId::distance)
-      .def_readonly("payload", &T::DistanceId::payload);
+      .def_readonly("id", &T::DistanceId::id);
 
   py::class_<T>(m, name.c_str())
       .def(py::init<int>())
@@ -32,7 +32,7 @@ void declare_treex(py::module &m, const std::string &name) {
   py::class_<typename T::DistanceId>(m, (name + "dp").c_str())
       .def(py::init<>())
       .def_readonly("distance", &T::DistanceId::distance)
-      .def_readonly("payload", &T::DistanceId::payload);
+      .def_readonly("id", &T::DistanceId::id);
 
   py::class_<T>(m, name.c_str())
       .def(py::init<int, const std::vector<std::string>>())
