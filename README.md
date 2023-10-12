@@ -51,7 +51,7 @@ to run only one example or test
 
 ## Create wheels
 
-for publishing in pypy
+for publishing in pypi
 ```bash
 docker pull quay.io/pypa/manylinux2014_x86_64
 docker run -it -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 /io/build-wheels.sh
