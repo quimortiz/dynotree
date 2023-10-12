@@ -1,9 +1,10 @@
 # dyn_kdtree
 
-Dynamic Kd-Tree:  Euclidean, SO(2), SO(3) and more!
-C++ with Python Bindings
+Dynamic Kd-Tree in C++ and Python: Euclidean, SO(2), SO(3) and more!
 
-The KD-tree implementation is based on [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree)
+The underlying KD-tree implementation is based on [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree), but dynotree supports non-Euclidean spaces and custom compound spaces. State spaces can be defined at both compile and runtime for both efficiency and flexibility.
+
+The C++ library is header-only, with Eigen as single dependency, and we provide Python bindings for fast development and prototyping.
 
 
 # Try it out!

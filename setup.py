@@ -119,9 +119,11 @@ class CMakeBuild(build_ext):
         if not build_temp.exists():
             build_temp.mkdir(parents=True)
 
+        print("cmake_args", cmake_args)
         subprocess.run(
             ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
         )
+        print("build_args", build_args)
         subprocess.run(
             ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
         )
@@ -139,7 +141,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="dynotree",
-    version="0.0.3",
+    version="0.0.4",
     author="Joaquim Ortiz-Haro",
     author_email="quimortiz21@gmail.com",
     description="Dynotree - Dynamic Kd tree",
