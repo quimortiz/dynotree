@@ -7,7 +7,8 @@ from typing import Tuple, List
 import matplotlib.pyplot as plt
 import dynotree
 
-np.random.seed(0)
+# np.random.seed(0)
+dynotree.srand(1)
 
 
 # ref: https://paulbourke.net/geometry/pointlineplane/
@@ -70,6 +71,20 @@ def is_collision(x: np.ndarray) -> bool:
     return False
 
 
+static = False
+
+if static:
+    tree = dynotree.TreeR2SO2(-1)
+    state_space = tree.getStateSpace()
+    state_space.set_bounds(np.array([0, 0]), np.array([3, 3]))
+else:
+    tree = dynotree.TreeX(3, ["Rn:2", "SO2"])
+    state_space = tree.getStateSpace()
+    state_space.set_bounds(
+        [np.array([0, 0]), np.array([])], [np.array([3, 3]), np.array([])]
+    )
+
+
 fig, ax = plt.subplots()
 start = np.array([0.1, 0.1, np.pi / 2])
 goal = np.array([2.0, 0.2, 0])
@@ -97,8 +112,10 @@ fig, ax = plt.subplots()
 
 N = 100
 
+x = np.zeros(3)
 for i in range(N):
-    x = np.random.rand(3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
+    state_space.sample_uniform(x)
+    # x = np.random.rand(3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
     is_col = is_collision(x)
     if is_col:
         plot_robot(ax, x, color="gray")
@@ -130,14 +147,8 @@ ax.set_ylim(ylim)
 ax.set_aspect("equal")
 ax.set_title("interpolation")
 
-static = False
 
-if static:
-    tree = dynotree.TreeR2SO2(-1)
-else:
-    tree = dynotree.TreeX(3, ["L2:2", "SO2"])
-
-interpolate_fun = tree.interpolate
+interpolate_fun = state_space.interpolate
 N = 10
 for i in range(N):
     out = np.zeros(3)
@@ -164,8 +175,10 @@ parents.append(-1)
 max_expansion = 1.0
 
 solved = False
+xrand = np.zeros(3)
 for i in range(max_steps):
-    xrand = np.random.rand(3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
+    state_space.sample_uniform(xrand)
+    # xrand = np.random.rand(3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
     if np.random.rand() < goal_bias:
         xrand = np.copy(goal)
     # find nearest neighbor

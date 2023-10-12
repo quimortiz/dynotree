@@ -1,140 +1,29 @@
 #pragma once
 
-#include <cwchar>
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
-#include <iostream>
-#include <variant>
-
-template <class T> using cref = const Eigen::Ref<const T> &;
-
-/**
- * KDTree.h by Julian Kent
- * A C++11 KD-Tree with the following features:
- *     single file
- *     header only
- *     high performance K Nearest Neighbor and ball searches
- *     dynamic insertions
- *     simple API
- *     depends only on the STL
- *     templatable on your custom data type to store in the leaves. No need to
- * keep a separate data structure! templatable on double, float etc templatable
- * on L1, L2Squared or custom distance functor templated on number of dimensions
- * for efficient inlining
- *
- * -------------------------------------------------------------------
- *
- * This Source Code Form is subject to the terms of the Mozilla Public License,
- * v. 2.0. If a copy of the MPL was not distributed with this  file, you can
- * obtain one at http://mozilla.org/MPL/2.0/.
- *
- * A high level explanation of MPLv2: You may use this in any software provided
- * you give attribution. You *must* make available any changes you make to the
- * source code of this file to anybody you distribute your software to.
- *
- * Upstreaming features and bugfixes are highly appreciated via:
- *
- * https://github.com/jkflying/bucket-pr-kdtree/tree/master/C%2B%2B
- *
- * For additional licensing rights, feature requests or questions, please
- * contact Julian Kent <jkflying@gmail.com>
- *
- * -------------------------------------------------------------------
- *
- * Example usage:
- *
- * // setup
- * using tree_t = jk::tree::KDTree<std::string, 2>;
- * using point_t = std::array<double, 2>;
- * tree_t tree;
- * tree.addPoint(point_t{{1, 2}}, "George");
- * tree.addPoint(point_t{{1, 3}}, "Harold");
- * tree.addPoint(point_t{{7, 7}}, "Melvin");
- *
- * // KNN search
- * point_t lazyMonsterLocation{{6, 6}}; // this monster will always try to eat
- * the closest people const std::size_t monsterHeads = 2; // this monster can
- * eat two people at once auto lazyMonsterVictims =
- * tree.searchKnn(lazyMonsterLocation, monsterHeads); for (const auto& victim :
- * lazyMonsterVictims)
- * {
- *     std::cout << victim.payload << " closest to lazy monster, with distance "
- * << sqrt(victim.distance) << "!"
- *               << std::endl;
- * }
- *
- * // ball search
- * point_t stationaryMonsterLocation{{8, 8}}; // this monster doesn't move, so
- * can only eat people that are close const double neckLength = 6.0; // it can
- * only reach within this range auto potentialVictims =
- * tree.searchBall(stationaryMonsterLocation, neckLength * neckLength); //
- * metric is L2Squared std::cout << "Stationary monster can reach any of " <<
- * potentialVictims.size() << " people!" << std::endl;
- *
- * // hybrid KNN/ball search
- * auto actualVictims
- *     = tree.searchCapacityLimitedBall(stationaryMonsterLocation, neckLength *
- * neckLength, monsterHeads); std::cout << "The stationary monster will try to
- * eat "; for (const auto& victim : actualVictims)
- * {
- *     std::cout << victim.payload << " and ";
- * }
- * std::cout << "nobody else." << std::endl;
- *
- * Output:
- *
- * Melvin closest to lazy monster, with distance 1.41421!
- * Harold closest to lazy monster, with distance 5.83095!
- * Stationary monster can reach any of 1 people!
- * The stationary monster will try to eat Melvin and nobody else.
- *
- * -------------------------------------------------------------------
- *
- * Tuning tips:
- *
- * If you need to add a lot of points before doing any queries, set the optional
- * `autosplit` parameter to false, then call splitOutstanding(). This will
- * reduce temporaries and result in a better balanced tree.
- *
- * Set the bucket size to be at least twice the K in a typical KNN query. If you
- * have more dimensions, it is better to have a larger bucket size. 32 is a good
- * starting point. If possible use powers of 2 for the bucket size.
- *
- * If you experience linear search performance, check that you don't have a
- * bunch of duplicate point locations. This will result in the tree being unable
- * to split the bucket the points are in, degrading search performance.
- *
- * The tree adapts to the parallel-to-axis dimensionality of the problem. Thus,
- * if there is one dimension with a much larger scale than the others, most of
- * the splitting will happen on this dimension. This is achieved by trying to
- * keep the bounding boxes of the data in the buckets equal lengths in all axes.
- *
- * Random data performs worse than 'real world' data with structure. This is
- * because real world data has tighter bounding boxes, meaning more branches of
- * the tree can be eliminated sooner.
- *
- * On pure random data, more than 7 dimensions won't be much faster than linear.
- * However, most data isn't actually random. The tree will adapt to any locally
- * reduced dimensionality, which is found in most real world data.
- *
- * Hybrid ball/KNN searches are faster than either type on its own, because
- * subtrees can be more aggresively eliminated.
- */
-
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cwchar>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <queue>
 #include <set>
+#include <variant>
 #include <vector>
 
-namespace jk {
-namespace tree {
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
 
+template <int Dim, class Scalar>
+using cref = const Eigen::Ref<const Eigen::Matrix<Scalar, Dim, 1>> &;
+template <int Dim, class Scalar>
+using ref = Eigen::Ref<Eigen::Matrix<Scalar, Dim, 1>>;
+
+namespace dynotree {
 template <typename T, typename Scalar>
-void choose_split_dimension_default(T lb, T ub, int &ii, Scalar &width) {
+void choose_split_dimension_default(const T &lb, const T &ub, int &ii,
+                                    Scalar &width) {
   for (std::size_t i = 0; i < lb.size(); i++) {
     Scalar dWidth = ub[i] - lb[i];
     if (dWidth > width) {
@@ -144,10 +33,32 @@ void choose_split_dimension_default(T lb, T ub, int &ii, Scalar &width) {
   }
 }
 
-template <typename Scalar, int Dimensions = -1> struct L1 {
+// template <int Dim, typename Scalar>
+// void sample_uniform_default(cref<Dim,Scalar> lb, cref<Dim,Scalar> ub,
+// ref<Dim,Scalar> x) { x = Eigen::Matrix<Scalar, T::RowsAtCompileTime,
+// 1>::Random(lb.size()); x.setRandom(); x = lb + (ub -
+// lb).cwiseProduct(x.array() + 1.) / 2.;
+// }
+
+template <typename Scalar, int Dimensions = -1> struct RnL1 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+
+  Eigen::Matrix<Scalar, Dimensions, 1> lb;
+  Eigen::Matrix<Scalar, Dimensions, 1> ub;
+
+  void set_bounds(cref_t lb_, cref_t ub_) {
+    lb = lb_;
+    ub = ub_;
+  }
+
+  inline void sample_uniform(ref_t x) const {
+    x.setRandom();
+    x.array() += 1;
+    x /= .2;
+    x = lb + (ub - lb).cwiseProduct(x);
+  }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     assert(t >= 0);
@@ -159,7 +70,8 @@ template <typename Scalar, int Dimensions = -1> struct L1 {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
+  inline Scalar distance_to_rectangle(cref_t &location1, cref_t &lb,
+                                      cref_t &ub) const {
 
     Scalar d = 0;
     Scalar dist = 0;
@@ -187,7 +99,7 @@ template <typename Scalar, int Dimensions = -1> struct L1 {
     return dist;
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     assert(location1.size());
     assert(location2.size());
@@ -199,6 +111,17 @@ template <typename Scalar> struct SO2 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 1, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 1, 1>>;
+
+  void sample_uniform(ref_t x) const {
+
+    x(0) = (double(rand()) / (RAND_MAX + 1.)) * 2. * M_PI - M_PI;
+  }
+
+  void set_bounds(cref_t lb_, cref_t ub_) {
+    std::stringstream ss;
+    ss << "so2 has no bounds " << __FILE__ << ":" << __LINE__;
+    throw std::runtime_error(ss.str());
+  }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
 
@@ -226,7 +149,8 @@ template <typename Scalar> struct SO2 {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
+  inline Scalar distance_to_rectangle(cref_t location1, cref_t lb,
+                                      cref_t ub) const {
 
     assert(location1(0) >= -M_PI);
     assert(location1(0) <= M_PI);
@@ -257,7 +181,7 @@ template <typename Scalar> struct SO2 {
     }
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     assert(location1(0) >= -M_PI);
     assert(location2(0) >= -M_PI);
@@ -281,33 +205,49 @@ template <typename Scalar> struct SO2Squared {
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 1, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 1, 1>>;
 
+  Eigen::Matrix<Scalar, 1, 1> lb;
+  Eigen::Matrix<Scalar, 1, 1> ub;
+
   SO2<Scalar> so2;
 
-  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+  inline void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     so2.interpolate(from, to, t, out);
   }
 
-  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+  inline void sample_uniform(ref_t x) const { so2.sample_uniform(x); }
+
+  inline void set_bounds(cref_t lb_, cref_t ub_) {
+    std::stringstream ss;
+    ss << "so2 has no bounds " << __FILE__ << ":" << __LINE__;
+    throw std::runtime_error(ss.str());
+  }
+
+  inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                                     Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
+  inline Scalar distance_to_rectangle(cref_t location1, cref_t lb,
+                                      cref_t ub) const {
 
-    Scalar d = so2.distanceToRect(location1, lb, ub);
+    Scalar d = so2.distance_to_rectangle(location1, lb, ub);
     return d * d;
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     Scalar d = so2.distance(location1, location2);
     return d * d;
   }
 };
 
-template <typename Scalar, int Dimensions = -1> struct L2Squared {
+template <typename Scalar, int Dimensions = -1> struct RnSquared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+
+  Eigen::Matrix<Scalar, Dimensions, 1> lb;
+  Eigen::Matrix<Scalar, Dimensions, 1> ub;
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     assert(t >= 0);
@@ -315,11 +255,34 @@ template <typename Scalar, int Dimensions = -1> struct L2Squared {
     out = from + t * (to - from);
   }
 
-  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+  void set_bounds(cref_t lb_, cref_t ub_) {
+    lb = lb_;
+    ub = ub_;
+  }
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                              Scalar &width) const {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
+  void sample_uniform(ref_t x) const {
+
+    x.setRandom();
+    x.array() += 1;
+    x /= .2;
+    x = lb + (ub - lb).cwiseProduct(x);
+
+    //
+    // x.setRandom();
+    // x.array() += 1;
+    // x /= .2;
+    // x = lb + (ub - lb).cwiseProduct(x);
+    // x.setRandom();
+    // x = lb + (ub - lb).cwiseProduct(x.array() + 1.) / 2.;
+  }
+
+  inline Scalar distance_to_rectangle(cref_t location1, cref_t lb,
+                                      cref_t ub) const {
 
     Scalar d = 0;
     Scalar dist = 0;
@@ -344,10 +307,15 @@ template <typename Scalar, int Dimensions = -1> struct L2Squared {
         dist += dif * dif;
       }
     }
+
+    // Issue: memory allocation
+    // Eigen::Matrix<Scalar, Dimensions, 1> bb = location1;
+    // dist = (location1 - bb.cwiseMax(lb).cwiseMin(ub)).squaredNorm();
+
     return dist;
   }
 
-  Scalar distance(cref_t &location1, cref_t &location2) const {
+  inline Scalar distance(cref_t &location1, cref_t &location2) const {
 
     assert(location1.size());
     assert(location2.size());
@@ -362,32 +330,61 @@ template <typename Scalar, int Dimensions = -1> struct L2Squared {
   }
 };
 
-template <typename Scalar, int Dimensions = -1> struct L2 {
+template <typename Scalar, int Dimensions = -1> struct Rn {
 
-  using L2squared = L2Squared<Scalar, Dimensions>;
-  L2squared l2squared;
+  using RnSquared = RnSquared<Scalar, Dimensions>;
+  RnSquared rn_squared;
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
 
-  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+  Eigen::Matrix<Scalar, Dimensions, 1> lb;
+  Eigen::Matrix<Scalar, Dimensions, 1> ub;
+
+  void set_bounds(cref_t lb_, cref_t ub_) {
+
+    std::cout << "setting bounds " << std::endl;
+    std::cout << lb_.transpose() << std::endl;
+    std::cout << ub_.transpose() << std::endl;
+    lb = lb_;
+    ub = ub_;
+  }
+
+  inline void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     assert(t >= 0);
     assert(t <= 1);
     out = from + t * (to - from);
   }
 
-  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
+  inline void sample_uniform(ref_t x) const {
+
+    std::cout << "bounds are" << std::endl;
+    std::cout << lb.transpose() << std::endl;
+    std::cout << ub.transpose() << std::endl;
+
+    x.setRandom();
+    x.array() += 1;
+    x /= 2.;
+    x = lb + (ub - lb).cwiseProduct(x);
+
+    // x.setRandom();
+    // x = lb + (ub - lb).cwiseProduct(x.array() + 1.) / 2.;
+  }
+
+  inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                                     Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
+  inline Scalar distance_to_rectangle(cref_t &location1, cref_t &lb,
+                                      cref_t &ub) const {
 
-    Scalar d = l2squared.distanceToRect(location1, lb, ub);
+    Scalar d = rn_squared.distance_to_rectangle(location1, lb, ub);
     return std::sqrt(d);
   };
 
-  Scalar distance(cref_t &location1, cref_t &location2) const {
-    Scalar d = l2squared.distance(location1, location2);
+  inline Scalar distance(cref_t &location1, cref_t &location2) const {
+    Scalar d = rn_squared.distance(location1, location2);
     return std::sqrt(d);
   }
 };
@@ -397,16 +394,29 @@ template <typename Scalar> struct R2SO2 {
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 3, 1>>;
 
+  using cref2_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 2, 1>> &;
+  using ref2_t = Eigen::Ref<Eigen::Matrix<Scalar, 2, 1>>;
+
+  // Eigen::Matrix<Scalar, 3, 1> lb;
+  // Eigen::Matrix<Scalar, 3, 1> ub;
+
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
   Scalar angular_weight = 1.0;
 
-  L2<Scalar, 2> l2;
+  Rn<Scalar, 2> l2;
   SO2<Scalar> so2;
 
-  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+  void set_bounds(cref2_t lb_, cref2_t ub_) { l2.set_bounds(lb_, ub_); }
+
+  inline void sample_uniform(ref_t x) const {
+    l2.sample_uniform(x.template head<2>());
+    so2.sample_uniform(x.template tail<1>());
+  }
+
+  inline void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     assert(t >= 0);
     assert(t <= 1);
     l2.interpolate(from.template head<2>(), to.template head<2>(), t,
@@ -415,17 +425,19 @@ template <typename Scalar> struct R2SO2 {
                     out.template tail<1>());
   }
 
-  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
+  inline Scalar distance_to_rectangle(cref_t location1, cref_t lb,
+                                      cref_t ub) const {
 
-    Scalar d1 = l2.distanceToRect(location1.template head<2>(),
-                                  lb.template head<2>(), ub.template head<2>());
+    Scalar d1 =
+        l2.distance_to_rectangle(location1.template head<2>(),
+                                 lb.template head<2>(), ub.template head<2>());
     Scalar d2 =
-        so2.distanceToRect(location1.template tail<1>(), lb.template tail<1>(),
-                           ub.template tail<1>());
+        so2.distance_to_rectangle(location1.template tail<1>(),
+                                  lb.template tail<1>(), ub.template tail<1>());
     return d1 + angular_weight * d2;
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     Scalar d1 =
         l2.distance(location1.template head<2>(), location2.template head<2>());
@@ -438,6 +450,10 @@ template <typename Scalar> struct R2SO2 {
 template <typename Scalar> struct R2SO2Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 3, 1>>;
+
+  using cref2_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 2, 1>> &;
+  using ref2_t = Eigen::Ref<Eigen::Matrix<Scalar, 2, 1>>;
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
@@ -445,23 +461,32 @@ template <typename Scalar> struct R2SO2Squared {
 
   Scalar angular_weight = 1.0;
 
-  L2Squared<Scalar, 2> l2squared;
+  RnSquared<Scalar, 2> rn_squared;
   SO2Squared<Scalar> so2squared;
-  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
 
-    Scalar d1 =
-        l2squared.distanceToRect(location1.template head<2>(),
-                                 lb.template head<2>(), ub.template head<2>());
-    Scalar d2 =
-        so2squared.distanceToRect(location1.template tail<1>(),
-                                  lb.template tail<1>(), ub.template tail<1>());
+  void set_bounds(cref2_t lb_, cref2_t ub_) { rn_squared.set_bounds(lb_, ub_); }
+
+  void sample_uniform(ref_t x) const {
+    rn_squared.sample_uniform(x.template head<2>());
+    so2squared.sample_uniform(x.template tail<1>());
+  }
+
+  inline Scalar distance_to_rectangle(cref_t location1, cref_t lb,
+                                      cref_t ub) const {
+
+    Scalar d1 = rn_squared.distance_to_rectangle(location1.template head<2>(),
+                                                 lb.template head<2>(),
+                                                 ub.template head<2>());
+    Scalar d2 = so2squared.distance_to_rectangle(location1.template tail<1>(),
+                                                 lb.template tail<1>(),
+                                                 ub.template tail<1>());
     return d1 + angular_weight * d2;
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
-    Scalar d1 = l2squared.distance(location1.template head<2>(),
-                                   location2.template head<2>());
+    Scalar d1 = rn_squared.distance(location1.template head<2>(),
+                                    location2.template head<2>());
     Scalar d2 = so2squared.distance(location1.template tail<1>(),
                                     location2.template tail<1>());
     return d1 + angular_weight * d2;
@@ -473,7 +498,17 @@ template <typename Scalar> struct SO3Squared {
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 4, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 4, 1>>;
 
-  L2Squared<Scalar, 4> l2squared;
+  RnSquared<Scalar, 4> rn_squared;
+
+  void sample_uniform(ref_t x) const {
+    x = Eigen::Quaterniond().UnitRandom().coeffs();
+  }
+
+  void set_bounds(cref_t lb_, cref_t ub_) {
+    std::stringstream ss;
+    ss << "so3 has no bounds " << __FILE__ << ":" << __LINE__;
+    throw std::runtime_error(ss.str());
+  }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     throw std::runtime_error("not implemented interpolate in so3");
@@ -483,16 +518,17 @@ template <typename Scalar> struct SO3Squared {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
+  inline Scalar distance_to_rectangle(cref_t &location1, cref_t &lb,
+                                      cref_t &ub) const {
 
     assert(std::abs(location1.norm() - 1) < 1e-6);
 
-    Scalar d1 = l2squared.distanceToRect(location1, lb, ub);
-    Scalar d2 = l2squared.distanceToRect(-1. * location1, lb, ub);
+    Scalar d1 = rn_squared.distance_to_rectangle(location1, lb, ub);
+    Scalar d2 = rn_squared.distance_to_rectangle(-1. * location1, lb, ub);
     return std::min(d1, d2);
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     assert(location1.size() == 4);
     assert(location2.size() == 4);
@@ -500,8 +536,8 @@ template <typename Scalar> struct SO3Squared {
     assert(std::abs(location1.norm() - 1) < 1e-6);
     assert(std::abs(location2.norm() - 1) < 1e-6);
 
-    Scalar d1 = l2squared.distance(location1, location2);
-    Scalar d2 = l2squared.distance(-location1, location2);
+    Scalar d1 = rn_squared.distance(location1, location2);
+    Scalar d2 = rn_squared.distance(-location1, location2);
     return std::min(d1, d2);
   };
 };
@@ -513,6 +549,14 @@ template <typename Scalar> struct SO3 {
 
   SO3Squared<Scalar> so3squared;
 
+  void sample_uniform(ref_t x) const { so3squared.sample_uniform(x); }
+
+  void set_bounds(cref_t lb_, cref_t ub_) {
+    std::stringstream ss;
+    ss << "so3 has no bounds " << __FILE__ << ":" << __LINE__;
+    throw std::runtime_error(ss.str());
+  }
+
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
   }
@@ -521,12 +565,13 @@ template <typename Scalar> struct SO3 {
     throw std::runtime_error("not implemented interpolate in so3");
   }
 
-  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
+  inline Scalar distance_to_rectangle(cref_t &location1, cref_t &lb,
+                                      cref_t &ub) const {
 
-    return std::sqrt(so3squared.distanceToRect(location1, lb, ub));
+    return std::sqrt(so3squared.distance_to_rectangle(location1, lb, ub));
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     return std::sqrt(so3squared.distance(location1, location2));
   };
@@ -539,27 +584,38 @@ template <typename Scalar> struct R9SO3Squared {};
 template <typename Scalar> struct R3SO3Squared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 7, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 7, 1>>;
+  using cref3_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  L2Squared<Scalar, 3> l2;
+  RnSquared<Scalar, 3> l2;
   SO3Squared<Scalar> so3;
 
-  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
+  void set_bounds(cref3_t lb_, cref3_t ub_) { l2.set_bounds(lb_, ub_); }
 
-    Scalar d1 = l2.distanceToRect(location1.template head<3>(),
-                                  lb.template head<3>(), ub.template head<3>());
+  inline void sample_uniform(cref3_t lb, cref3_t ub, ref_t x) const {
+    l2.sample_uniform(x.template head<3>());
+    so3.sample_uniform(x.template tail<4>());
+  }
+
+  inline Scalar distance_to_rectangle(cref_t &location1, cref_t &lb,
+                                      cref_t &ub) const {
+
+    Scalar d1 =
+        l2.distance_to_rectangle(location1.template head<3>(),
+                                 lb.template head<3>(), ub.template head<3>());
 
     Scalar d2 =
-        so3.distanceToRect(location1.template tail<4>(), lb.template tail<4>(),
-                           ub.template tail<4>());
+        so3.distance_to_rectangle(location1.template tail<4>(),
+                                  lb.template tail<4>(), ub.template tail<4>());
 
     return d1 + d2;
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     Scalar d1 =
         l2.distance(location1.template head<3>(), location2.template head<3>());
@@ -572,27 +628,47 @@ template <typename Scalar> struct R3SO3Squared {
 template <typename Scalar> struct R3SO3 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 7, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 7, 1>>;
+
+  using cref3_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
+  using ref3_t = Eigen::Ref<Eigen::Matrix<Scalar, 3, 1>>;
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
   }
 
-  L2<Scalar, 3> l2;
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+
+    std::stringstream error_msg;
+    error_msg << "not implemented interpolate in " << __PRETTY_FUNCTION__;
+    throw std::runtime_error(error_msg.str());
+  }
+
+  Rn<Scalar, 3> l2;
   SO3<Scalar> so3;
 
-  Scalar distanceToRect(cref_t &location1, cref_t &lb, cref_t &ub) const {
+  void set_bounds(cref3_t lb_, cref3_t ub_) { l2.set_bounds(lb_, ub_); }
 
-    Scalar d1 = l2.distanceToRect(location1.template head<3>(),
-                                  lb.template head<3>(), ub.template head<3>());
+  void sample_uniform(ref_t x) const {
+    l2.sample_uniform(x.template head<3>());
+    so3.sample_uniform(x.template tail<4>());
+  }
+
+  inline Scalar distance_to_rectangle(cref_t &location1, cref_t &lb,
+                                      cref_t &ub) const {
+
+    Scalar d1 =
+        l2.distance_to_rectangle(location1.template head<3>(),
+                                 lb.template head<3>(), ub.template head<3>());
 
     Scalar d2 =
-        so3.distanceToRect(location1.template tail<4>(), lb.template tail<4>(),
-                           ub.template tail<4>());
+        so3.distance_to_rectangle(location1.template tail<4>(),
+                                  lb.template tail<4>(), ub.template tail<4>());
 
     return d1 + d2;
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     Scalar d1 =
         l2.distance(location1.template head<3>(), location2.template head<3>());
@@ -602,12 +678,14 @@ template <typename Scalar> struct R3SO3 {
   };
 };
 
-enum class DistanceType { L1, L2, L2Squared, SO2, SO2Squared, SO3, SO3Squared };
-
-template <typename Scalar> struct SampleVisitor {
-  using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 7, 1>> &;
-  template <typename T>
-  void distance(T t, cref_t location1, cref_t location2) const {}
+enum class DistanceType {
+  RnL1,
+  Rn,
+  RnSquared,
+  SO2,
+  SO2Squared,
+  SO3,
+  SO3Squared
 };
 
 inline bool starts_with(const std::string &str, const std::string &prefix) {
@@ -639,7 +717,7 @@ template <typename Scalar> struct Combined {
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, -1, 1>>;
 
   using Space =
-      std::variant<L1<Scalar>, L2<Scalar>, L2Squared<Scalar>, SO2<Scalar>,
+      std::variant<RnL1<Scalar>, Rn<Scalar>, RnSquared<Scalar>, SO2<Scalar>,
                    SO2Squared<Scalar>, SO3<Scalar>, SO3Squared<Scalar>>;
   std::vector<Space> spaces;
   std::vector<int> dims; // TODO: remove this and get auto from spaces
@@ -657,33 +735,33 @@ template <typename Scalar> struct Combined {
       if (spaces_str.at(i) == "SO2") {
         spaces.push_back(SO2<Scalar>());
         dims.push_back(1);
-      }
-      if (spaces_str.at(i) == "SO2Squared") {
+      } else if (spaces_str.at(i) == "SO2Squared") {
         spaces.push_back(SO2Squared<Scalar>());
         dims.push_back(1);
-      }
-      if (spaces_str.at(i) == "SO3") {
+      } else if (spaces_str.at(i) == "SO3") {
         spaces.push_back(SO3<Scalar>());
         dims.push_back(4);
-      }
-      if (spaces_str.at(i) == "SO3Squared") {
+      } else if (spaces_str.at(i) == "SO3Squared") {
         spaces.push_back(SO3Squared<Scalar>());
-      }
-      if (starts_with(spaces_str.at(i), "L1")) {
-        spaces.push_back(L1<Scalar>());
+      } else if (starts_with(spaces_str.at(i), "RnL1")) {
+        spaces.push_back(RnL1<Scalar>());
         int dim = get_number(spaces_str.at(i));
         dims.push_back(dim);
-      }
-      if (starts_with(spaces_str.at(i), "L2") &&
-          !starts_with(spaces_str.at(i), "L2Squared")) {
-        spaces.push_back(L2<Scalar>());
+      } else if (starts_with(spaces_str.at(i), "Rn") &&
+                 !starts_with(spaces_str.at(i), "RnSquared")) {
+        spaces.push_back(Rn<Scalar>());
         int dim = get_number(spaces_str.at(i));
         dims.push_back(dim);
-      }
-      if (starts_with(spaces_str.at(i), "L2Squared")) {
-        spaces.push_back(L2Squared<Scalar>());
+      } else if (starts_with(spaces_str.at(i), "RnSquared")) {
+        spaces.push_back(RnSquared<Scalar>());
         int dim = get_number(spaces_str.at(i));
         dims.push_back(dim);
+      } else {
+        std::stringstream error_msg;
+        error_msg << "Unknown space " << spaces_str.at(i) << " in "
+                  << __PRETTY_FUNCTION__ << std::endl
+                  << __FILE__ << ":" << __LINE__;
+        throw std::runtime_error(error_msg.str());
       }
     }
     assert(spaces.size() == dims.size());
@@ -692,6 +770,52 @@ template <typename Scalar> struct Combined {
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     choose_split_dimension_default(lb, ub, ii, width);
   }
+
+  void set_bounds(const std::vector<Eigen::VectorXd> &lbs,
+                  const std::vector<Eigen::VectorXd> &ubs) {
+
+    assert(lbs.size() == ubs.size());
+
+    for (size_t i = 0; i < lbs.size(); i++) {
+      std::visit(
+          [&](auto &obj) {
+            if (lbs[i].size())
+              obj.set_bounds(lbs[i], ubs[i]);
+          },
+          spaces[i]);
+    }
+  }
+
+  void sample_uniform(ref_t x) const {
+
+    assert(spaces.size() == dims.size());
+    assert(spaces.size());
+    int counter = 0;
+    for (size_t i = 0; i < spaces.size(); i++) {
+      std::visit(
+          [&](const auto &obj) {
+            obj.sample_uniform(x.segment(counter, dims[i]));
+          },
+          spaces[i]);
+      counter += dims[i];
+    }
+  }
+
+  // void sample_uniform(std::vector<cref_t> lb, std::vector<cref_t> ub, ref_t
+  // x) const {
+  //   assert(spaces.size() == dims.size());
+  //   assert(spaces.size());
+  //   int counter = 0;
+  //   for (size_t i = 0; i < spaces.size(); i++) {
+  //     std::visit(
+  //         [&](const auto &obj) {
+  //           obj.sample_uniform(x.segment(counter, dims[i]));
+  //         },
+  //         spaces[i]);
+  //     counter += dims[i];
+  //   }
+  //
+  // }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
 
@@ -711,7 +835,7 @@ template <typename Scalar> struct Combined {
     }
   }
 
-  Scalar distance(cref_t location1, cref_t location2) const {
+  inline Scalar distance(cref_t location1, cref_t location2) const {
 
     assert(spaces.size() == dims.size());
     assert(spaces.size());
@@ -729,7 +853,8 @@ template <typename Scalar> struct Combined {
     return d;
   }
 
-  Scalar distanceToRect(cref_t location1, cref_t lb, cref_t ub) const {
+  inline Scalar distance_to_rectangle(cref_t location1, cref_t lb,
+                                      cref_t ub) const {
 
     assert(spaces.size() == dims.size());
     assert(spaces.size());
@@ -739,9 +864,9 @@ template <typename Scalar> struct Combined {
     for (size_t i = 0; i < spaces.size(); i++) {
 
       auto caller = [&](const auto &obj) {
-        return obj.distanceToRect(location1.segment(counter, dims[i]),
-                                  lb.segment(counter, dims[i]),
-                                  ub.segment(counter, dims[i]));
+        return obj.distance_to_rectangle(location1.segment(counter, dims[i]),
+                                         lb.segment(counter, dims[i]),
+                                         ub.segment(counter, dims[i]));
       };
 
       d += std::visit(caller, spaces[i]);
@@ -751,48 +876,48 @@ template <typename Scalar> struct Combined {
     return d;
   }
   //   switch (spaces[i]) {
-  //   case DistanceType::L1: {
-  //     d += L1<Scalar, -1>::distanceToRect(
+  //   case DistanceType::RnL1: {
+  //     d += RnL1<Scalar, -1>::distance_to_rectangle(
   //         location1.template segment(counter, dims[i]),
   //         lb.template segment(counter, dims[i]),
   //         ub.template segment(counter, dims[i]));
   //   } break;
-  //   case DistanceType::L2: {
-  //     d += L2<Scalar, -1>::distanceToRect(
+  //   case DistanceType::Rn: {
+  //     d += Rn<Scalar, -1>::distance_to_rectangle(
   //         location1.template segment(counter, dims[i]),
   //         lb.template segment(counter, dims[i]),
   //         ub.template segment(counter, dims[i]));
   //   } break;
-  //   case DistanceType::L2Squared: {
-  //     d += L2Squared<Scalar, -1>::distanceToRect(
+  //   case DistanceType::RnSquared: {
+  //     d += RnSquared<Scalar, -1>::distance_to_rectangle(
   //         location1.template segment(counter, dims[i]),
   //         lb.template segment(counter, dims[i]),
   //         ub.template segment(counter, dims[i]));
   //   } break;
   //   case DistanceType::SO2: {
   //     assert(dims[i] == 1);
-  //     d += SO2<Scalar>::distanceToRect(
+  //     d += SO2<Scalar>::distance_to_rectangle(
   //         location1.template segment<1>(counter),
   //         lb.template segment<1>(counter), ub.template
   //         segment<1>(counter));
   //   } break;
   //   case DistanceType::SO2Squared: {
   //     assert(dims[i] == 1);
-  //     d += SO2Squared<Scalar>::distanceToRect(
+  //     d += SO2Squared<Scalar>::distance_to_rectangle(
   //         location1.template segment<1>(counter),
   //         lb.template segment<1>(counter), ub.template
   //         segment<1>(counter));
   //   } break;
   //   case DistanceType::SO3: {
   //     assert(dims[i] == 4);
-  //     d += SO3<Scalar>::distanceToRect(
+  //     d += SO3<Scalar>::distance_to_rectangle(
   //         location1.template segment<4>(counter),
   //         lb.template segment<4>(counter), ub.template
   //         segment<4>(counter));
   //   } break;
   //   case DistanceType::SO3Squared: {
   //     assert(dims[i] == 4);
-  //     d += SO3Squared<Scalar>::distanceToRect(
+  //     d += SO3Squared<Scalar>::distance_to_rectangle(
   //         location1.template segment<4>(counter),
   //         lb.template segment<4>(counter), ub.template
   //         segment<4>(counter));
@@ -809,36 +934,36 @@ template <typename Scalar> struct Combined {
   //   std::vector<int> dims;
 };
 
-template <class Payload, int Dimensions, std::size_t BucketSize = 32,
+template <class Id, int Dimensions, std::size_t BucketSize = 32,
           typename Scalar = double,
-          typename Distance = L2Squared<Scalar, Dimensions>>
+          typename StateSpace = RnSquared<Scalar, Dimensions>>
 class KDTree {
 private:
   struct Node;
   std::vector<Node> m_nodes;
   std::set<std::size_t> waitingForSplit;
-  Distance distance_fun;
+  StateSpace state_space;
 
 public:
-  using distance_t = Distance;
   using scalar_t = Scalar;
-  using payload_t = Payload;
+  using id_t = Id;
   using point_t = Eigen::Matrix<Scalar, Dimensions, 1>;
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
   int m_dimensions = Dimensions;
   static const std::size_t bucketSize = BucketSize;
   // TODO: I also want Dimensions at runtime!!
-  using tree_t = KDTree<Payload, Dimensions, BucketSize, Scalar, Distance>;
+  using tree_t = KDTree<Id, Dimensions, BucketSize, Scalar, StateSpace>;
 
-  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
-    distance_fun.interpolate(from, to, t, out);
-  }
+  // void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+  //   state_space.interpolate(from, to, t, out);
+  // }
+  //
+  StateSpace &getStateSpace() { return state_space; }
 
-  Distance &getDistanceFun() { return distance_fun; }
-
-  KDTree(int runtime_dimension = -1, const Distance &distance_fun = Distance())
-      : distance_fun(distance_fun) {
+  KDTree(int runtime_dimension = -1,
+         const StateSpace &state_space = StateSpace())
+      : state_space(state_space) {
 
     if constexpr (Dimensions == Eigen::Dynamic) {
       assert(runtime_dimension > 0);
@@ -851,7 +976,7 @@ public:
 
   size_t size() const { return m_nodes[0].m_entries; }
 
-  void addPoint(const point_t &location, const Payload &payload,
+  void addPoint(const point_t &location, const Id &payload,
                 bool autosplit = true) {
     std::size_t addNode = 0;
 
@@ -865,7 +990,7 @@ public:
         addNode = m_nodes[addNode].m_children.second;
       }
     }
-    m_nodes[addNode].add(LocationPayload{location, payload});
+    m_nodes[addNode].add(LocationId{location, payload});
 
     if (m_nodes[addNode].shouldSplit() &&
         m_nodes[addNode].m_entries % BucketSize == 0) {
@@ -892,35 +1017,35 @@ public:
     }
   }
 
-  struct DistancePayload {
+  struct DistanceId {
     Scalar distance;
-    Payload payload;
-    bool operator<(const DistancePayload &dp) const {
+    Id payload;
+    inline bool operator<(const DistanceId &dp) const {
       return distance < dp.distance;
     }
   };
 
-  std::vector<DistancePayload> searchKnn(const point_t &location,
-                                         std::size_t maxPoints) const {
+  std::vector<DistanceId> searchKnn(const point_t &location,
+                                    std::size_t maxPoints) const {
     return searcher().search(location, std::numeric_limits<Scalar>::max(),
-                             maxPoints, distance_fun);
+                             maxPoints, state_space);
   }
 
-  std::vector<DistancePayload> searchBall(const point_t &location,
-                                          Scalar maxRadius) const {
+  std::vector<DistanceId> searchBall(const point_t &location,
+                                     Scalar maxRadius) const {
     return searcher().search(location, maxRadius,
                              std::numeric_limits<std::size_t>::max(),
-                             distance_fun);
+                             state_space);
   }
 
-  std::vector<DistancePayload>
+  std::vector<DistanceId>
   searchCapacityLimitedBall(const point_t &location, Scalar maxRadius,
                             std::size_t maxPoints) const {
-    return searcher().search(location, maxRadius, maxPoints, distance_fun);
+    return searcher().search(location, maxRadius, maxPoints, state_space);
   }
 
-  DistancePayload search(const point_t &location) const {
-    DistancePayload result;
+  DistanceId search(const point_t &location) const {
+    DistanceId result;
     result.distance = std::numeric_limits<Scalar>::infinity();
 
     if (m_nodes[0].m_entries > 0) {
@@ -934,12 +1059,12 @@ public:
         std::size_t nodeIndex = searchStack.back();
         searchStack.pop_back();
         const Node &node = m_nodes[nodeIndex];
-        if (result.distance > node.pointRectDist(location, distance_fun)) {
+        if (result.distance > node.pointRectDist(location, state_space)) {
           if (node.m_splitDimension == m_dimensions) {
-            for (const auto &lp : node.m_locationPayloads) {
-              Scalar nodeDist = distance_fun.distance(location, lp.location);
+            for (const auto &lp : node.m_locationId) {
+              Scalar nodeDist = state_space.distance(location, lp.location);
               if (nodeDist < result.distance) {
-                result = DistancePayload{nodeDist, lp.payload};
+                result = DistanceId{nodeDist, lp.payload};
               }
             }
           } else {
@@ -958,10 +1083,10 @@ public:
 
     // NB! this method is not const. Do not call this on same instance from
     // different threads simultaneously.
-    const std::vector<DistancePayload> &search(const point_t &location,
-                                               Scalar maxRadius,
-                                               std::size_t maxPoints,
-                                               Distance distance_fun) {
+    const std::vector<DistanceId> &search(const point_t &location,
+                                          Scalar maxRadius,
+                                          std::size_t maxPoints,
+                                          const StateSpace &state_space) {
       // clear results from last time
       m_results.clear();
 
@@ -971,17 +1096,16 @@ public:
                                                   BucketSize)));
       if (m_prioqueueCapacity < maxPoints &&
           maxPoints < m_tree.m_nodes[0].m_entries) {
-        std::vector<DistancePayload> container;
+        std::vector<DistanceId> container;
         container.reserve(maxPoints);
-        m_prioqueue =
-            std::priority_queue<DistancePayload, std::vector<DistancePayload>>(
-                std::less<DistancePayload>(), std::move(container));
+        m_prioqueue = std::priority_queue<DistanceId, std::vector<DistanceId>>(
+            std::less<DistanceId>(), std::move(container));
         m_prioqueueCapacity = maxPoints;
       }
 
       m_tree.searchCapacityLimitedBall(location, maxRadius, maxPoints,
                                        m_searchStack, m_prioqueue, m_results,
-                                       distance_fun);
+                                       state_space);
 
       m_prioqueueCapacity = std::max(m_prioqueueCapacity, m_results.size());
       return m_results;
@@ -991,28 +1115,26 @@ public:
     const tree_t &m_tree;
 
     std::vector<std::size_t> m_searchStack;
-    std::priority_queue<DistancePayload, std::vector<DistancePayload>>
-        m_prioqueue;
+    std::priority_queue<DistanceId, std::vector<DistanceId>> m_prioqueue;
     std::size_t m_prioqueueCapacity = 0;
-    std::vector<DistancePayload> m_results;
+    std::vector<DistanceId> m_results;
   };
 
   // NB! returned class has no const methods. Get one instance per thread!
   Searcher searcher() const { return Searcher(*this); }
 
 private:
-  struct LocationPayload {
+  struct LocationId {
     point_t location;
-    Payload payload;
+    Id payload;
   };
-  std::vector<LocationPayload> m_bucketRecycle;
+  std::vector<LocationId> m_bucketRecycle;
 
   void searchCapacityLimitedBall(
       const point_t &location, Scalar maxRadius, std::size_t maxPoints,
       std::vector<std::size_t> &searchStack,
-      std::priority_queue<DistancePayload, std::vector<DistancePayload>>
-          &prioqueue,
-      std::vector<DistancePayload> &results, Distance distance_fun) const {
+      std::priority_queue<DistanceId, std::vector<DistanceId>> &prioqueue,
+      std::vector<DistanceId> &results, const StateSpace &state_space) const {
     std::size_t numSearchPoints = std::min(maxPoints, m_nodes[0].m_entries);
 
     if (numSearchPoints > 0) {
@@ -1021,12 +1143,12 @@ private:
         std::size_t nodeIndex = searchStack.back();
         searchStack.pop_back();
         const Node &node = m_nodes[nodeIndex];
-        Scalar minDist = node.pointRectDist(location, distance_fun);
+        Scalar minDist = node.pointRectDist(location, state_space);
         if (maxRadius > minDist && (prioqueue.size() < numSearchPoints ||
                                     prioqueue.top().distance > minDist)) {
           if (node.m_splitDimension == m_dimensions) {
             node.searchCapacityLimitedBall(location, maxRadius, numSearchPoints,
-                                           prioqueue, distance_fun);
+                                           prioqueue, state_space);
           } else {
             node.queueChildren(location, searchStack);
           }
@@ -1049,8 +1171,8 @@ private:
     Node &splitNode = m_nodes[index];
     splitNode.m_splitDimension = m_dimensions;
     Scalar width(0);
-    distance_fun.choose_split_dimension(splitNode.m_lb, splitNode.m_ub,
-                                        splitNode.m_splitDimension, width);
+    state_space.choose_split_dimension(splitNode.m_lb, splitNode.m_ub,
+                                       splitNode.m_splitDimension, width);
 
     if (splitNode.m_splitDimension == m_dimensions) {
       return false;
@@ -1058,7 +1180,7 @@ private:
 
     std::vector<Scalar> splitDimVals;
     splitDimVals.reserve(splitNode.m_entries);
-    for (const auto &lp : splitNode.m_locationPayloads) {
+    for (const auto &lp : splitNode.m_locationId) {
       splitDimVals.push_back(lp.location[splitNode.m_splitDimension]);
     }
     std::nth_element(splitDimVals.begin(),
@@ -1078,7 +1200,7 @@ private:
     m_nodes.emplace_back(entries, m_dimensions);
     Node &rightNode = m_nodes.back();
 
-    for (const auto &lp : splitNode.m_locationPayloads) {
+    for (const auto &lp : splitNode.m_locationId) {
       if (lp.location[splitNode.m_splitDimension] < splitNode.m_splitValue) {
         leftNode.add(lp);
       } else {
@@ -1092,20 +1214,20 @@ private:
       splitNode.m_splitValue = 0;
       splitNode.m_splitDimension = m_dimensions;
       splitNode.m_children = std::pair<std::size_t, std::size_t>(0, 0);
-      std::swap(rightNode.m_locationPayloads, m_bucketRecycle);
+      std::swap(rightNode.m_locationId, m_bucketRecycle);
       m_nodes.pop_back();
       m_nodes.pop_back();
       return false;
     } else {
-      splitNode.m_locationPayloads.clear();
+      splitNode.m_locationId.clear();
       // if it was a standard sized bucket, recycle the memory to reduce
       // allocator pressure otherwise clear the memory used by the bucket
       // since it is a branch not a leaf anymore
-      if (splitNode.m_locationPayloads.capacity() == BucketSize) {
-        std::swap(splitNode.m_locationPayloads, m_bucketRecycle);
+      if (splitNode.m_locationId.capacity() == BucketSize) {
+        std::swap(splitNode.m_locationId, m_bucketRecycle);
       } else {
-        std::vector<LocationPayload> empty;
-        std::swap(splitNode.m_locationPayloads, empty);
+        std::vector<LocationId> empty;
+        std::swap(splitNode.m_locationId, empty);
       }
       return true;
     }
@@ -1116,9 +1238,9 @@ private:
       init(capacity, runtime_dimension);
     }
 
-    Node(std::vector<LocationPayload> &recycle, std::size_t capacity,
+    Node(std::vector<LocationId> &recycle, std::size_t capacity,
          int runtime_dimension) {
-      std::swap(m_locationPayloads, recycle);
+      std::swap(m_locationId, recycle);
       init(capacity, runtime_dimension);
     }
 
@@ -1133,7 +1255,7 @@ private:
 
       m_lb.setConstant(std::numeric_limits<Scalar>::max());
       m_ub.setConstant(std::numeric_limits<Scalar>::lowest());
-      m_locationPayloads.reserve(std::max(BucketSize, capacity));
+      m_locationId.reserve(std::max(BucketSize, capacity));
     }
 
     void expandBounds(const point_t &location) {
@@ -1142,37 +1264,36 @@ private:
       m_entries++;
     }
 
-    void add(const LocationPayload &lp) {
+    void add(const LocationId &lp) {
       expandBounds(lp.location);
-      m_locationPayloads.push_back(lp);
+      m_locationId.push_back(lp);
     }
 
     bool shouldSplit() const { return m_entries >= BucketSize; }
 
-    void
-    searchCapacityLimitedBall(const point_t &location, Scalar maxRadius,
-                              std::size_t K,
-                              std::priority_queue<DistancePayload> &results,
-                              Distance distance_fun) const {
+    void searchCapacityLimitedBall(const point_t &location, Scalar maxRadius,
+                                   std::size_t K,
+                                   std::priority_queue<DistanceId> &results,
+                                   const StateSpace &state_space) const {
 
       std::size_t i = 0;
 
       // this fills up the queue if it isn't full yet
       for (; results.size() < K && i < m_entries; i++) {
-        const auto &lp = m_locationPayloads[i];
-        Scalar distance = distance_fun.distance(location, lp.location);
+        const auto &lp = m_locationId[i];
+        Scalar distance = state_space.distance(location, lp.location);
         if (distance < maxRadius) {
-          results.emplace(DistancePayload{distance, lp.payload});
+          results.emplace(DistanceId{distance, lp.payload});
         }
       }
 
       // this adds new things to the queue once it is full
       for (; i < m_entries; i++) {
-        const auto &lp = m_locationPayloads[i];
-        Scalar distance = distance_fun.distance(location, lp.location);
+        const auto &lp = m_locationId[i];
+        Scalar distance = state_space.distance(location, lp.location);
         if (distance < maxRadius && distance < results.top().distance) {
           results.pop();
-          results.emplace(DistancePayload{distance, lp.payload});
+          results.emplace(DistanceId{distance, lp.payload});
         }
       }
     }
@@ -1188,8 +1309,9 @@ private:
       }
     }
 
-    Scalar pointRectDist(const point_t &location, Distance distance) const {
-      return distance.distanceToRect(location, m_lb, m_ub);
+    Scalar pointRectDist(const point_t &location,
+                         const StateSpace &distance) const {
+      return distance.distance_to_rectangle(location, m_lb, m_ub);
     }
 
     std::size_t m_entries = 0; /// size of the tree, or subtree
@@ -1216,8 +1338,7 @@ private:
 
     std::pair<std::size_t, std::size_t>
         m_children; /// subtrees of this node (if not a leaf)
-    std::vector<LocationPayload>
-        m_locationPayloads; /// data held in this node (if a leaf)
+    std::vector<LocationId> m_locationId; /// data held in this node (if a leaf)
   };
 };
 
@@ -1228,22 +1349,20 @@ private:
 //
 // class
 
-// template <class Payload, std::size_t Dimensions, std::size_t BucketSize =
+// template <class Id, std::size_t Dimensions, std::size_t BucketSize =
 // 32,
-//           class Distance = L2Squared, typename Scalar = double>
+//           class Distance = RnSquared, typename Scalar = double>
 
-template class KDTree<size_t, 4, 32, double, SO3Squared<double>>;
-template class KDTree<size_t, 2, 32>;
-template class KDTree<size_t, -1, 32>;
+// template class KDTree<size_t, 4, 32, double, SO3Squared<double>>;
+// template class KDTree<size_t, 2, 32>;
+// template class KDTree<size_t, -1, 32>;
 // TODO:...
 // Create a Python Interface :)
 
-} // namespace tree
-} // namespace jk
-
+} // namespace dynotree
 //
 //
 //
-// <class Payload, std::size_t Dimensions, std::size_t BucketSize = 32,
-//           class Distance = L2Squared, typename Scalar = double>
+// <class Id, std::size_t Dimensions, std::size_t BucketSize = 32,
+//           class Distance = RnSquared, typename Scalar = double>
 //

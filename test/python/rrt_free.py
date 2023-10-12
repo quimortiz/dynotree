@@ -21,23 +21,26 @@ def plot_robot(ax, x, color="black", alpha=1.0):
     ax.plot([x[0]], [x[1]], marker="o", color=color, alpha=alpha)
 
 
-def get_x_rand():
-    return np.random.rand(2) * (ub - lb) + lb
-
-
 ub = np.array([xlim[1], ylim[1]])
 lb = np.array([xlim[0], ylim[0]])
 
+dynotree.srand(1)
 tree = dynotree.TreeR2(-1)
-interpolate_fun = tree.interpolate
+space = tree.getStateSpace()
+print(lb, ub)
+space.set_bounds(lb, ub)
+interpolate_fun = space.interpolate
+# interpolate_fun = tree.interpolate
 valid_configs = []
 tree.addPoint(start, 0, True)
 valid_configs.append(start)
 parents = []
 parents.append(-1)
 __xnew = np.zeros(2)
+xrand = np.zeros(2)
 for i in range(num_steps):
-    xrand = get_x_rand()
+    space.sample_uniform(xrand)
+    # get_x_rand()
     nn = tree.searchKnn(xrand, 1)[0]
     xnear = valid_configs[nn.payload]
     advance_rate = min(max_expansion / nn.distance, 1.0)
