@@ -150,10 +150,6 @@ template <typename Scalar> struct Time {
     }
   }
 };
-template <typename Scalar, int Dimensions> struct RnTime {
-
-  // TODO: continue here!!
-};
 
 template <typename Scalar> struct SO2 {
 
@@ -428,6 +424,131 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   inline Scalar distance(cref_t &x, cref_t &y) const {
     Scalar d = rn_squared.distance(x, y);
     return std::sqrt(d);
+  }
+};
+
+template <int id> struct AddOneOrKeepMinusOne {
+  // using value = id + 1;
+  static constexpr int value = id + 1;
+};
+
+template <> struct AddOneOrKeepMinusOne<-1> {
+  static constexpr int value = -1;
+};
+
+// Dimensions, without including time. E.g. R^2 x Time is DIM=2
+template <typename Scalar, int Dimensions> struct RnTime {
+
+  // using effective_dim = typename AddOneOrKeepMinusOne<Dimensions>::value;
+
+  constexpr static int effective_dim = AddOneOrKeepMinusOne<Dimensions>::value;
+  using cref_t = const Eigen::Ref<const Eigen::Matrix<
+      Scalar, AddOneOrKeepMinusOne<effective_dim>::value, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, effective_dim, 1>>;
+
+  Time<Scalar> time;
+  Rn<Scalar, Dimensions> rn;
+
+  double lambda_t = 1.;
+  double lambda_r = 1;
+
+  void set_lambda(double lambda_t_, double lambda_r_) {
+    assert(lambda_t_ >= 0);
+    assert(lambda_r_ >= 0);
+    lambda_t = lambda_t_;
+    lambda_r = lambda_r_;
+  }
+
+  void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    assert(t >= 0);
+    assert(t <= 1);
+
+    time.interpolate(from.template tail<1>(), to.template tail<1>(), t,
+                     out.template tail<1>());
+
+    if constexpr (Dimensions == Eigen::Dynamic) {
+      size_t n = from.size() - 1;
+      rn.interpolate(from.head(n), to.head(n), t, out.head(n));
+
+    }
+
+    else {
+      rn.interpolate(from.template head<Dimensions>(),
+                     to.template head<Dimensions>(), t,
+                     out.template head<Dimensions>());
+    }
+  }
+
+  void set_bounds(cref_t lb_, cref_t ub_) {
+
+    assert(lb_.size() == ub_.size());
+
+    time.set_bounds(lb_.template tail<1>(), ub_.template tail<1>());
+
+    if constexpr (Dimensions == Eigen::Dynamic) {
+      size_t n = lb_.size() - 1;
+      rn.set_bounds(lb_.head(n), ub_.head(n));
+    } else {
+      rn.set_bounds(lb_.template head<Dimensions>(),
+                    ub_.template head<Dimensions>());
+    }
+  }
+
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                              Scalar &width) const {
+    choose_split_dimension_default(lb, ub, ii, width);
+  }
+
+  void sample_uniform(ref_t x) const {
+
+    time.sample_uniform(x.template tail<1>());
+
+    if constexpr (Dimensions == Eigen::Dynamic) {
+      size_t n = x.size() - 1;
+      rn.sample_uniform(x.head(n));
+    } else {
+      rn.sample_uniform(x.template head<Dimensions>());
+    }
+  }
+
+  inline Scalar distance_to_rectangle(cref_t &x, cref_t &lb, cref_t &ub) const {
+
+    double dt = time.distance_to_rectangle(
+        x.template tail<1>(), lb.template tail<1>(), ub.template tail<1>());
+    double dr;
+
+    if (dt == std::numeric_limits<Scalar>::max()) {
+      return std::numeric_limits<Scalar>::max();
+    }
+
+    if constexpr (Dimensions == Eigen::Dynamic) {
+      size_t n = x.size() - 1;
+      double dr = rn.distance_to_rectangle(x.head(n), lb.head(n), ub.head(n));
+    } else {
+      double dr = rn.distance_to_rectangle(x.template head<Dimensions>(),
+                                           lb.template head<Dimensions>(),
+                                           ub.template head<Dimensions>());
+    }
+    return lambda_r * dr + lambda_t * dt;
+  }
+
+  inline Scalar distance(cref_t &x, cref_t &y) const {
+
+    double dt = time.distance(x.template tail<1>(), y.template tail<1>());
+    double dr;
+
+    if (dt == std::numeric_limits<Scalar>::max()) {
+      return std::numeric_limits<Scalar>::max();
+    }
+
+    if constexpr (Dimensions == Eigen::Dynamic) {
+      size_t n = x.size() - 1;
+      double dr = rn.distance(x.head(n), y.head(n));
+    } else {
+      double dr = rn.distance(x.template head<Dimensions>(),
+                              y.template head<Dimensions>());
+    }
+    return lambda_r * dr + lambda_t * dt;
   }
 };
 
