@@ -1,23 +1,23 @@
-#include "nigh/nigh_forward.hpp"
 #define BOOST_TEST_MODULE test_0
 #define BOOST_TEST_DYN_LINK
+
+#include <chrono>
+#include <iostream>
+
+#include "dynkdtree/KDTree.h"
+#include <Eigen/Dense>
+
 #include "ompl/base/ScopedState.h"
 #include "ompl/base/spaces/SE3StateSpace.h"
 #include "ompl/base/spaces/SO3StateSpace.h"
 #include "ompl/datastructures/NearestNeighborsGNAT.h"
 #include <boost/test/unit_test.hpp>
 
-#include <chrono>
-#include <iostream>
-
-#include "dynkdtree/KDTree.h"
-
+#include "nigh/nigh_forward.hpp"
 #include <nigh/lp_space.hpp>
 #include <nigh/so3_space.hpp>
 
 #include <nigh/kdtree_batch.hpp>
-
-#include <Eigen/Dense>
 
 double time_since_s(std::chrono::high_resolution_clock::time_point t0) {
   auto t1 = std::chrono::high_resolution_clock::now();

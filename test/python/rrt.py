@@ -115,7 +115,6 @@ N = 100
 x = np.zeros(3)
 for i in range(N):
     state_space.sample_uniform(x)
-    # x = np.random.rand(3) * np.array([3, 3, 2 * np.pi]) - np.array([0, 0, np.pi])
     is_col = is_collision(x)
     if is_col:
         plot_robot(ax, x, color="gray")
