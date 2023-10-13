@@ -42,12 +42,12 @@ for i in range(num_steps):
     space.sample_uniform(xrand)
     # get_x_rand()
     nn = tree.searchKnn(xrand, 1)[0]
-    xnear = valid_configs[nn.payload]
+    xnear = valid_configs[nn.id]
     advance_rate = min(max_expansion / nn.distance, 1.0)
     interpolate_fun(xnear, xrand, advance_rate, __xnew)
     tree.addPoint(__xnew, len(valid_configs), True)
     valid_configs.append(np.copy(__xnew))
-    parents.append(nn.payload)
+    parents.append(nn.id)
 
 fig, ax = plt.subplots()
 ax.set_xlim(xlim)
