@@ -7,6 +7,10 @@
 
 # Dynotree
 
+[![pre-commit](https://github.com/quimortiz/dyn_kdtree/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/quimortiz/dyn_kdtree/actions/workflows/pre-commit.yml)
+
+
+
 Dynamic Kd-Tree in C++ and Python: Euclidean, SO(2), SO(3) and more!
 
 The underlying KD-tree implementation is based on [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree), but dynotree supports non-Euclidean spaces and custom compound spaces. State spaces can be defined at both compile and runtime for both efficiency and flexibility.
