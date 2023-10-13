@@ -9,6 +9,7 @@
 
 [![pre-commit](https://github.com/quimortiz/dyn_kdtree/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/quimortiz/dyn_kdtree/actions/workflows/pre-commit.yml)
 [![C/C++ CI](https://github.com/quimortiz/dyn_kdtree/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/quimortiz/dyn_kdtree/actions/workflows/c-cpp.yml)
+[![PyPI version](https://badge.fury.io/py/dynotree.svg)](https://badge.fury.io/py/dynotree)
 
 
 
