@@ -182,7 +182,7 @@ for i in range(max_steps):
         xrand = np.copy(goal)
     # find nearest neighbor
     nn = tree.searchKnn(xrand, 1)[0]
-    xnear = valid_configs[nn.payload]
+    xnear = valid_configs[nn.id]
     advance_rate = min(max_expansion / nn.distance, 1.0)
     print("advance_rate", advance_rate)
     xnew = np.zeros(3)
@@ -198,7 +198,7 @@ for i in range(max_steps):
         print("adding point")
         tree.addPoint(xnew, len(valid_configs), True)
         valid_configs.append(xnew)
-        parents.append(nn.payload)
+        parents.append(nn.id)
         if np.linalg.norm(xnew - goal) < 0.01:
             solved = True
             break
