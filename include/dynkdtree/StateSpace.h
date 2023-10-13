@@ -397,12 +397,12 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
 
   inline void sample_uniform(ref_t x) const {
 
-    std::cout << "bounds are" << std::endl;
-    std::cout << lb.transpose() << std::endl;
-    std::cout << ub.transpose() << std::endl;
+    // // std::cout << "bounds are" << std::endl;
+    // std::cout << lb.transpose() << std::endl;
+    // std::cout << ub.transpose() << std::endl;
 
     x.setRandom();
-    x.array() += 1;
+    x.array() += 1.;
     x /= 2.;
     x = lb + (ub - lb).cwiseProduct(x);
 
