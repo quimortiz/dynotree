@@ -436,21 +436,23 @@ template <> struct AddOneOrKeepMinusOne<-1> {
   static constexpr int value = -1;
 };
 
+// template <int id> struct print_num;
+
 // Dimensions, without including time. E.g. R^2 x Time is DIM=2
 template <typename Scalar, int Dimensions> struct RnTime {
 
   // using effective_dim = typename AddOneOrKeepMinusOne<Dimensions>::value;
 
   constexpr static int effective_dim = AddOneOrKeepMinusOne<Dimensions>::value;
-  using cref_t = const Eigen::Ref<const Eigen::Matrix<
-      Scalar, AddOneOrKeepMinusOne<effective_dim>::value, 1>> &;
+  using cref_t =
+      const Eigen::Ref<const Eigen::Matrix<Scalar, effective_dim, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, effective_dim, 1>>;
 
   Time<Scalar> time;
   Rn<Scalar, Dimensions> rn;
 
   double lambda_t = 1.;
-  double lambda_r = 1;
+  double lambda_r = 1.;
 
   void set_lambda(double lambda_t_, double lambda_r_) {
     assert(lambda_t_ >= 0);
@@ -523,16 +525,16 @@ template <typename Scalar, int Dimensions> struct RnTime {
 
     if constexpr (Dimensions == Eigen::Dynamic) {
       size_t n = x.size() - 1;
-      double dr = rn.distance_to_rectangle(x.head(n), lb.head(n), ub.head(n));
+      dr = rn.distance_to_rectangle(x.head(n), lb.head(n), ub.head(n));
     } else {
-      double dr = rn.distance_to_rectangle(x.template head<Dimensions>(),
-                                           lb.template head<Dimensions>(),
-                                           ub.template head<Dimensions>());
+      dr = rn.distance_to_rectangle(x.template head<Dimensions>(),
+                                    lb.template head<Dimensions>(),
+                                    ub.template head<Dimensions>());
     }
     return lambda_r * dr + lambda_t * dt;
   }
 
-  inline Scalar distance(cref_t &x, cref_t &y) const {
+  inline Scalar distance(cref_t x, cref_t y) const {
 
     double dt = time.distance(x.template tail<1>(), y.template tail<1>());
     double dr;
@@ -543,10 +545,10 @@ template <typename Scalar, int Dimensions> struct RnTime {
 
     if constexpr (Dimensions == Eigen::Dynamic) {
       size_t n = x.size() - 1;
-      double dr = rn.distance(x.head(n), y.head(n));
+      dr = rn.distance(x.head(n), y.head(n));
     } else {
-      double dr = rn.distance(x.template head<Dimensions>(),
-                              y.template head<Dimensions>());
+      dr = rn.distance(x.template head<Dimensions>(),
+                       y.template head<Dimensions>());
     }
     return lambda_r * dr + lambda_t * dt;
   }

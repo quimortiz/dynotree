@@ -1182,3 +1182,53 @@ BOOST_AUTO_TEST_CASE(t_orig_performance) {
   }
   std::cout << "Performance tests completed" << std::endl;
 }
+
+template <typename Tree, typename Space>
+void test_time(Tree &tree, Space &space) {
+  int num_points = 100000;
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(3, num_points);
+
+  X.row(2) = X.row(2).cwiseAbs(); // time should be positive
+
+  Eigen::Vector3d query(.8, 0, .3);
+
+  double min_d = std::numeric_limits<double>::max();
+  int best_i = -1;
+  for (size_t i = 0; i < X.cols(); i++) {
+
+    double d = space.distance(query, X.col(i).head<3>());
+    if (d < min_d) {
+      min_d = d;
+      best_i = i;
+    }
+  }
+
+  // dynotree::KDTree<int, 3, 32, double, StateSpace>
+
+  for (size_t i = 0; i < X.cols(); i++) {
+    tree.addPoint(X.col(i).head<3>(), i);
+  }
+
+  auto nn = tree.search(query);
+
+  BOOST_TEST(nn.id == best_i);
+  BOOST_TEST(nn.distance == min_d, boost::test_tools::tolerance(1e-6));
+}
+
+BOOST_AUTO_TEST_CASE(t_space_time) {
+
+  // compile time
+  using StateSpace = dynotree::RnTime<double, 2>;
+  using Tree = dynotree::KDTree<int, 3, 32, double, StateSpace>;
+  StateSpace space;
+  Tree tree;
+
+  // run time
+  using StateSpaceX = dynotree::RnTime<double, -1>;
+  using TreeX = dynotree::KDTree<int, -1, 32, double, StateSpaceX>;
+  StateSpaceX spacex;
+  TreeX treex(3);
+
+  test_time(tree, space);
+  test_time(treex, spacex);
+}

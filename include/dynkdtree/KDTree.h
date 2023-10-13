@@ -141,7 +141,7 @@ public:
         std::size_t nodeIndex = searchStack.back();
         searchStack.pop_back();
         const Node &node = m_nodes[nodeIndex];
-        if (result.distance > node.pointRectDist(x, state_space)) {
+        if (result.distance > node.distance_to_rectangle(x, state_space)) {
           if (node.m_splitDimension == m_dimensions) {
             for (const auto &lp : node.m_locationId) {
               Scalar nodeDist = state_space.distance(x, lp.x);
@@ -223,7 +223,7 @@ private:
         std::size_t nodeIndex = searchStack.back();
         searchStack.pop_back();
         const Node &node = m_nodes[nodeIndex];
-        Scalar minDist = node.pointRectDist(x, state_space);
+        Scalar minDist = node.distance_to_rectangle(x, state_space);
         if (maxRadius > minDist && (prioqueue.size() < numSearchPoints ||
                                     prioqueue.top().distance > minDist)) {
           if (node.m_splitDimension == m_dimensions) {
@@ -389,7 +389,8 @@ private:
       }
     }
 
-    Scalar pointRectDist(const point_t &x, const StateSpace &distance) const {
+    Scalar distance_to_rectangle(const point_t &x,
+                                 const StateSpace &distance) const {
       return distance.distance_to_rectangle(x, m_lb, m_ub);
     }
 
