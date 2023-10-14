@@ -56,5 +56,5 @@ jobs:
     - name: Run Python RRT
       run: |
            cd build
-           python3 ../../test/python/rrt.py
-           python3 ../../test/python/rrt_free.py
+           python3 ../../../test/python/rrt.py
+           python3 ../../../test/python/rrt_free.py
