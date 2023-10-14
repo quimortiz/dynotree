@@ -31,7 +31,7 @@ jobs:
       run: |
           mkdir build
           cd build
-          cmake -DCMAKE_PREFIX_PATH="~/__local;" -DBUILD_TESTING=1 -DBUILD_PYTHON=1 ..
+          cmake -DCMAKE_PREFIX_PATH="~/__local;" -DBUILD_TESTING=1 -DBUILD_PYTHON_BINDINGS=1 ..
 
     - name: Make
       run: |
@@ -39,22 +39,22 @@ jobs:
            make
     - name: Check C++
       run: |
-           cd build
+           cd build/test/cpp
            ./main
     - name: Check Python
       run: |
-           cd build
-           python3 -c "import dynotree"
+           cd build/bindings/python
+           python3 -c "import pydynotree"
     - name: Python Install Dependencies
       run: |
            pip3 install numpy
            pip3 install matplotlib
     - name: Run Python Basic
       run: |
-           cd build
-           python3 ../test/python/main.py
+           cd build/bindings/python
+           python3 ../../../test/python/main.py
     - name: Run Python RRT
       run: |
            cd build
-           python3 ../test/python/rrt.py
-           python3 ../test/python/rrt_free.py
+           python3 ../../test/python/rrt.py
+           python3 ../../test/python/rrt_free.py
