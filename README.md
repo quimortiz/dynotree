@@ -1,9 +1,7 @@
 
-
 <p align="center">
-  <img width="50%" height="auto" src="./logo.svg">
+  <img width="50%" height="auto" src="https://github.com/quimortiz/logo.svg">
 </p>
-
 
 # Dynotree
 
@@ -11,32 +9,44 @@
 [![C/C++ CI](https://github.com/quimortiz/dyn_kdtree/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/quimortiz/dyn_kdtree/actions/workflows/c-cpp.yml)
 [![PyPI version](https://badge.fury.io/py/dynotree.svg)](https://badge.fury.io/py/dynotree)
 
+A Dynamic Kd-Tree written in C++ with Python Bindings, supporting Euclidean, SO(2), SO(3), and more!
 
+Dynotree supports both Euclidean and non-Euclidean spaces, as well as compound spaces. These spaces can be defined either at compile time for efficiency or at runtime for flexibility.
 
-Dynamic Kd-Tree in C++ and Python: Euclidean, SO(2), SO(3) and more!
+It is a header-only C++ library that depends solely on Eigen and offers Python bindings for rapid development and prototyping.
 
-The underlying KD-tree implementation is based on [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree), but dynotree supports non-Euclidean spaces and custom compound spaces. State spaces can be defined at both compile and runtime for both efficiency and flexibility.
+The primary application is motion planning. Check the `examples/python` directory where we implement
+RRT, RRT star, and RRT connect in few lines code, utilizing dynotree for efficient nearest neighbor lookup.
 
-The C++ library is header-only, with Eigen as single dependency, and we provide Python bindings for fast development and prototyping.
+This code has been employed in various research projects and is continuously tested using Github Actions. We have benchmarked it against nearest neighbor implementations from Nigh, OMPL, and bucket-pr-kdtree.
 
+We welcome Bug Issues, Pull Requests, and feature suggestions.
+
+The base KD-tree implementation derives from [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree), but our version has been enhanced to handle non-Euclidean spaces and support both Compile and Runtime spaces based on the Eigen API.
 
 # Try it out!
 
 ## PYTHON
 
+### PIP Package
+
 ```bash
 pip3 install dynotree
 ```
 
-A first example:
+First example:
 [rrt_free.py](test/python/rrt_free.py)
 
-A second example:
+Second example:
 [rrt.py](https://github.com/quimortiz/dyn_kdtree/blob/main/test/python/rrt.py)
+
+### Python from source
+
+Refer to the section on `Creating a Python package and installing from source` below.
 
 ## C++
 
-Test and examples are in  [main.cpp](https://github.com/quimortiz/dyn_kdtree/blob/main/src/main.cpp)
+Tests and examples can be found in [main.cpp](https://github.com/quimortiz/dyn_kdtree/blob/main/src/main.cpp).
 
 ```bash
 git clone --recurse-submodules https://github.com/quimortiz/dyn_kdtree
@@ -48,51 +58,54 @@ make
 ./main
 ```
 
-use
+To run a specific example or test, use:
 ```
 ./main --run_test=NAME_OF_TEST
 ```
-to run only one example or test
 
+# Development
 
-# DEV
+## Create a Python Package and Install from Source
 
+To create wheels:
+```
+CMAKE_ARGS="-DBUILD_PYTHON_BINDINGS=1" python3 -m build
+```
+The wheels will be located in the `dist/` directory. Install the wheels with the following (adjust the package and python version as needed):
 
-## Testing
+```
+pip3 install dist/dynotree-0.0.4-cp38-cp38-linux_x86_64.whl
+```
 
+## Create a Python Package and Upload to PYPI
 
+### Creating wheels for PYPI
 
-## Create wheels
-
-for publishing in pypi
 ```bash
 docker pull quay.io/pypa/manylinux2014_x86_64
 docker run -it -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64 /io/build-wheels.sh
 python3 -m twine upload wheelhouse/*
 ```
 
-using testpypi
+For uploading to testpypi:
 ```bash
 python3 -m twine upload --repository testpypi wheelhouse/*
 ```
 
-
-for creating local package:
+For creating a local package:
 ```bash
 TODO
 ```
 
+# Why choose dyn_kdtree?
 
-# Why dyn_kdtree?
-
-* Faster than OMPL and simpler than NIGH
-* Dynamic: Add points one by one -- Ideal for Motion Planning
-* Support Euclidean, SO(2), SO(3) and any combination
-* Performant and flexible C++ code based on Eigen.
-* Single Header File
-* Python Bindings for easy integration
-* Extendable with custom spaces!
-
+* It's faster than OMPL and simpler than NIGH.
+* It's dynamic: you can add points individually, making it ideal for Motion Planning.
+* Supports Euclidean, SO(2), SO(3), and various combinations.
+* Offers performant and flexible C++ code based on Eigen.
+* Available as a Single Header File.
+* Comes with Python Bindings for seamless integration.
+* Can be extended to accommodate custom spaces.
 
 # Python Bindings
 
@@ -102,29 +115,26 @@ TODO
 
 ## Option 3
 
-
 # Dependencies
 
-Python: No dependencies
+For Python: No dependencies.
 
+For C++ Code: Eigen
 
-C++ Code: Eigen
-
-Develop: Eigen and Boost Testing
+For Development: Eigen and Boost Testing
 
 # Interface
 
-See this for examples.
+Refer to the provided examples for more information.
 
 # Benchmark
 
-Check this repo for benchmark against
+For benchmarking against other platforms, refer to this repository:
 * [bucket-pr-kdtree](https://github.com/jkflying/bucket-pr-kdtree)
 * OMPL
 * Nigh
 * ...
 
-
 # Roadmap
 
-Code is Stable, currently used in ...
+The code is stable and is currently in use ...

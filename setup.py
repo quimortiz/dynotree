@@ -58,7 +58,7 @@ class CMakeBuild(build_ext):
 
         # In this example, we pass in the version to C++. You might not need
         # to.
-        cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]
+        # cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -141,7 +141,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="dynotree",
-    version="0.0.4",
+    version="0.0.5",
     author="Joaquim Ortiz-Haro",
     author_email="quimortiz21@gmail.com",
     description="Dynotree - Dynamic Kd tree",
@@ -152,5 +152,5 @@ setup(
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.6",
-    project_urls={"Link 1": "https://github.com/quimortiz/dynotree/"},
+    project_urls={"Github": "https://github.com/quimortiz/dynotree/"},
 )

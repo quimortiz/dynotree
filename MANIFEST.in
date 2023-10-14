@@ -1,5 +1,6 @@
 include README.md LICENSE deps/pybind11/LICENSE
 graft deps/
+graft bindings/
 graft src
 graft include
-global-include CMakeLists.txt *.cmake
+global-include CMakeLists.txt *.cmake *.in
