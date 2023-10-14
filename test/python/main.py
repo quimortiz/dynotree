@@ -3,7 +3,7 @@ import sys
 sys.path.append(".")
 
 
-import dynotree
+import pydynotree as dynotree
 import numpy as np
 import time
 
