@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img width="50%" height="auto" src="https://github.com/quimortiz/dyn_kdtree/assets/32126190/8d1a154d-90c5-4e39-b7c9-81efde725a11">
+  <img width="50%" height="auto" src="./logo.svg">
 </p>
 
 
