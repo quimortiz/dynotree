@@ -152,5 +152,5 @@ setup(
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.6",
-    project_urls={"Link 1": "https://github.com/quimortiz/dyn_kdtree/"},
+    project_urls={"Link 1": "https://github.com/quimortiz/dynotree/"},
 )
