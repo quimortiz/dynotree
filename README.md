@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img width="50%" height="auto" src="https://github.com/quimortiz/dynotree/logo.svg">
+  <img width="50%" height="auto" src="https://github.com/quimortiz/dynotree/blob/main/logo.svg">
 </p>
 
 # Dynotree
