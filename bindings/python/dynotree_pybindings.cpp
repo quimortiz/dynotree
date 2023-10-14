@@ -1,5 +1,5 @@
 
-#include "dynkdtree/KDTree.h"
+#include "dynotree/KDTree.h"
 
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
@@ -79,7 +79,7 @@ void declare_state_space(py::module &m, const std::string &name) {
   //
 }
 
-PYBIND11_MODULE(dynotree, m) {
+PYBIND11_MODULE(pydynotree, m) {
   m.doc() = "pybind11 example plugin"; // optional module docstring
 
   using R2 = dynotree::Rn<double, 2>;

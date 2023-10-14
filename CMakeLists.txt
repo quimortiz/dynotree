@@ -1,40 +1,80 @@
 # CMakeTemplate A template for CMake projects
-project(kdtree)
 
-# set c++17
-set(CMAKE_CXX_STANDARD 17)
+# Build system is based on https://dominikberner.ch/cmake-interface-lib/
+# https://github.com/bernedom/SI
 
-cmake_minimum_required(VERSION 3.0)
-find_package(Eigen3 REQUIRED)
+cmake_minimum_required(VERSION 3.12)
 
-option(BUILD_PYTHON ON)
+project(
+  dynotree
+  VERSION 0.0.4
+  DESCRIPTION "A dynamic nearest neighbor search library"
+  LANGUAGES CXX
+  HOMEPAGE_URL "https://github.com/quimortiz/dyn_kdtree/")
+
+include(GNUInstallDirs)
+
+# Is it required to find eigen here? find_package(Eigen3 REQUIRED)
+
+add_library(dynotree INTERFACE)
+add_library(dynotree::dynotree ALIAS dynotree)
+
+target_include_directories(
+  dynotree INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+target_compile_features(dynotree INTERFACE cxx_std_17)
+
+# add_library(dynobench::dynobench ALIAS dynobench)
+option(BUILD_PYTHON_BINDINGS OFF)
 option(BUILD_TESTING OFF)
+option(BUILD_EXAMPLES OFF)
 
+#
 message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
-message(STATUS "BUILD_PYTHON: ${BUILD_PYTHON}")
+message(STATUS "BUILD_PYTHON_BINDINGS ${BUILD_PYTHON_BINDINGS}")
+message(STATUS "BUILD_EXAMPLES: ${BUILD_EXAMPLES}")
+#
 
-if(BUILD_PYTHON)
-  add_subdirectory(deps/pybind11)
-  pybind11_add_module(dynotree src/pykdtree.cpp)
-  target_include_directories(dynotree PRIVATE include)
-  target_link_libraries(dynotree PRIVATE Eigen3::Eigen)
-  set_property(TARGET dynotree PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif(BUILD_PYTHON)
+#
+
+# endif(BUILD_TESTING)
+
+install(
+  TARGETS dynotree
+  EXPORT dynotree_Targets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "dynotreeConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion)
+
+configure_package_config_file(
+  "${PROJECT_SOURCE_DIR}/cmake/dynotreeConfig.cmake.in"
+  "${PROJECT_BINARY_DIR}/dynotreeConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dynotree/cmake)
+
+install(
+  EXPORT dynotree_Targets
+  FILE dynotreeTargets.cmake
+  NAMESPACE dynotree::
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dynotree/cmake)
+
+install(FILES "${PROJECT_BINARY_DIR}/dynotreeConfig.cmake"
+              "${PROJECT_BINARY_DIR}/dynotreeConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dynotree/cmake)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/dynotree DESTINATION include)
 
 if(BUILD_TESTING)
-  find_package(ompl 1.6 REQUIRED)
-  message(STATUS "OMPL_FOUND: ${OMPL_FOUND}")
-  message(STATUS "OMPL_INCLUDE_DIRS: ${OMPL_INCLUDE_DIRS}")
-  message(STATUS "OMPL_LIBRARIES: ${OMPL_LIBRARIES}")
-  message(STATUS "OMPL_VERSION: ${OMPL_VERSION}")
+  enable_testing()
+  add_subdirectory(test/cpp)
+endif()
 
-  find_package(Boost REQUIRED COMPONENTS unit_test_framework system filesystem
-                                         serialization)
-
-  add_executable(main src/main.cpp)
-
-  target_include_directories(main PRIVATE include deps/nigh/src
-                                          ${OMPL_INCLUDE_DIRS})
-  target_link_libraries(main PRIVATE Eigen3::Eigen Boost::unit_test_framework
-                                     Boost::filesystem ${OMPL_LIBRARIES})
-endif(BUILD_TESTING)
+if(BUILD_PYTHON_BINDINGS)
+  add_subdirectory(bindings/python)
+endif()

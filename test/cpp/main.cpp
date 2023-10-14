@@ -4,7 +4,7 @@
 #include <chrono>
 #include <iostream>
 
-#include "dynkdtree/KDTree.h"
+#include "dynotree/KDTree.h"
 #include <Eigen/Dense>
 
 #include "ompl/base/ScopedState.h"
