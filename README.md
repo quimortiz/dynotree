@@ -1,11 +1,17 @@
 
 
 <p align="center">
-  <img width="20%" height="auto" src="https://github.com/quimortiz/dyn_kdtree/assets/32126190/467624f4-f8f1-48c5-ab61-8fdd684b8e1b">
+  <img width="50%" height="auto" src="https://github.com/quimortiz/dyn_kdtree/assets/32126190/8d1a154d-90c5-4e39-b7c9-81efde725a11">
 </p>
 
 
 # Dynotree
+
+[![pre-commit](https://github.com/quimortiz/dyn_kdtree/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/quimortiz/dyn_kdtree/actions/workflows/pre-commit.yml)
+[![C/C++ CI](https://github.com/quimortiz/dyn_kdtree/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/quimortiz/dyn_kdtree/actions/workflows/c-cpp.yml)
+[![PyPI version](https://badge.fury.io/py/dynotree.svg)](https://badge.fury.io/py/dynotree)
+
+
 
 Dynamic Kd-Tree in C++ and Python: Euclidean, SO(2), SO(3) and more!
 
