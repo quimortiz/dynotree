@@ -101,6 +101,26 @@ Run tests with
 TODO
 ```
 
+# Documentation
+
+[C++ Documentation](https://quimortiz.github.io/dynotree/index.html)
+
+Python Documentation - TOO
+
+The documentation is quite minimal. The goal is to provide a searchable index that exposes all available classes and functions.
+You can instead check examples and tests to see how to use the code.
+C++ documentation is built with Doxygen and GitHub CI.
+Python documentation is deployed in another project (To Do) (built automatically from the PIP package).
+
+To build the documentation locally:
+
+```
+doxygen
+firefox doxydoc/html/index.html
+```
+
+
+
 # Why choose dyn_kdtree?
 
 * It's faster than OMPL and simpler than NIGH.
