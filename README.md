@@ -105,12 +105,13 @@ TODO
 
 [C++ Documentation](https://quimortiz.github.io/dynotree/index.html)
 
-Python Documentation - TOO
+[Python Documentation](https://quimortiz.github.io/dynotree_pydoc/index.html)
+
 
 The documentation is quite minimal. The goal is to provide a searchable index that exposes all available classes and functions.
 You can instead check examples and tests to see how to use the code.
 C++ documentation is built with Doxygen and GitHub CI.
-Python documentation is deployed in another project (To Do) (built automatically from the PIP package).
+Python documentation is built and deployed in another repository [dynotree_pydoc](https://github.com/quimortiz/dynotree_pydoc) (To Do -- should be built automatically from the PIP package).
 
 To build the documentation locally:
 
@@ -147,4 +148,4 @@ TODO
 
 # Roadmap
 
-The code is stable and currently in used in Dynoplan. No API breaking changes are expected but ther are not guarantees. 
+The code is stable and currently in used in Dynoplan. No API breaking changes are expected but ther are not guarantees.
