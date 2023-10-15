@@ -1,12 +1,12 @@
 
 <p align="center">
-  <img width="50%" height="auto" src="https://github.com/quimortiz/logo.svg">
+  <img width="50%" height="auto" src="https://github.com/quimortiz/dynotree/blob/main/logo.svg">
 </p>
 
 # Dynotree
 
-[![pre-commit](https://github.com/quimortiz/dyn_kdtree/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/quimortiz/dyn_kdtree/actions/workflows/pre-commit.yml)
-[![C/C++ CI](https://github.com/quimortiz/dyn_kdtree/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/quimortiz/dyn_kdtree/actions/workflows/c-cpp.yml)
+[![pre-commit](https://github.com/quimortiz/dynotree/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/quimortiz/dynotree/actions/workflows/pre-commit.yml)
+[![C/C++ CI](https://github.com/quimortiz/dynotree/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/quimortiz/dynotree/actions/workflows/c-cpp.yml)
 [![PyPI version](https://badge.fury.io/py/dynotree.svg)](https://badge.fury.io/py/dynotree)
 
 A Dynamic Kd-Tree written in C++ with Python Bindings, supporting Euclidean, SO(2), SO(3), and more!
@@ -48,6 +48,7 @@ Refer to the section on `Creating a Python package and installing from source` b
 
 Tests and examples can be found in [main.cpp](https://github.com/quimortiz/dyn_kdtree/blob/main/src/main.cpp).
 
+TODO
 ```bash
 git clone --recurse-submodules https://github.com/quimortiz/dyn_kdtree
 cd dyn_kdtree
@@ -57,7 +58,7 @@ cmake ..
 make
 ./main
 ```
-
+TODO
 To run a specific example or test, use:
 ```
 ./main --run_test=NAME_OF_TEST
@@ -65,21 +66,23 @@ To run a specific example or test, use:
 
 # Development
 
-## Create a Python Package and Install from Source
+## Python
 
-To create wheels:
+### Create a Python Package and Install from Source
+
+Create wheels with
 ```
 CMAKE_ARGS="-DBUILD_PYTHON_BINDINGS=1" python3 -m build
 ```
-The wheels will be located in the `dist/` directory. Install the wheels with the following (adjust the package and python version as needed):
 
+The wheels will be located in the `dist/` directory. You can install the wheels with (adjust the package and python version as needed)
 ```
 pip3 install dist/dynotree-0.0.4-cp38-cp38-linux_x86_64.whl
 ```
 
-## Create a Python Package and Upload to PYPI
+### Create a Python Package and Upload to PYPI
 
-### Creating wheels for PYPI
+Create valid wheels for PYPI (using special docker container)
 
 ```bash
 docker pull quay.io/pypa/manylinux2014_x86_64
@@ -91,9 +94,10 @@ For uploading to testpypi:
 ```bash
 python3 -m twine upload --repository testpypi wheelhouse/*
 ```
+## C++
 
-For creating a local package:
-```bash
+Run tests with
+```
 TODO
 ```
 
