@@ -69,9 +69,9 @@ void declare_state_space(py::module &m, const std::string &name) {
   py::class_<T>(m, name.c_str())
       // .def(py::init<int, const std::vector<std::string>>())
       .def(py::init<>())
-      .def("interpolate", &T::interpolate)       // add point
-      .def("set_bounds", &T::set_bounds)         // search
-      .def("sample_uniform", &T::sample_uniform) // search
+      .def("interpolate", &T::interpolate)
+      .def("set_bounds", &T::set_bounds)
+      .def("sample_uniform", &T::sample_uniform)
       .def("distance", &T::distance)
       .def("distance_to_rectangle", &T::distance_to_rectangle);
 
@@ -80,7 +80,13 @@ void declare_state_space(py::module &m, const std::string &name) {
 }
 
 PYBIND11_MODULE(pydynotree, m) {
-  m.doc() = "pybind11 example plugin"; // optional module docstring
+  m.doc() = R"pbdoc(
+        pydynotree
+        -----------------------
+
+        .. currentmodule:: pydynotree
+
+    )pbdoc";
 
   using R2 = dynotree::Rn<double, 2>;
   using R3 = dynotree::Rn<double, 3>;

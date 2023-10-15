@@ -140,11 +140,11 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setup(
-    name="dynotree",
+    name="pydynotree",
     version="0.0.5",
     author="Joaquim Ortiz-Haro",
     author_email="quimortiz21@gmail.com",
-    description="Dynotree - Dynamic Kd tree",
+    description="pyDynotree - Dynamic Kd tree",
     long_description=long_description,
     long_description_content_type="text/markdown",
     ext_modules=[CMakeExtension("dynotree")],
