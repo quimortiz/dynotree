@@ -1,0 +1,9 @@
+<map id="dynotree::Rn::distance_to_rectangle" name="dynotree::Rn::distance_to_rectangle">
+<area shape="rect" id="Node000001" title=" " alt="" coords="230,71,377,111"/>
+<area shape="rect" id="Node000002" href="$structdynotree_1_1RnTime.html#ae78bf6a045ea188fe27f59848ddfec9b" title=" " alt="" coords="5,5,182,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,68,161,49,162,44,222,63"/>
+<area shape="rect" id="Node000003" href="$structdynotree_1_1R3SO3.html#ad47d88ca921f41558753bc3f0d73d033" title=" " alt="" coords="7,71,180,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="215,94,181,94,181,88,215,88"/>
+<area shape="rect" id="Node000004" href="$structdynotree_1_1R2SO2.html#a18939a03da4bd3fe88167c643be6f5c9" title=" " alt="" coords="7,136,180,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="222,119,162,138,161,133,221,114"/>
+</map>

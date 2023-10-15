@@ -1,0 +1,14 @@
+<map id="dynotree::R2SO2&lt; Scalar &gt;" name="dynotree::R2SO2&lt; Scalar &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="79,620,250,785"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,442,55,507"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="36,506,46,549,64,595,71,607,67,610,59,597,40,551,31,507"/>
+<area shape="rect" id="Node000003" href="$structdynotree_1_1Rn.html" title=" " alt="" coords="79,392,250,557"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="167,557,167,603,162,603,162,557"/>
+<area shape="rect" id="Node000004" href="$structdynotree_1_1RnSquared.html" title=" " alt="" coords="167,149,338,329"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="222,329,204,376,199,375,217,327"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="44,5,240,71"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="142,71,136,149,132,239,136,328,143,375,138,376,131,329,126,239,131,149,136,70"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="162,69,197,133,193,136,157,72"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="275,442,372,507"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="304,508,234,608,229,605,299,505"/>
+</map>

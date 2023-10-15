@@ -1,0 +1,17 @@
+<map id="dynotree::RnSquared::distance_to_rectangle" name="dynotree::RnSquared::distance_to_rectangle">
+<area shape="rect" id="Node000001" title=" " alt="" coords="444,169,598,210"/>
+<area shape="rect" id="Node000002" href="$structdynotree_1_1Rn.html#accba15a4f5a48c406b08a69611a6e88a" title=" " alt="" coords="239,71,387,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="468,164,395,127,367,114,369,110,397,122,470,159"/>
+<area shape="rect" id="Node000006" href="$structdynotree_1_1SO3Squared.html#aab255dd5a98397b33f54aeeba8c46740" title=" " alt="" coords="236,136,390,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="429,178,390,171,391,166,429,172"/>
+<area shape="rect" id="Node000007" href="$structdynotree_1_1R3SO3Squared.html#a337705cf30f9823df853387b752bca97" title=" " alt="" coords="230,201,396,242"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="429,206,397,212,396,206,428,201"/>
+<area shape="rect" id="Node000008" href="$structdynotree_1_1R2SO2Squared.html#a5a73f5d178549426ec60c1abe35821c0" title=" " alt="" coords="230,267,396,307"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="470,220,397,256,368,269,366,264,395,251,467,215"/>
+<area shape="rect" id="Node000003" href="$structdynotree_1_1RnTime.html#ae78bf6a045ea188fe27f59848ddfec9b" title=" " alt="" coords="5,5,182,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="227,68,164,49,165,44,229,63"/>
+<area shape="rect" id="Node000004" href="$structdynotree_1_1R3SO3.html#ad47d88ca921f41558753bc3f0d73d033" title=" " alt="" coords="7,71,180,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="224,94,181,94,181,88,224,88"/>
+<area shape="rect" id="Node000005" href="$structdynotree_1_1R2SO2.html#a18939a03da4bd3fe88167c643be6f5c9" title=" " alt="" coords="7,136,180,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="229,119,165,138,164,133,227,114"/>
+</map>

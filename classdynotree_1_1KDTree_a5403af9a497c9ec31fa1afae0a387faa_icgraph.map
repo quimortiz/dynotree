@@ -1,0 +1,14 @@
+<map id="dynotree::KDTree::searcher" name="dynotree::KDTree::searcher">
+<area shape="rect" id="Node000001" title=" " alt="" coords="681,36,858,61"/>
+<area shape="rect" id="Node000002" href="$classdynotree_1_1KDTree.html#afdc6400d27c9dbb140ddd93afa5a307d" title=" " alt="" coords="6,9,193,35"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="708,34,633,19,515,10,396,8,194,17,193,11,396,3,515,5,634,14,709,29"/>
+<area shape="rect" id="Node000003" href="$classdynotree_1_1KDTree.html#a828697be47ac3ea41d22326fb9246a87" title=" " alt="" coords="468,28,633,69"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="666,51,634,51,634,46,666,46"/>
+<area shape="rect" id="Node000005" href="$classdynotree_1_1KDTree.html#ad96d97400113817e53ee060e16eab112" title=" " alt="" coords="5,62,194,88"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="709,69,634,83,515,92,396,94,194,86,194,81,396,89,515,87,633,78,708,63"/>
+<area shape="rect" id="Node000004" href="$classdynotree_1_1KDTree_1_1Searcher.html#a4c3f79cf80d7bdabfff81162b3ceb18c" title=" " alt="" coords="242,28,420,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="453,60,421,60,421,55,453,55"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="226,39,193,35,194,30,226,34"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="436,37,468,37,468,42,436,42"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="227,63,195,67,194,62,226,58"/>
+</map>
