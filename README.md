@@ -121,35 +121,15 @@ firefox doxydoc/html/index.html
 
 
 
-# Why choose dyn_kdtree?
-
-* It's faster than OMPL and simpler than NIGH.
-* It's dynamic: you can add points individually, making it ideal for Motion Planning.
-* Supports Euclidean, SO(2), SO(3), and various combinations.
-* Offers performant and flexible C++ code based on Eigen.
-* Available as a Single Header File.
-* Comes with Python Bindings for seamless integration.
-* Can be extended to accommodate custom spaces.
-
-# Python Bindings
-
-## Option 1
-
-## Option 2
-
-## Option 3
 
 # Dependencies
 
-For Python: No dependencies.
+PIP Package: No dependencies (but example require `numpy` and `matplotlib`)
 
-For C++ Code: Eigen
+C++ header-only Libray - Eigen3.
 
-For Development: Eigen and Boost Testing
+For C++ test and benchmark: Eigen and Boost Testing
 
-# Interface
-
-Refer to the provided examples for more information.
 
 # Benchmark
 
@@ -159,6 +139,12 @@ For benchmarking against other platforms, refer to this repository:
 * Nigh
 * ...
 
+Run benchmark with:
+
+```
+TODO
+```
+
 # Roadmap
 
-The code is stable and is currently in use ...
+The code is stable and currently in used in Dynoplan. No API breaking changes are expected but ther are not guarantees. 
