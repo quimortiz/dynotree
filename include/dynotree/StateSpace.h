@@ -372,7 +372,6 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
 };
 
 template <typename Scalar, int Dimensions = -1> struct Rn {
-
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
 
@@ -381,10 +380,6 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   Eigen::Matrix<Scalar, Dimensions, 1> ub;
 
   void set_bounds(cref_t lb_, cref_t ub_) {
-
-    std::cout << "setting bounds " << std::endl;
-    std::cout << lb_.transpose() << std::endl;
-    std::cout << ub_.transpose() << std::endl;
     lb = lb_;
     ub = ub_;
   }
@@ -396,18 +391,10 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   }
 
   inline void sample_uniform(ref_t x) const {
-
-    // // std::cout << "bounds are" << std::endl;
-    // std::cout << lb.transpose() << std::endl;
-    // std::cout << ub.transpose() << std::endl;
-
     x.setRandom();
     x.array() += 1.;
     x /= 2.;
     x = lb + (ub - lb).cwiseProduct(x);
-
-    // x.setRandom();
-    // x = lb + (ub - lb).cwiseProduct(x.array() + 1.) / 2.;
   }
 
   inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
@@ -424,6 +411,97 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   inline Scalar distance(cref_t &x, cref_t &y) const {
     Scalar d = rn_squared.distance(x, y);
     return std::sqrt(d);
+  }
+};
+
+struct Vpure {
+
+  using Scalar = double;
+
+  using cref_t = const Eigen::Ref<const Eigen::Matrix<double, -1, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<double, -1, 1>>;
+
+  Rn<double, 4> rn;
+
+  virtual void set_bounds(cref_t lb_, cref_t ub_) = 0;
+
+  virtual inline void interpolate(cref_t from, cref_t to, Scalar t,
+                                  ref_t out) const = 0;
+
+  virtual inline void sample_uniform(ref_t x) const = 0;
+
+  virtual inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                                             Scalar &width) = 0;
+
+  virtual inline Scalar distance_to_rectangle(cref_t &x, cref_t &lb,
+                                              cref_t &ub) const = 0;
+
+  virtual inline Scalar distance(cref_t &x, cref_t &y) const = 0;
+};
+
+struct S4irtual : Vpure {
+
+  using Scalar = double;
+
+  using cref_t = const Eigen::Ref<const Eigen::Matrix<double, -1, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<double, -1, 1>>;
+
+  Rn<double, 4> rn;
+
+  void set_bounds(cref_t lb_, cref_t ub_) override { rn.set_bounds(lb_, ub_); }
+
+  virtual inline void interpolate(cref_t from, cref_t to, Scalar t,
+                                  ref_t out) const override {
+    rn.interpolate(from, to, t, out);
+  }
+
+  virtual inline void sample_uniform(ref_t x) const override {
+    rn.sample_uniform(x);
+  }
+
+  virtual inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                                             Scalar &width) override {
+    rn.choose_split_dimension(lb, ub, ii, width);
+  }
+
+  virtual inline Scalar distance_to_rectangle(cref_t &x, cref_t &lb,
+                                              cref_t &ub) const override {
+    return rn.distance_to_rectangle(x, lb, ub);
+  };
+
+  virtual inline Scalar distance(cref_t &x, cref_t &y) const override {
+    return rn.distance(x, y);
+  }
+};
+
+struct virtual_wrapper {
+
+  using Scalar = double;
+
+  using cref_t = const Eigen::Ref<const Eigen::Matrix<double, -1, 1>> &;
+  using ref_t = Eigen::Ref<Eigen::Matrix<double, -1, 1>>;
+
+  std::shared_ptr<Vpure> s4;
+
+  void set_bounds(cref_t lb_, cref_t ub_) { s4->set_bounds(lb_, ub_); }
+
+  inline void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
+    s4->interpolate(from, to, t, out);
+  }
+
+  inline void sample_uniform(ref_t x) const { s4->sample_uniform(x); }
+
+  inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                                     Scalar &width) {
+    s4->choose_split_dimension(lb, ub, ii, width);
+  }
+
+  inline Scalar distance_to_rectangle(cref_t &x, cref_t &lb, cref_t &ub) const {
+    return s4->distance_to_rectangle(x, lb, ub);
+  };
+
+  inline Scalar distance(cref_t &x, cref_t &y) const {
+    return s4->distance(x, y);
   }
 };
 

@@ -164,15 +164,28 @@ template <typename Scalar> void __compile_vs_runtime() {
 
   using TreeRX = dynotree::KDTree<int, -1, 32, Scalar>;
   using TreeR4 = dynotree::KDTree<int, 4, 32, Scalar>;
+  using TreeVirtual =
+      dynotree::KDTree<int, -1, 32, Scalar, dynotree::virtual_wrapper>;
 
   TreeRX treex(4);
   TreeR4 tree4(-1);
+
+  // std::shared_ptr<dynotree::Vpure> space_v =
+  // std::make_shared<dynotree::S4irtual>();
+
+  //
+  dynotree::virtual_wrapper space;
+  space.s4 = std::make_shared<dynotree::S4irtual>();
+  // space.s4 = space_v;
+
+  TreeVirtual tree_virtual(4, space);
 
   MatrixX X = MatrixX::Random(10000, 4);
 
   for (size_t i = 0; i < X.rows(); ++i) {
     treex.addPoint(X.row(i), i);
     tree4.addPoint(X.row(i).template head<4>(), i);
+    tree_virtual.addPoint(X.row(i), i);
   }
   int num_neighs = 10;
 
@@ -195,6 +208,9 @@ template <typename Scalar> void __compile_vs_runtime() {
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < 10; i++)
       tree4.searchBall(x, .5);
+    // auto out =
+    //      std::cout << out.size() << std::endl;
+    // }
     // tree4.searchKnn(x, num_neighs);
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -203,15 +219,29 @@ template <typename Scalar> void __compile_vs_runtime() {
         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt 4:" << dt << std::endl;
   }
+
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < 10; i++)
+      tree_virtual.searchBall(x, .5);
+
+    // tree4.searchKnn(x, num_neighs);
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+    std::cout << "dt virtual:" << dt << std::endl;
+  }
 }
 
 BOOST_AUTO_TEST_CASE(bench_run_vs_compile) {
   std::srand(0);
   std::cout << "benchmark in c++:double" << std::endl;
   __compile_vs_runtime<double>();
-  std::cout << "benchmark in c++:float" << std::endl;
-  std::srand(0);
-  __compile_vs_runtime<float>();
+  // std::cout << "benchmark in c++:float" << std::endl;
+  // std::srand(0);
+  // __compile_vs_runtime<float>();
 }
 
 // incremental benchmark

@@ -21,7 +21,7 @@ namespace dynotree {
 
 template <class Id, int Dimensions, std::size_t BucketSize = 32,
           typename Scalar = double,
-          typename StateSpace = RnSquared<Scalar, Dimensions>>
+          typename StateSpace = Rn<Scalar, Dimensions>>
 class KDTree {
 private:
   struct Node;
