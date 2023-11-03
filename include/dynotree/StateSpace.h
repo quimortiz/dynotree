@@ -667,7 +667,7 @@ template <typename Scalar> struct R2SO2 {
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     if (use_weights)
-      choose_split_dimension_weights(lb, ub, ii, weights, width);
+      choose_split_dimension_weights(lb, ub, weights , ii, width);
     else
       choose_split_dimension_default(lb, ub, ii, width);
   }
