@@ -1,6 +1,0 @@
-[submodule "deps/pybind11"]
-	path = deps/pybind11
-	url = https://github.com/pybind/pybind11
-[submodule "deps/nigh"]
-	path = deps/nigh
-	url = https://github.com/UNC-Robotics/nigh
