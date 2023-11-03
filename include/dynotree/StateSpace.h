@@ -169,6 +169,9 @@ template <typename Scalar> struct SO2 {
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 1, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 1, 1>>;
 
+  double weight = 1.0;
+  bool use_weights = false;
+
   void sample_uniform(ref_t x) const {
 
     x(0) = (double(rand()) / (RAND_MAX + 1.)) * 2. * M_PI - M_PI;
@@ -224,13 +227,13 @@ template <typename Scalar> struct SO2 {
       Scalar d2 = lb(0) - (x(0) - 2 * M_PI);
       assert(d2 >= 0);
       assert(d1 >= 0);
-      return std::min(d1, d2);
+      return std::min(d1, d2) * (use_weights ? weight : 1.);
     } else if (x(0) < lb(0)) {
       Scalar d1 = lb(0) - x(0);
       Scalar d2 = (x(0) + 2 * M_PI) - ub(0);
       assert(d2 >= 0);
       assert(d1 >= 0);
-      return std::min(d1, d2);
+      return std::min(d1, d2) * (use_weights ? weight : 1.);
     } else {
       assert(false);
       return 0;
@@ -252,7 +255,7 @@ template <typename Scalar> struct SO2 {
       dif += 2 * M_PI;
     }
     Scalar out = std::abs(dif);
-    return out;
+    return out * (use_weights ? weight : 1.);
   }
 };
 
@@ -657,21 +660,31 @@ template <typename Scalar> struct R2SO2 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 3, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 3, 1>>;
+  using vec_t = Eigen::Matrix<Scalar, 3, 1>;
 
   using cref2_t = const Eigen::Ref<const Eigen::Matrix<Scalar, 2, 1>> &;
   using ref2_t = Eigen::Ref<Eigen::Matrix<Scalar, 2, 1>>;
 
-  // Eigen::Matrix<Scalar, 3, 1> lb;
-  // Eigen::Matrix<Scalar, 3, 1> ub;
-
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
-    choose_split_dimension_default(lb, ub, ii, width);
+    if (use_weights)
+      choose_split_dimension_weights(lb, ub, ii, weights, width);
+    else
+      choose_split_dimension_default(lb, ub, ii, width);
   }
 
   Scalar angular_weight = 1.0;
 
   Rn<Scalar, 2> l2;
   SO2<Scalar> so2;
+  vec_t weights;
+  bool use_weights = false;
+
+  void set_weights(cref_t wr2, double wso2) {
+    weights.template head<2>() = wr2;
+    weights(2) = wso2;
+    l2.set_weights(wr2);
+    so2.set_weights(wso2);
+  }
 
   void set_bounds(cref2_t lb_, cref2_t ub_) { l2.set_bounds(lb_, ub_); }
 

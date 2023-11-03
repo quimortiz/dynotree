@@ -1361,3 +1361,11 @@ BOOST_AUTO_TEST_CASE(t_scaling) {
     }
   }
 }
+
+BOOST_AUTO_TEST_CASE(t_scaling_so2) {
+  // check sO2 with typical scaling of 1 for [x,y] and 0.5 for angle
+
+  // TODO: continue here!!
+
+  BOOST_TEST(false);
+}
