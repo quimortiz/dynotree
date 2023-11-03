@@ -27,6 +27,19 @@ void choose_split_dimension_default(const T &lb, const T &ub, int &ii,
   }
 }
 
+template <typename T, typename T2, typename Scalar>
+void choose_split_dimension_weights(const T &lb, const T &ub, const T2 &weight,
+                                    int &ii, Scalar &width) {
+  for (std::size_t i = 0; i < lb.size(); i++) {
+    Scalar dWidth = (ub[i] - lb[i]) * weight(i);
+    // Scalar dWidth = (ub[i] - lb[i]);
+    if (dWidth > width) {
+      ii = i;
+      width = dWidth;
+    }
+  }
+}
+
 template <typename Scalar, int Dimensions = -1> struct RnL1 {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
@@ -287,9 +300,18 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
 
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+  using vec_t = Eigen::Matrix<Scalar, Dimensions, 1>;
 
   Eigen::Matrix<Scalar, Dimensions, 1> lb;
   Eigen::Matrix<Scalar, Dimensions, 1> ub;
+  vec_t weights;
+  bool use_weights = false;
+
+  void set_weights(cref_t weights_) {
+    assert(weights_.size() == weights.size());
+    weights = weights_;
+    use_weights = true;
+  }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     assert(t >= 0);
@@ -304,23 +326,17 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
                               Scalar &width) const {
-    choose_split_dimension_default(lb, ub, ii, width);
+    if (use_weights)
+      choose_split_dimension_weights(lb, ub, weights, ii, width);
+    else
+      choose_split_dimension_default(lb, ub, ii, width);
   }
 
   void sample_uniform(ref_t x) const {
-
-    x.setRandom();
-    x.array() += 1;
-    x /= .2;
+    x.setRandom();   // [-1,1]
+    x.array() += 1.; // [0,2]
+    x /= .2;         // [0,1]
     x = lb + (ub - lb).cwiseProduct(x);
-
-    //
-    // x.setRandom();
-    // x.array() += 1;
-    // x /= .2;
-    // x = lb + (ub - lb).cwiseProduct(x);
-    // x.setRandom();
-    // x = lb + (ub - lb).cwiseProduct(x.array() + 1.) / 2.;
   }
 
   inline Scalar distance_to_rectangle(cref_t x, cref_t lb, cref_t ub) const {
@@ -339,20 +355,15 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
       for (size_t i = 0; i < x.size(); i++) {
         Scalar xx = std::max(lb(i), std::min(ub(i), x(i)));
         Scalar dif = xx - x(i);
-        dist += dif * dif;
+        dist += dif * dif * (use_weights ? weights(i) * weights(i) : 1.);
       }
     } else {
       for (size_t i = 0; i < Dimensions; i++) {
         Scalar xx = std::max(lb(i), std::min(ub(i), x(i)));
         Scalar dif = xx - x(i);
-        dist += dif * dif;
+        dist += dif * dif * (use_weights ? weights(i) * weights(i) : 1.);
       }
     }
-
-    // Issue: memory allocation
-    // Eigen::Matrix<Scalar, Dimensions, 1> bb = x;
-    // dist = (x - bb.cwiseMax(lb).cwiseMin(ub)).squaredNorm();
-
     return dist;
   }
 
@@ -361,23 +372,30 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
     assert(x.size());
     assert(y.size());
 
-    // if constexpr (Dimensions == Eigen::Dynamic) {
-    //   std::cout << "dynamic" << std::endl;
-    // } else {
-    //   std::cout << "" << std::endl;
-    // }
-
-    return (x - y).squaredNorm();
+    if (use_weights)
+      return (x - y).cwiseProduct(weights).squaredNorm();
+    else
+      return (x - y).squaredNorm();
   }
 };
 
 template <typename Scalar, int Dimensions = -1> struct Rn {
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+  using vec_t = Eigen::Matrix<Scalar, Dimensions, 1>;
 
   RnSquared<Scalar, Dimensions> rn_squared;
   Eigen::Matrix<Scalar, Dimensions, 1> lb;
   Eigen::Matrix<Scalar, Dimensions, 1> ub;
+  vec_t weights;
+  bool use_weights = false;
+
+  void set_weights(cref_t weights_) {
+    assert(weights_.size() == weights.size());
+    weights = weights_;
+    use_weights = true;
+    rn_squared.set_weights(weights);
+  }
 
   void set_bounds(cref_t lb_, cref_t ub_) {
     lb = lb_;
@@ -398,8 +416,11 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   }
 
   inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
-                                     Scalar &width) {
-    choose_split_dimension_default(lb, ub, ii, width);
+                                     Scalar &width) const {
+    if (use_weights)
+      choose_split_dimension_weights(lb, ub, weights, ii, width);
+    else
+      choose_split_dimension_default(lb, ub, ii, width);
   }
 
   inline Scalar distance_to_rectangle(cref_t &x, cref_t &lb, cref_t &ub) const {

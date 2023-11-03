@@ -7,6 +7,8 @@
 #include "dynotree/KDTree.h"
 #include <Eigen/Dense>
 
+#include "dynotree/linear_nn.h"
+
 #include "ompl/base/ScopedState.h"
 #include "ompl/base/spaces/SE3StateSpace.h"
 #include "ompl/base/spaces/SO3StateSpace.h"
@@ -1261,4 +1263,101 @@ BOOST_AUTO_TEST_CASE(t_space_time) {
 
   test_time(tree, space);
   test_time(treex, spacex);
+}
+
+BOOST_AUTO_TEST_CASE(t_linear) {
+
+  dynotree::LinearKNN<int, 3> linear_knn;
+  Eigen::Vector3d p0(1., 2., 3.);
+  Eigen::Vector3d p1(1.1, 2., 3.);
+  Eigen::Vector3d p2(0, 0, 0);
+
+  linear_knn.addPoint(p0, 0);
+  linear_knn.addPoint(p1, 1);
+
+  auto n = linear_knn.searchNN(p2);
+  std::cout << n.id << " " << n.distance << std::endl;
+  {
+    std::vector<dynotree::LinearKNN<int, 3>::DistanceId> nns;
+    nns = linear_knn.searchBall(p2, .05);
+
+    for (size_t j = 0; j < nns.size(); ++j) {
+      std::cout << nns[j].id << " " << nns[j].distance << std::endl;
+    }
+  }
+  std::cout << n.id << n.distance << std::endl;
+
+  {
+    std::vector<dynotree::LinearKNN<int, 3>::DistanceId> nns;
+
+    nns = linear_knn.searchKnn(p2, 1);
+
+    for (size_t j = 0; j < nns.size(); ++j) {
+      std::cout << nns[j].id << " " << nns[j].distance << std::endl;
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(t_scaling) {
+
+  using Scalar = double;
+  using TreeR4 = dynotree::KDTree<int, 4, 32, Scalar>;
+  using LinearR4 = dynotree::LinearKNN<int, 4, Scalar>;
+
+  dynotree::Rn<Scalar, 4> r4;
+  r4.set_weights(Eigen::Vector4d(1, 1, .1, .1));
+
+  TreeR4 tree4(-1, r4);
+
+  LinearR4 linear4(-1, r4);
+
+  int num_points = 10000;
+
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, num_points);
+
+  for (size_t i = 0; i < X.cols(); ++i) {
+    tree4.addPoint(X.col(i), i);
+    linear4.addPoint(X.col(i), i);
+  }
+
+  Eigen::Vector4d x = Eigen::Vector4d::Random();
+
+  {
+    auto out1 = tree4.search(x);
+    auto out2 = linear4.searchNN(x);
+    BOOST_TEST(out1.id == out2.id);
+    BOOST_TEST(out1.distance == out2.distance,
+               boost::test_tools::tolerance(1e-6));
+    std::cout << out1.id << " " << out1.distance << std::endl;
+    std::cout << out2.id << " " << out2.distance << std::endl;
+    std::cout << r4.distance(X.col(out1.id), x) << std::endl;
+    std::cout << r4.distance(X.col(out2.id), x) << std::endl;
+  }
+  {
+
+    auto out1 = tree4.searchBall(x, 1.);
+    auto out2 = linear4.searchBall(x, 1.);
+
+    BOOST_TEST(out1.size() == out2.size());
+
+    for (auto &out : out1) {
+      BOOST_TEST(r4.distance(x, X.col(out.id)) < 1.);
+    }
+    for (auto &out : out2) {
+      BOOST_TEST(r4.distance(x, X.col(out.id)) < 1.);
+    }
+  }
+  {
+
+    auto out1 = tree4.searchKnn(x, 10);
+    auto out2 = linear4.searchKnn(x, 10);
+
+    BOOST_TEST(out1.size() == out2.size());
+
+    for (size_t i = 0; i < out1.size(); i++) {
+      BOOST_TEST(out1[i].id == out2[i].id);
+      BOOST_TEST(out1[i].distance == out2[i].distance,
+                 boost::test_tools::tolerance(1e-6));
+    }
+  }
 }
