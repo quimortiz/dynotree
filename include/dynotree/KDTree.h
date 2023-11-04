@@ -46,10 +46,24 @@ public:
   //
   StateSpace &getStateSpace() { return state_space; }
 
-  KDTree(int runtime_dimension = -1,
-         const StateSpace &state_space = StateSpace())
-      : state_space(state_space) {
+  // KDTree(int runtime_dimension = -1,
+  //        const StateSpace &state_space = StateSpace())
+  //     : state_space(state_space) {
+  //
+  //   if constexpr (Dimensions == Eigen::Dynamic) {
+  //     assert(runtime_dimension > 0);
+  //     m_dimensions = runtime_dimension;
+  //     m_nodes.emplace_back(BucketSize, m_dimensions);
+  //   } else {
+  //     m_nodes.emplace_back(BucketSize, -1);
+  //   }
+  // }
 
+  // TODO: decide if I want this
+  KDTree() = default;
+
+  void init_tree(int runtime_dimension = -1, const StateSpace &t_state_space = StateSpace()) {
+    state_space = t_state_space;
     if constexpr (Dimensions == Eigen::Dynamic) {
       assert(runtime_dimension > 0);
       m_dimensions = runtime_dimension;
@@ -58,6 +72,8 @@ public:
       m_nodes.emplace_back(BucketSize, -1);
     }
   }
+
+
 
   size_t size() const { return m_nodes[0].m_entries; }
 
