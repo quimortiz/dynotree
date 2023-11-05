@@ -21,7 +21,7 @@ namespace dynotree {
 
 template <class Id, int Dimensions, std::size_t BucketSize = 32,
           typename Scalar = double,
-          typename StateSpace = RnSquared<Scalar, Dimensions>>
+          typename StateSpace = Rn<Scalar, Dimensions>>
 class KDTree {
 private:
   struct Node;
@@ -35,6 +35,7 @@ public:
   using point_t = Eigen::Matrix<Scalar, Dimensions, 1>;
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+  using state_space_t = StateSpace;
   int m_dimensions = Dimensions;
   static const std::size_t bucketSize = BucketSize;
   // TODO: I also want Dimensions at runtime!!
@@ -46,10 +47,25 @@ public:
   //
   StateSpace &getStateSpace() { return state_space; }
 
-  KDTree(int runtime_dimension = -1,
-         const StateSpace &state_space = StateSpace())
-      : state_space(state_space) {
+  // KDTree(int runtime_dimension = -1,
+  //        const StateSpace &state_space = StateSpace())
+  //     : state_space(state_space) {
+  //
+  //   if constexpr (Dimensions == Eigen::Dynamic) {
+  //     assert(runtime_dimension > 0);
+  //     m_dimensions = runtime_dimension;
+  //     m_nodes.emplace_back(BucketSize, m_dimensions);
+  //   } else {
+  //     m_nodes.emplace_back(BucketSize, -1);
+  //   }
+  // }
 
+  // TODO: decide if I want this
+  KDTree() = default;
+
+  void init_tree(int runtime_dimension = -1,
+                 const StateSpace &t_state_space = StateSpace()) {
+    state_space = t_state_space;
     if constexpr (Dimensions == Eigen::Dynamic) {
       assert(runtime_dimension > 0);
       m_dimensions = runtime_dimension;

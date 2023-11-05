@@ -7,6 +7,8 @@
 #include "dynotree/KDTree.h"
 #include <Eigen/Dense>
 
+#include "dynotree/linear_nn.h"
+
 #include "ompl/base/ScopedState.h"
 #include "ompl/base/spaces/SE3StateSpace.h"
 #include "ompl/base/spaces/SO3StateSpace.h"
@@ -33,6 +35,7 @@ BOOST_AUTO_TEST_CASE(t_hello) {
     using tree_t = dynotree::KDTree<std::string, 2>;
     using point_t = Eigen::Vector2d;
     tree_t tree;
+    tree.init_tree();
     tree.addPoint(point_t(Eigen::Vector2d(1, 2)), "George");
     tree.addPoint(point_t(Eigen::Vector2d(1, 3)), "Harold");
     tree.addPoint(point_t(Eigen::Vector2d(7, 7)), "Melvin");
@@ -59,6 +62,7 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
   using point_t = Eigen::VectorXd;
   using V1d = Eigen::Matrix<double, 1, 1>;
   tree_t tree;
+  tree.init_tree();
   tree.addPoint(point_t(V1d(0)), "George");
   tree.addPoint(point_t(V1d(3.)), "Harold");
   tree.addPoint(point_t(V1d(-3.)), "Melvin");
@@ -81,6 +85,7 @@ BOOST_AUTO_TEST_CASE(t_hello3) {
   using V1d = Eigen::Matrix<double, 1, 1>;
   using point_t = V1d;
   tree_t tree;
+  tree.init_tree();
 
   std::vector<point_t> points;
   size_t N = 100;
@@ -123,6 +128,7 @@ BOOST_AUTO_TEST_CASE(t_hello4) {
 
   using point_t = Eigen::Vector3d;
   tree_t tree;
+  tree.init_tree();
 
   std::vector<point_t> points;
   size_t N = 100;
@@ -164,15 +170,31 @@ template <typename Scalar> void __compile_vs_runtime() {
 
   using TreeRX = dynotree::KDTree<int, -1, 32, Scalar>;
   using TreeR4 = dynotree::KDTree<int, 4, 32, Scalar>;
+  using TreeVirtual =
+      dynotree::KDTree<int, -1, 32, Scalar, dynotree::virtual_wrapper>;
 
-  TreeRX treex(4);
-  TreeR4 tree4(-1);
+  TreeRX treex;
+  treex.init_tree(4);
+  TreeR4 tree4;
+  tree4.init_tree();
+
+  // std::shared_ptr<dynotree::Vpure> space_v =
+  // std::make_shared<dynotree::S4irtual>();
+
+  //
+  dynotree::virtual_wrapper space;
+  space.s4 = std::make_shared<dynotree::S4irtual>();
+  // space.s4 = space_v;
+
+  TreeVirtual tree_virtual;
+  tree_virtual.init_tree(4, space);
 
   MatrixX X = MatrixX::Random(10000, 4);
 
   for (size_t i = 0; i < X.rows(); ++i) {
     treex.addPoint(X.row(i), i);
     tree4.addPoint(X.row(i).template head<4>(), i);
+    tree_virtual.addPoint(X.row(i), i);
   }
   int num_neighs = 10;
 
@@ -195,6 +217,9 @@ template <typename Scalar> void __compile_vs_runtime() {
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < 10; i++)
       tree4.searchBall(x, .5);
+    // auto out =
+    //      std::cout << out.size() << std::endl;
+    // }
     // tree4.searchKnn(x, num_neighs);
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -203,15 +228,29 @@ template <typename Scalar> void __compile_vs_runtime() {
         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt 4:" << dt << std::endl;
   }
+
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < 10; i++)
+      tree_virtual.searchBall(x, .5);
+
+    // tree4.searchKnn(x, num_neighs);
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+    std::cout << "dt virtual:" << dt << std::endl;
+  }
 }
 
 BOOST_AUTO_TEST_CASE(bench_run_vs_compile) {
   std::srand(0);
   std::cout << "benchmark in c++:double" << std::endl;
   __compile_vs_runtime<double>();
-  std::cout << "benchmark in c++:float" << std::endl;
-  std::srand(0);
-  __compile_vs_runtime<float>();
+  // std::cout << "benchmark in c++:float" << std::endl;
+  // std::srand(0);
+  // __compile_vs_runtime<float>();
 }
 
 // incremental benchmark
@@ -223,8 +262,10 @@ BOOST_AUTO_TEST_CASE(bench_run_vs_compile2) {
   using TreeRX = dynotree::KDTree<int, -1>;
   using TreeR4 = dynotree::KDTree<int, 4>;
 
-  TreeRX treex(4);
-  TreeR4 tree4(-1);
+  TreeRX treex;
+  treex.init_tree(4);
+  TreeR4 tree4;
+  tree4.init_tree();
 
   Eigen::VectorXd x = Eigen::VectorXd::Random(4);
   Eigen::Vector4d x4 = x;
@@ -302,7 +343,8 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
   std::srand(0);
   using TreeR4 = dynotree::KDTree<int, 4>;
 
-  TreeR4 tree4(-1);
+  TreeR4 tree4;
+  tree4.init_tree();
 
   Eigen::VectorXd x = Eigen::VectorXd::Random(4);
   Eigen::Vector4d x4 = x;
@@ -385,7 +427,8 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
   {
 
     using TreeR4 = dynotree::KDTree<int, 4>;
-    TreeR4 tree4(-1);
+    TreeR4 tree4;
+    tree4.init_tree();
     auto t0 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < X.cols(); ++i) {
       auto out = tree4.searchKnn(X.col(i), num_neighs);
@@ -401,7 +444,8 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
   {
 
     using TreeR4 = dynotree::KDTree<int, 4>;
-    TreeR4 tree4(-1);
+    TreeR4 tree4;
+    tree4.init_tree();
     auto t0 = std::chrono::high_resolution_clock::now();
     std::vector<std::pair<MyNode, double>> nbh;
     for (size_t i = 0; i < X.cols(); ++i) {
@@ -430,7 +474,8 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
   using TreeQuat =
       dynotree::KDTree<int, 4, 32, double, dynotree::SO3Squared<double>>;
 
-  TreeQuat tree4(-1);
+  TreeQuat tree4;
+  tree4.init_tree();
 
   Eigen::VectorXd x = Eigen::VectorXd::Random(4);
   Eigen::Vector4d x4 = x;
@@ -633,13 +678,12 @@ BOOST_AUTO_TEST_CASE(t_se3) {
   // SE3Squared<double>>;
   // SO3Squared<double>>;
 
-  TreeR3SO3 tree(-1);
+  TreeR3SO3 tree;
+  tree.init_tree();
 
   using Space = dynotree::Combined<double>::Space;
   //
   // std::vector<Space> spaces;
-
-  // TODO: test this!! How i am going to give this as input? -- it is not a
 
   std::vector<Space> spaces;
   spaces.push_back(dynotree::Rn<double>());
@@ -651,7 +695,8 @@ BOOST_AUTO_TEST_CASE(t_se3) {
   // dynotree::Combined<double> combi_space(spaces, {3, 4});
   dynotree::Combined<double> combi_space({"Rn:3", "SO3"});
   // spaces, {3, 4});
-  TreeR3SO3X treex(7, combi_space);
+  TreeR3SO3X treex;
+  treex.init_tree(7, combi_space);
 
   int nx = 7;
   Eigen::VectorXd x = Eigen::VectorXd::Random(nx);
@@ -869,8 +914,6 @@ BOOST_AUTO_TEST_CASE(t_se3) {
     }
     space->freeState(query);
   }
-
-  // TODO: incremental benchmark
 }
 
 BOOST_AUTO_TEST_CASE(t_original_example) {
@@ -879,6 +922,7 @@ BOOST_AUTO_TEST_CASE(t_original_example) {
   using tree_t = dynotree::KDTree<std::string, 2>;
   using point_t = Eigen::Vector2d;
   tree_t tree;
+  tree.init_tree();
   tree.addPoint(point_t(1, 2), "George");
   tree.addPoint(point_t(1, 3), "Harold");
   tree.addPoint(point_t(7, 7), "Melvin");
@@ -923,6 +967,7 @@ BOOST_AUTO_TEST_CASE(t_orig_accuracy) {
   std::vector<Eigen::Vector4d> points;
   using tree_t = dynotree::KDTree<int, dims>;
   tree_t tree;
+  tree.init_tree();
   int count = 0;
   std::srand(1234567);
 
@@ -1023,6 +1068,7 @@ BOOST_AUTO_TEST_CASE(t_orig_accuracy) {
   }
 
   tree_t tree2;
+  tree2.init_tree();
 
   for (std::size_t j = 0; j < points.size(); j++) {
     tree2.addPoint(points[j], j, false);
@@ -1073,14 +1119,16 @@ BOOST_AUTO_TEST_CASE(t_orig_duplicate) {
 
   auto randomPoint = []() {
     point_t loc(runtime_dim);
-    // std::array<double, dims> loc;
+    // std::array<d/uble, dims> loc;
     for (std::size_t j = 0; j < runtime_dim; j++) {
       loc[j] = double(rand()) / RAND_MAX;
     }
     return loc;
   };
   using tree_t = dynotree::KDTree<int, dims>;
-  tree_t tree(runtime_dim);
+  tree_t tree;
+
+  tree.init_tree(runtime_dim);
 
   point_t loc = randomPoint();
   for (int i = 0; i < 5000; i++) {
@@ -1119,6 +1167,7 @@ BOOST_AUTO_TEST_CASE(t_orig_performance) {
   using point_t = Eigen::Vector2d;
   std::vector<point_t> points;
   dynotree::KDTree<int, dims, 8> tree;
+  tree.init_tree();
 
   int count = 0;
   std::srand(1234567);
@@ -1222,13 +1271,119 @@ BOOST_AUTO_TEST_CASE(t_space_time) {
   using Tree = dynotree::KDTree<int, 3, 32, double, StateSpace>;
   StateSpace space;
   Tree tree;
+  tree.init_tree();
 
   // run time
   using StateSpaceX = dynotree::RnTime<double, -1>;
   using TreeX = dynotree::KDTree<int, -1, 32, double, StateSpaceX>;
   StateSpaceX spacex;
-  TreeX treex(3);
+  TreeX treex;
+  treex.init_tree(3);
 
   test_time(tree, space);
   test_time(treex, spacex);
+}
+
+BOOST_AUTO_TEST_CASE(t_linear) {
+
+  dynotree::LinearKNN<int, 3> linear_knn;
+  Eigen::Vector3d p0(1., 2., 3.);
+  Eigen::Vector3d p1(1.1, 2., 3.);
+  Eigen::Vector3d p2(0, 0, 0);
+
+  linear_knn.addPoint(p0, 0);
+  linear_knn.addPoint(p1, 1);
+
+  auto n = linear_knn.searchNN(p2);
+  std::cout << n.id << " " << n.distance << std::endl;
+  {
+    std::vector<dynotree::LinearKNN<int, 3>::DistanceId> nns;
+    nns = linear_knn.searchBall(p2, .05);
+
+    for (size_t j = 0; j < nns.size(); ++j) {
+      std::cout << nns[j].id << " " << nns[j].distance << std::endl;
+    }
+  }
+  std::cout << n.id << n.distance << std::endl;
+
+  {
+    std::vector<dynotree::LinearKNN<int, 3>::DistanceId> nns;
+
+    nns = linear_knn.searchKnn(p2, 1);
+
+    for (size_t j = 0; j < nns.size(); ++j) {
+      std::cout << nns[j].id << " " << nns[j].distance << std::endl;
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(t_scaling) {
+
+  using Scalar = double;
+  using TreeR4 = dynotree::KDTree<int, 4, 32, Scalar>;
+  using LinearR4 = dynotree::LinearKNN<int, 4, Scalar>;
+
+  dynotree::Rn<Scalar, 4> r4;
+  r4.set_weights(Eigen::Vector4d(1, 1, .1, .1));
+
+  TreeR4 tree4;
+  tree4.init_tree(4, r4);
+
+  LinearR4 linear4(-1, r4);
+
+  int num_points = 10000;
+
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, num_points);
+
+  for (size_t i = 0; i < X.cols(); ++i) {
+    tree4.addPoint(X.col(i), i);
+    linear4.addPoint(X.col(i), i);
+  }
+
+  Eigen::Vector4d x = Eigen::Vector4d::Random();
+
+  {
+    auto out1 = tree4.search(x);
+    auto out2 = linear4.searchNN(x);
+    BOOST_TEST(out1.id == out2.id);
+    BOOST_TEST(out1.distance == out2.distance,
+               boost::test_tools::tolerance(1e-6));
+    std::cout << out1.id << " " << out1.distance << std::endl;
+    std::cout << out2.id << " " << out2.distance << std::endl;
+    std::cout << r4.distance(X.col(out1.id), x) << std::endl;
+    std::cout << r4.distance(X.col(out2.id), x) << std::endl;
+  }
+  {
+
+    double radius = 1.;
+    auto out1 = tree4.searchBall(x, radius);
+    auto out2 = linear4.searchBall(x, radius);
+
+    BOOST_TEST(out1.size() == out2.size());
+
+    for (auto &out : out1) {
+      BOOST_TEST(r4.distance(x, X.col(out.id)) < radius);
+    }
+    for (auto &out : out2) {
+      BOOST_TEST(r4.distance(x, X.col(out.id)) < radius);
+    }
+  }
+  {
+    int nn = 10;
+
+    auto out1 = tree4.searchKnn(x, nn);
+    auto out2 = linear4.searchKnn(x, nn);
+
+    BOOST_TEST(out1.size() == out2.size());
+
+    for (size_t i = 0; i < out1.size(); i++) {
+      BOOST_TEST(out1[i].id == out2[i].id);
+      BOOST_TEST(out1[i].distance == out2[i].distance,
+                 boost::test_tools::tolerance(1e-6));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(t_scaling_so2) {
+  // TODO: continue here!!
 }

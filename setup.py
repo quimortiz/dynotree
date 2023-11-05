@@ -1,10 +1,22 @@
 import os
 import re
+import sys
+import sysconfig
+import platform
+import subprocess
+
+from distutils.version import LooseVersion
+from setuptools import setup, Extension, find_packages
+from setuptools.command.build_ext import build_ext
+from setuptools.command.test import test as TestCommand
+from shutil import copyfile, copymode
+import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 
-from setuptools import Extension, setup
+from setuptools import Extension, setup, find_packages
 from setuptools.command.build_ext import build_ext
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
@@ -141,16 +153,16 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="pydynotree",
-    version="0.0.5",
+    version="0.0.8",
     author="Joaquim Ortiz-Haro",
     author_email="quimortiz21@gmail.com",
-    description="pyDynotree - Dynamic Kd tree",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    ext_modules=[CMakeExtension("dynotree")],
-    cmdclass={"build_ext": CMakeBuild},
+    description="A hybrid Python/C++ test project",
+    long_description="",
+    packages=find_packages("src/python"),
+    package_dir={"": "src/python"},
+    ext_modules=[CMakeExtension("pydynotree/pydynotree")],
+    cmdclass=dict(build_ext=CMakeBuild),
+    package_data={"pydynotree": ["pydynotree.pyi"]},
+    test_suite="tests",
     zip_safe=False,
-    extras_require={"test": ["pytest>=6.0"]},
-    python_requires=">=3.6",
-    project_urls={"Github": "https://github.com/quimortiz/dynotree/"},
 )

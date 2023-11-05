@@ -6,6 +6,7 @@ import numpy as np
 from typing import Tuple, List
 import matplotlib.pyplot as plt
 import pydynotree as dynotree
+import os
 
 np.random.seed(0)
 
@@ -25,7 +26,8 @@ ub = np.array([xlim[1], ylim[1]])
 lb = np.array([xlim[0], ylim[0]])
 
 dynotree.srand(1)
-tree = dynotree.TreeR2(-1)
+tree = dynotree.TreeR2()
+tree.init_tree()
 space = tree.getStateSpace()
 print(lb, ub)
 space.set_bounds(lb, ub)
@@ -40,8 +42,7 @@ __xnew = np.zeros(2)
 xrand = np.zeros(2)
 for i in range(num_steps):
     space.sample_uniform(xrand)
-    # get_x_rand()
-    nn = tree.searchKnn(xrand, 1)[0]
+    nn = tree.search(xrand)
     xnear = valid_configs[nn.id]
     advance_rate = min(max_expansion / nn.distance, 1.0)
     interpolate_fun(xnear, xrand, advance_rate, __xnew)
@@ -68,4 +69,7 @@ for i in range(len(valid_configs)):
 
 plot_robot(ax, start, "green")
 ax.set_title("build rrt in free space")
-plt.show()
+
+
+if os.environ.get("CI") != "1":
+    plt.show()
