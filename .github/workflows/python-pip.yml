@@ -20,7 +20,7 @@ jobs:
 
     - name: Check Install package from PIP
       run: |
-           pip install dynotree
+           pip install pydynotree
            python3 -c "import pydynotree"
     - name: Python Install Dependencies
       run: |
