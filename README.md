@@ -31,7 +31,7 @@ The base KD-tree implementation derives from [bucket-pr-kdtree](https://github.c
 ### PIP Package
 
 ```bash
-pip3 install dynotree
+pip3 install pydynotree
 ```
 
 First example:
