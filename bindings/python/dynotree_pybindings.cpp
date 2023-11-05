@@ -24,7 +24,8 @@ void declare_tree(py::module &m, const std::string &name) {
       .def("search", &T::search)
       .def("searchKnn", &T::searchKnn)
       .def("searchBall", &T::searchBall)
-      .def("getStateSpace", &T::getStateSpace);
+      .def("getStateSpace", &T::getStateSpace)
+      .def("splitOutstanding", &T::splitOutstanding);
 }
 
 template <typename T>
@@ -42,7 +43,11 @@ void declare_treex(py::module &m, const std::string &name) {
       .def("search", &T::search)       // search
       .def("searchKnn", &T::searchKnn) // search
       .def("searchBall", &T::searchBall)
-      .def("getStateSpace", &T::getStateSpace); //
+      .def("getStateSpace", &T::getStateSpace)
+      .def("splitOutstanding", &T::splitOutstanding);
+
+  //
+  //
 }
 
 template <typename T>
