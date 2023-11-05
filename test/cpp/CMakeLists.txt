@@ -1,4 +1,5 @@
-find_package(ompl 1.6 REQUIRED)
+# find_package(ompl 1.6 REQUIRED)
+find_package(ompl REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include(FetchContent)
