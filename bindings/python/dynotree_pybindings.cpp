@@ -23,6 +23,7 @@ void declare_tree(py::module &m, const std::string &name) {
       .def("addPoint", &T::addPoint)
       .def("search", &T::search)
       .def("searchKnn", &T::searchKnn)
+      .def("searchBall", &T::searchBall)
       .def("getStateSpace", &T::getStateSpace);
 }
 
@@ -36,10 +37,11 @@ void declare_treex(py::module &m, const std::string &name) {
 
   py::class_<T>(m, name.c_str())
       .def(py::init<>())
-      .def("init_tree", &T::init_tree)          // init tree
-      .def("addPoint", &T::addPoint)            // add point
-      .def("search", &T::search)                // search
-      .def("searchKnn", &T::searchKnn)          // search
+      .def("init_tree", &T::init_tree) // init tree
+      .def("addPoint", &T::addPoint)   // add point
+      .def("search", &T::search)       // search
+      .def("searchKnn", &T::searchKnn) // search
+      .def("searchBall", &T::searchBall)
       .def("getStateSpace", &T::getStateSpace); //
 }
 

@@ -189,7 +189,7 @@ for i in range(max_steps):
     if np.random.rand() < goal_bias:
         xrand = np.copy(goal)
     # find nearest neighbor
-    nn = tree.searchKnn(xrand, 1)[0]
+    nn = tree.search(xrand)
     xnear = valid_configs[nn.id]
     advance_rate = min(max_expansion / nn.distance, 1.0)
     print("advance_rate", advance_rate)

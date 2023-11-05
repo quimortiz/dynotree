@@ -42,8 +42,7 @@ __xnew = np.zeros(2)
 xrand = np.zeros(2)
 for i in range(num_steps):
     space.sample_uniform(xrand)
-    # get_x_rand()
-    nn = tree.searchKnn(xrand, 1)[0]
+    nn = tree.search(xrand)
     xnear = valid_configs[nn.id]
     advance_rate = min(max_expansion / nn.distance, 1.0)
     interpolate_fun(xnear, xrand, advance_rate, __xnew)
