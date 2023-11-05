@@ -1,5 +1,7 @@
 <map id="dynotree::RnSquared::choose_split_dimension" name="dynotree::RnSquared::choose_split_dimension">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,172,46"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,172,79"/>
 <area shape="rect" id="Node000002" href="$namespacedynotree.html#a7b281f073dcb54249f4c0011a2dc3428" title=" " alt="" coords="220,5,369,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,23,204,23,204,28,172,28"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,43,204,38,205,43,172,48"/>
+<area shape="rect" id="Node000003" href="$namespacedynotree.html#a90e2cff99a1f8f113a0bbd260a9180c8" title=" " alt="" coords="220,71,369,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,69,205,74,204,80,171,75"/>
 </map>

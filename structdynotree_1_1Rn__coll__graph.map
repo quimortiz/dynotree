@@ -1,9 +1,12 @@
 <map id="dynotree::Rn&lt; Scalar, Dimensions &gt;" name="dynotree::Rn&lt; Scalar, Dimensions &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="143,407,314,587"/>
-<area shape="rect" id="Node000002" href="$structdynotree_1_1RnSquared.html" title=" " alt="" coords="18,149,189,329"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,327,175,381,179,390,174,392,170,384,143,330"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="206,457,377,657"/>
+<area shape="rect" id="Node000002" href="$structdynotree_1_1RnSquared.html" title=" " alt="" coords="73,164,243,364"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,363,187,398,200,432,205,441,200,443,195,434,182,400,171,364"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="5,5,201,71"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="106,70,106,132,101,132,101,70"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="213,206,351,271"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="278,272,253,391,248,390,273,271"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="103,70,103,104,108,139,109,147,104,148,102,140,98,104,98,70"/>
+<area shape="rect" id="Node000004" href="$classbool.html" title=" " alt="" coords="249,5,286,71"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="273,70,275,94,285,276,291,440,286,440,280,277,270,95,268,71"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="250,52,215,75,191,96,178,121,169,148,164,146,173,119,187,93,212,70,247,48"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="399,231,538,296"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="452,297,363,444,358,441,447,295"/>
 </map>

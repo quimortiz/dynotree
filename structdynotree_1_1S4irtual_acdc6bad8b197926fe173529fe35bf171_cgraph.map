@@ -1,0 +1,9 @@
+<map id="dynotree::S4irtual::choose_split_dimension" name="dynotree::S4irtual::choose_split_dimension">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,172,79"/>
+<area shape="rect" id="Node000002" href="$structdynotree_1_1Rn.html#a628dd3df13e1f165ec3528820e45a595" title=" " alt="" coords="220,39,360,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,56,204,56,204,62,172,62"/>
+<area shape="rect" id="Node000003" href="$namespacedynotree.html#a7b281f073dcb54249f4c0011a2dc3428" title=" " alt="" coords="408,5,557,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="360,44,392,39,393,44,361,49"/>
+<area shape="rect" id="Node000004" href="$namespacedynotree.html#a90e2cff99a1f8f113a0bbd260a9180c8" title=" " alt="" coords="408,71,557,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="361,68,393,73,392,79,360,73"/>
+</map>

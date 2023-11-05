@@ -90,11 +90,11 @@ Collaboration diagram for dynotree::KDTree&lt; Id, Dimensions, BucketSize, Scala
 <div class="dyncontent">
 <div class="center"><img src="classdynotree_1_1KDTree__coll__graph.png" border="0" usemap="#adynotree_1_1KDTree_3_01Id_00_01Dimensions_00_01BucketSize_00_01Scalar_00_01StateSpace_01_4_coll__map" alt="Collaboration graph"/></div>
 <map name="adynotree_1_1KDTree_3_01Id_00_01Dimensions_00_01BucketSize_00_01Scalar_00_01StateSpace_01_4_coll__map" id="adynotree_1_1KDTree_3_01Id_00_01Dimensions_00_01BucketSize_00_01Scalar_00_01StateSpace_01_4_coll__map">
-<area shape="rect" title=" " alt="" coords="5,134,191,408"/>
+<area shape="rect" title=" " alt="" coords="5,134,191,428"/>
 <area shape="rect" title=" " alt="" coords="22,5,49,71"/>
-<area shape="poly" title=" " alt="" coords="36,70,39,109,41,117,35,118,34,110,31,71"/>
+<area shape="poly" title=" " alt="" coords="36,70,39,109,40,117,35,118,34,110,31,71"/>
 <area shape="rect" title=" " alt="" coords="137,5,184,71"/>
-<area shape="poly" title=" " alt="" coords="155,71,142,118,137,117,150,70"/>
+<area shape="poly" title=" " alt="" coords="155,71,143,118,138,117,150,70"/>
 </map>
 </div>
 <table class="memberdecls">
@@ -117,6 +117,8 @@ Public Types</h2></td></tr>
 <tr class="separator:ab06adeba0ea9f779afd2a2c5cd4bd872"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafc188ee85f02ed20f9340063b6da62f" id="r_aafc188ee85f02ed20f9340063b6da62f"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#aafc188ee85f02ed20f9340063b6da62f">ref_t</a> = Eigen::Ref&lt; Eigen::Matrix&lt; Scalar, Dimensions, 1 &gt; &gt;</td></tr>
 <tr class="separator:aafc188ee85f02ed20f9340063b6da62f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08b9b2dbb1e248b1d44059d34a3d2ac5" id="r_a08b9b2dbb1e248b1d44059d34a3d2ac5"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a08b9b2dbb1e248b1d44059d34a3d2ac5">state_space_t</a> = StateSpace</td></tr>
+<tr class="separator:a08b9b2dbb1e248b1d44059d34a3d2ac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c167d831fbc61816bb4505278403dc2" id="r_a5c167d831fbc61816bb4505278403dc2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a5c167d831fbc61816bb4505278403dc2">tree_t</a> = <a class="el" href="classdynotree_1_1KDTree.html">KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;</td></tr>
 <tr class="separator:a5c167d831fbc61816bb4505278403dc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -124,11 +126,13 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad29dcfe631ca22e3871eb034221adf3a" id="r_ad29dcfe631ca22e3871eb034221adf3a"><td class="memItemLeft" align="right" valign="top">StateSpace &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#ad29dcfe631ca22e3871eb034221adf3a">getStateSpace</a> ()</td></tr>
 <tr class="separator:ad29dcfe631ca22e3871eb034221adf3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a817450606f5d2081f41edb1db2c4a530" id="r_a817450606f5d2081f41edb1db2c4a530"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a817450606f5d2081f41edb1db2c4a530">KDTree</a> (int runtime_dimension=-1, const StateSpace &amp;state_space=StateSpace())</td></tr>
-<tr class="separator:a817450606f5d2081f41edb1db2c4a530"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73d509b7926ab31a5ef7b599fad49bb0" id="r_a73d509b7926ab31a5ef7b599fad49bb0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a73d509b7926ab31a5ef7b599fad49bb0">KDTree</a> ()=default</td></tr>
+<tr class="separator:a73d509b7926ab31a5ef7b599fad49bb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30040e119a9b167f92823adadee82b04" id="r_a30040e119a9b167f92823adadee82b04"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a30040e119a9b167f92823adadee82b04">init_tree</a> (int runtime_dimension=-1, const StateSpace &amp;t_state_space=StateSpace())</td></tr>
+<tr class="separator:a30040e119a9b167f92823adadee82b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07a5dae406e61c15b95ab04117d805c8" id="r_a07a5dae406e61c15b95ab04117d805c8"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a07a5dae406e61c15b95ab04117d805c8">size</a> () const</td></tr>
 <tr class="separator:a07a5dae406e61c15b95ab04117d805c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f70875fce7602b18f64e1c3ccc2af61" id="r_a0f70875fce7602b18f64e1c3ccc2af61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a0f70875fce7602b18f64e1c3ccc2af61">addPoint</a> (const <a class="el" href="classdynotree_1_1KDTree.html#a2b64bd90b04a3f33ac98f02990f5e787">point_t</a> &amp;x, const Id &amp;id, bool autosplit=true)</td></tr>
+<tr class="memitem:a0f70875fce7602b18f64e1c3ccc2af61" id="r_a0f70875fce7602b18f64e1c3ccc2af61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a0f70875fce7602b18f64e1c3ccc2af61">addPoint</a> (const <a class="el" href="classdynotree_1_1KDTree.html#a2b64bd90b04a3f33ac98f02990f5e787">point_t</a> &amp;x, const Id &amp;id, <a class="el" href="classbool.html">bool</a> autosplit=true)</td></tr>
 <tr class="separator:a0f70875fce7602b18f64e1c3ccc2af61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a977c18691028b476536e957dafeb8cc2" id="r_a977c18691028b476536e957dafeb8cc2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdynotree_1_1KDTree.html#a977c18691028b476536e957dafeb8cc2">splitOutstanding</a> ()</td></tr>
 <tr class="separator:a977c18691028b476536e957dafeb8cc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -160,7 +164,7 @@ Static Public Attributes</h2></td></tr>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::cref_t =  const Eigen::Ref&lt;const Eigen::Matrix&lt;Scalar, Dimensions, 1&gt; &gt; &amp;</td>
@@ -176,7 +180,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::id_t =  Id</td>
@@ -192,7 +196,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::point_t =  Eigen::Matrix&lt;Scalar, Dimensions, 1&gt;</td>
@@ -208,7 +212,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::ref_t =  Eigen::Ref&lt;Eigen::Matrix&lt;Scalar, Dimensions, 1&gt; &gt;</td>
@@ -224,10 +228,26 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::scalar_t =  Scalar</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a08b9b2dbb1e248b1d44059d34a3d2ac5" name="a08b9b2dbb1e248b1d44059d34a3d2ac5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08b9b2dbb1e248b1d44059d34a3d2ac5">&#9670;&#160;</a></span>state_space_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::state_space_t =  StateSpace</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -240,7 +260,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::tree_t =  <a class="el" href="classdynotree_1_1KDTree.html">KDTree</a>&lt;Id, Dimensions, BucketSize, Scalar, StateSpace&gt;</td>
@@ -251,13 +271,13 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a817450606f5d2081f41edb1db2c4a530" name="a817450606f5d2081f41edb1db2c4a530"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a817450606f5d2081f41edb1db2c4a530">&#9670;&#160;</a></span>KDTree()</h2>
+<a id="a73d509b7926ab31a5ef7b599fad49bb0" name="a73d509b7926ab31a5ef7b599fad49bb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73d509b7926ab31a5ef7b599fad49bb0">&#9670;&#160;</a></span>KDTree()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -265,24 +285,13 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
         <tr>
           <td class="memname"><a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::KDTree </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>runtime_dimension</em> = <code>-1</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
-          <td class="paramtype">const StateSpace &amp;&#160;</td>
-          <td class="paramname"><em>state_space</em> = <code>StateSpace()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -296,7 +305,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -316,7 +325,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype"><a class="el" href="classbool.html">bool</a>&#160;</td>
           <td class="paramname"><em>autosplit</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
@@ -340,7 +349,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -361,13 +370,51 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 
 </div>
 </div>
+<a id="a30040e119a9b167f92823adadee82b04" name="a30040e119a9b167f92823adadee82b04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30040e119a9b167f92823adadee82b04">&#9670;&#160;</a></span>init_tree()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::init_tree </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>runtime_dimension</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const StateSpace &amp;&#160;</td>
+          <td class="paramname"><em>t_state_space</em> = <code>StateSpace()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0173f4c79f9949d9eb811e9d4773ad1d" name="a0173f4c79f9949d9eb811e9d4773ad1d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0173f4c79f9949d9eb811e9d4773ad1d">&#9670;&#160;</a></span>search()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -395,7 +442,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -449,7 +496,7 @@ Here is the call graph for this function:</div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -521,7 +568,7 @@ Here is the caller graph for this function:</div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -567,7 +614,7 @@ Here is the caller graph for this function:</div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -621,7 +668,7 @@ Here is the call graph for this function:</div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -648,7 +695,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -676,7 +723,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -700,7 +747,7 @@ template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Sca
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = RnSquared&lt;Scalar, Dimensions&gt;&gt; </div>
+template&lt;class Id , int Dimensions, std::size_t BucketSize = 32, typename Scalar  = double, typename StateSpace  = Rn&lt;Scalar, Dimensions&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">int <a class="el" href="classdynotree_1_1KDTree.html">dynotree::KDTree</a>&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;::m_dimensions = Dimensions</td>

@@ -1,12 +1,15 @@
 <map id="dynotree::R3SO3&lt; Scalar &gt;" name="dynotree::R3SO3&lt; Scalar &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="97,620,267,785"/>
-<area shape="rect" id="Node000002" href="$structdynotree_1_1Rn.html" title=" " alt="" coords="18,392,189,557"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,556,151,603,146,605,129,557"/>
-<area shape="rect" id="Node000003" href="$structdynotree_1_1RnSquared.html" title=" " alt="" coords="129,149,299,329"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="175,329,152,377,147,375,170,327"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="201,675,371,840"/>
+<area shape="rect" id="Node000002" href="$structdynotree_1_1Rn.html" title=" " alt="" coords="122,427,293,612"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,611,256,658,251,660,235,613"/>
+<area shape="rect" id="Node000003" href="$structdynotree_1_1RnSquared.html" title=" " alt="" coords="122,164,293,364"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="210,364,210,410,205,410,205,364"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="5,5,201,71"/>
-<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="103,71,97,149,95,239,97,329,99,374,94,375,92,329,90,239,92,149,98,70"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="123,69,159,133,154,136,118,72"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="213,442,311,507"/>
-<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="254,507,219,605,214,603,249,506"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="91,72,69,128,50,202,45,242,44,283,48,324,59,363,82,403,112,439,108,443,78,406,55,365,43,325,38,284,39,242,45,201,64,126,86,70"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="120,69,157,147,152,150,115,71"/>
+<area shape="rect" id="Node000005" href="$classbool.html" title=" " alt="" coords="237,5,274,71"/>
+<area shape="poly" id="edge6_Node000002_Node000005" title=" " alt="" coords="275,47,302,65,324,93,339,113,346,123,349,140,349,168,342,211,307,364,288,413,284,411,302,363,337,210,343,167,344,141,341,125,335,116,320,96,298,69,272,51"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="248,71,241,95,229,148,224,147,235,94,242,69"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="317,487,415,552"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="358,553,322,660,317,658,353,551"/>
 </map>

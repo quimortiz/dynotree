@@ -1,5 +1,7 @@
 <map id="dynotree::RnSquared&lt; Scalar, Dimensions &gt;" name="dynotree::RnSquared&lt; Scalar, Dimensions &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,149,176,329"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="21,5,160,71"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,70,93,132,88,132,88,70"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="45,164,216,364"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,144,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,70,104,147,99,148,80,71"/>
+<area shape="rect" id="Node000003" href="$classbool.html" title=" " alt="" coords="168,5,205,71"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="181,71,162,148,157,147,176,70"/>
 </map>

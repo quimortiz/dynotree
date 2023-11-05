@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['operator_3c_0',['operator&lt;',['../structdynotree_1_1KDTree_1_1DistanceId.html#a57b37945faf95ba728e18b5aa5a95bb3',1,'dynotree::KDTree::DistanceId']]]
+  ['linearknn_0',['LinearKNN',['../classdynotree_1_1LinearKNN.html#a2b45ceb860205f3959b228b104217aed',1,'dynotree::LinearKNN']]]
 ];
