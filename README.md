@@ -94,6 +94,28 @@ For uploading to testpypi:
 ```bash
 python3 -m twine upload --repository testpypi wheelhouse/*
 ```
+
+### Stubs
+
+
+Generate stubs from compiled file with pybind
+```
+pybind12-stubgen pydynotree
+```
+
+Copy them in the python package.
+
+From
+```
+/home/quim/stg/dynotree/src/python/pydynotree
+```
+run
+```
+cp ../../../build_release_clang/bindings/python/stubs/pydynotree.pyi
+```
+
+
+
 ## C++
 
 Run tests with
