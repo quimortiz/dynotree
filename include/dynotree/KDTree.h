@@ -35,6 +35,7 @@ public:
   using point_t = Eigen::Matrix<Scalar, Dimensions, 1>;
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+  using state_space_t = StateSpace;
   int m_dimensions = Dimensions;
   static const std::size_t bucketSize = BucketSize;
   // TODO: I also want Dimensions at runtime!!
@@ -62,7 +63,8 @@ public:
   // TODO: decide if I want this
   KDTree() = default;
 
-  void init_tree(int runtime_dimension = -1, const StateSpace &t_state_space = StateSpace()) {
+  void init_tree(int runtime_dimension = -1,
+                 const StateSpace &t_state_space = StateSpace()) {
     state_space = t_state_space;
     if constexpr (Dimensions == Eigen::Dynamic) {
       assert(runtime_dimension > 0);
@@ -72,8 +74,6 @@ public:
       m_nodes.emplace_back(BucketSize, -1);
     }
   }
-
-
 
   size_t size() const { return m_nodes[0].m_entries; }
 

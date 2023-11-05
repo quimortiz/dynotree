@@ -4,13 +4,18 @@ sys.path.append(".")
 
 
 import pydynotree as dynotree
+
+print(dynotree.__dict__)
+
+
 import numpy as np
 import time
 
 
 num_points = 10000
 
-a = dynotree.TreeRX(2)
+a = dynotree.TreeRX()
+a.init_tree(2)
 
 a.addPoint(np.array([0, 0]), 0, True)
 a.addPoint(np.array([0, 1]), 1, True)
@@ -20,7 +25,8 @@ print(nn)
 print(nn.distance)
 print(nn.id)
 
-b = dynotree.TreeR2(-1)
+b = dynotree.TreeR2()
+b.init_tree()
 b.addPoint(np.array([0, 0]), 0, True)
 b.addPoint(np.array([0, 1]), 1, True)
 b.addPoint(np.array([0, 2]), 2, True)
@@ -29,8 +35,10 @@ print(nn)
 print(nn.distance)
 print(nn.id)
 
-a = dynotree.TreeRX(2)
-b = dynotree.TreeR2(-1)
+a = dynotree.TreeRX()
+a.init_tree(2)
+b = dynotree.TreeR2()
+b.init_tree()
 
 for i in range(num_points):
     x = np.random.rand(2)
@@ -52,8 +60,10 @@ print("elapsed time: ", toc - tic)
 
 # print(o[0].id)
 
-a = dynotree.TreeRX(4)
-b = dynotree.TreeR4(-1)
+a = dynotree.TreeRX()
+a.init_tree(4)
+b = dynotree.TreeR4()
+b.init_tree()
 
 for i in range(num_points):
     x = np.random.rand(4)
@@ -74,9 +84,10 @@ toc = time.time()
 print("elapsed time: ", toc - tic)
 print(o[0].id)
 
-
-a = dynotree.TreeRX(7)
-b = dynotree.TreeR7(-1)
+a = dynotree.TreeRX()
+a.init_tree(7)
+b = dynotree.TreeR7()
+b.init_tree()
 
 for i in range(num_points):
     x = np.random.rand(7)

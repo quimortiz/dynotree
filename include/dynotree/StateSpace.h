@@ -667,7 +667,7 @@ template <typename Scalar> struct R2SO2 {
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
     if (use_weights)
-      choose_split_dimension_weights(lb, ub, weights , ii, width);
+      choose_split_dimension_weights(lb, ub, weights, ii, width);
     else
       choose_split_dimension_default(lb, ub, ii, width);
   }
@@ -976,6 +976,8 @@ template <typename Scalar> struct Combined {
                    SO2Squared<Scalar>, SO3<Scalar>, SO3Squared<Scalar>>;
   std::vector<Space> spaces;
   std::vector<int> dims; // TODO: remove this and get auto from spaces
+
+  Combined() = default;
 
   Combined(const std::vector<Space> &spaces, const std::vector<int> &dims)
       : spaces(spaces), dims(dims) {
