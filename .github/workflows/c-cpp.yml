@@ -66,3 +66,9 @@ jobs:
       run: |
            cd build
            PYTHONPATH=bindings/python/ CI=0 python3  ../test/python/all.py
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
