@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main","dev" ]
 
+env:
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
 jobs:
   build:
 
@@ -67,7 +70,10 @@ jobs:
            cd build
            PYTHONPATH=bindings/python/ CI=0 python3  ../test/python/all.py
 
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
-      env:
-           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: collect code coverage
+      run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+
+    # - name: Upload coverage reports to Codecov
+    #   uses: codecov/codecov-action@v3
+    #   env:
+    #        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
