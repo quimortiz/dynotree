@@ -73,9 +73,8 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
   point_t lazyMonsterLocation(V1d(3.1));
   // 6, 6)); // this monster will always try to eat the closest people
   const std::size_t monsterHeads = 2; // this monster can eat two people at
-//  once 
-  auto lazyMonsterVictims =
-      tree.searchKnn(lazyMonsterLocation, monsterHeads);
+                                      //  once
+  auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation, monsterHeads);
   for (const auto &victim : lazyMonsterVictims) {
     std::cout << victim.id << " closest to lazy monster, with distance "
               << victim.distance << "!" << std::endl;
@@ -84,8 +83,7 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
 
 BOOST_AUTO_TEST_CASE(t_hello3) {
   std::srand(0);
-  using tree_t = dynotree::KDTree<size_t, 1, 4, double,
-  dynotree::SO2<double>>;
+  using tree_t = dynotree::KDTree<size_t, 1, 4, double, dynotree::SO2<double>>;
 
   using V1d = Eigen::Matrix<double, 1, 1>;
   using point_t = V1d;
@@ -110,14 +108,13 @@ BOOST_AUTO_TEST_CASE(t_hello3) {
     double min_distance = std::numeric_limits<double>::max();
     int counter = 0;
     for (size_t ii = 0; ii < points.size(); ++ii) {
-      double d = tree.getStateSpace().distance(points[ii],
-      lazyMonsterLocation); if (d < radius) {
+      double d = tree.getStateSpace().distance(points[ii], lazyMonsterLocation);
+      if (d < radius) {
         counter++;
       }
     }
 
-    std::cout << "counter/size: " << counter << " " <<
-    lazyMonsterVictims.size()
+    std::cout << "counter/size: " << counter << " " << lazyMonsterVictims.size()
               << std::endl;
     if (counter != lazyMonsterVictims.size()) {
       std::cout << "Error: " << counter << " " << lazyMonsterVictims.size()
@@ -160,8 +157,7 @@ BOOST_AUTO_TEST_CASE(t_hello4) {
       }
     }
 
-    std::cout << "counter/size: " << counter << " " <<
-    lazyMonsterVictims.size()
+    std::cout << "counter/size: " << counter << " " << lazyMonsterVictims.size()
               << std::endl;
     if (counter != lazyMonsterVictims.size()) {
       std::cout << "Error: " << counter << " " << lazyMonsterVictims.size()
@@ -216,8 +212,7 @@ template <typename Scalar> void __compile_vs_runtime() {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt X:" << dt << std::endl;
   }
 
@@ -233,8 +228,7 @@ template <typename Scalar> void __compile_vs_runtime() {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt 4:" << dt << std::endl;
   }
 
@@ -248,8 +242,7 @@ template <typename Scalar> void __compile_vs_runtime() {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt virtual:" << dt << std::endl;
   }
 }
@@ -293,8 +286,7 @@ BOOST_AUTO_TEST_CASE(bench_run_vs_compile2) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt X:" << dt << std::endl;
   }
 
@@ -308,8 +300,7 @@ BOOST_AUTO_TEST_CASE(bench_run_vs_compile2) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt X:" << dt << std::endl;
   }
 }
@@ -318,8 +309,7 @@ struct MyNode {
   int id;
   Eigen::Vector4d point_;
 
-  MyNode(const int &name, const Eigen::Vector4d &pt) : id(name), point_(pt)
-  {}
+  MyNode(const int &name, const Eigen::Vector4d &pt) : id(name), point_(pt) {}
 };
 
 struct MyNodeKey {
@@ -349,8 +339,7 @@ using namespace unc::robotics;
 
 BOOST_AUTO_TEST_CASE(t_against_nigh) {
 
-  nigh::Nigh<MyNode, nigh::L2Space<double, 4>, MyNodeKey,
-  nigh::NoThreadSafety,
+  nigh::Nigh<MyNode, nigh::L2Space<double, 4>, MyNodeKey, nigh::NoThreadSafety,
              nigh::KDTreeBatch<32>>
       nn;
 
@@ -389,8 +378,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
     std::cout << " linear time " << dt << std::endl;
     std::cout << "best is " << best << " with dist " << dist << "dist2 "
@@ -410,8 +398,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
     for (size_t j = 0; j < nbh.size(); ++j) {
       std::cout << nbh[j].first.id << " " << nbh[j].second << std::endl;
@@ -431,8 +418,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     for (size_t j = 0; j < nnt.size(); ++j) {
       std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
     }
@@ -455,8 +441,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt nigh inc:" << dt << std::endl;
   }
   {
@@ -474,8 +459,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "dt tree inc:" << dt << std::endl;
   }
 }
@@ -546,8 +530,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
     std::cout << " linear time " << dt << std::endl;
     std::cout << "best is " << best << " with dist " << dist << "dist2 "
@@ -567,8 +550,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     for (size_t j = 0; j < nbh.size(); ++j) {
       std::cout << nbh[j].first.id << " "
                 << nbh[j].first.point_.coeffs().transpose() << " "
@@ -588,8 +570,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
     for (size_t j = 0; j < nnt.size(); ++j) {
       std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
@@ -653,8 +634,7 @@ BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "nns " << std::endl;
     for (size_t j = 0; j < nbh.size(); ++j) {
       space->printState(nbh[j]);
@@ -775,8 +755,7 @@ BOOST_AUTO_TEST_CASE(t_se3) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
     std::cout << " linear time " << dt << std::endl;
     std::cout << "best is " << best << " with dist " << dist << "dist2 "
@@ -819,8 +798,7 @@ BOOST_AUTO_TEST_CASE(t_se3) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
     for (size_t j = 0; j < nnt.size(); ++j) {
       std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
@@ -839,8 +817,8 @@ BOOST_AUTO_TEST_CASE(t_se3) {
 
       // std::cout << tree.getStateSpace().distance(x7, x7) <<std::endl;
       // std::cout << tree.getStateSpace().distance(x7, X.col(0))
-      <<std::endl; std::cout << treex.getStateSpace().distance(x7,
-      X.col(309717))
+      << std::endl;
+      std::cout << treex.getStateSpace().distance(x7, X.col(309717))
                 << std::endl;
       std::cout << treex.getStateSpace().distance_to_rectangle(
                        x7, X.col(309717), X.col(309717))
@@ -856,8 +834,7 @@ BOOST_AUTO_TEST_CASE(t_se3) {
       auto t1 = std::chrono::high_resolution_clock::now();
       auto dt =
           1.e-9 *
-          std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-          t0).count();
+          std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
 
       for (size_t j = 0; j < nnt.size(); ++j) {
         std::cout << nntx[j].id << " " << nntx[j].distance << std::endl;
@@ -928,8 +905,7 @@ BOOST_AUTO_TEST_CASE(t_se3) {
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt =
         1.e-9 *
-        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-        t0).count();
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
     std::cout << "nns " << std::endl;
     for (size_t j = 0; j < nbh.size(); ++j) {
       space->printState(nbh[j]);
