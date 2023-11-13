@@ -168,6 +168,26 @@ Run benchmark with:
 TODO
 ```
 
+
+# Code Coverage
+
+(work in progress)
+```
+cmake  -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=1 -DENABLE_TEST_COVERAGE=1 ..
+make -j8
+ctest -C Release -VV
+gcov ./test/cpp/CMakeFiles/main.dir/main.cpp.gcno
+lcov --capture --directory . --output-file coverage.info
+lcov --remove coverage.info '/usr/include/*' 'src/*' '/usr/lib/*' -o filtered_coverage.info
+genhtml filtered_coverage.info --output-directory out
+find . -type f -name '*.html'
+firefox out/index.html
+```
+
+(TODO: get this into github CI...)
+
+
+
 # Roadmap
 
 The code is stable and currently in used in Dynoplan. No API breaking changes are expected but ther are not guarantees.
