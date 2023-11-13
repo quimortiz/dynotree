@@ -73,876 +73,877 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
   point_t lazyMonsterLocation(V1d(3.1));
   // 6, 6)); // this monster will always try to eat the closest people
   const std::size_t monsterHeads = 2; // this monster can eat two people at
-  once auto lazyMonsterVictims =
+//  once 
+  auto lazyMonsterVictims =
       tree.searchKnn(lazyMonsterLocation, monsterHeads);
   for (const auto &victim : lazyMonsterVictims) {
     std::cout << victim.id << " closest to lazy monster, with distance "
               << victim.distance << "!" << std::endl;
   }
 }
-//
-// BOOST_AUTO_TEST_CASE(t_hello3) {
-//   std::srand(0);
-//   using tree_t = dynotree::KDTree<size_t, 1, 4, double,
-//   dynotree::SO2<double>>;
-//
-//   using V1d = Eigen::Matrix<double, 1, 1>;
-//   using point_t = V1d;
-//   tree_t tree;
-//   tree.init_tree();
-//
-//   std::vector<point_t> points;
-//   size_t N = 100;
-//   for (size_t ii = 0; ii < N; ++ii) {
-//     double i = M_PI * (-1 + 2 * static_cast<double>(rand()) /
-//                                 static_cast<double>(RAND_MAX));
-//     points.push_back(point_t(V1d(i)));
-//     tree.addPoint(point_t(V1d(i)), ii);
-//   }
-//   double radius = 1;
-//
-//   for (size_t jj = 0; jj < 100; ++jj) {
-//     double j = M_PI * (-1 + 2 * static_cast<double>(rand()) /
-//                                 static_cast<double>(RAND_MAX));
-//     point_t lazyMonsterLocation((V1d(j)));
-//     auto lazyMonsterVictims = tree.searchBall(lazyMonsterLocation, radius);
-//     double min_distance = std::numeric_limits<double>::max();
-//     int counter = 0;
-//     for (size_t ii = 0; ii < points.size(); ++ii) {
-//       double d = tree.getStateSpace().distance(points[ii],
-//       lazyMonsterLocation); if (d < radius) {
-//         counter++;
-//       }
-//     }
-//
-//     std::cout << "counter/size: " << counter << " " <<
-//     lazyMonsterVictims.size()
-//               << std::endl;
-//     if (counter != lazyMonsterVictims.size()) {
-//       std::cout << "Error: " << counter << " " << lazyMonsterVictims.size()
-//                 << std::endl;
-//       throw std::runtime_error("Error");
-//     }
-//   }
-// }
-//
-// BOOST_AUTO_TEST_CASE(t_hello4) {
-//   std::srand(0);
-//   using tree_t =
-//       dynotree::KDTree<size_t, 3, 4, double, dynotree::R2SO2Squared<double>>;
-//
-//   using point_t = Eigen::Vector3d;
-//   tree_t tree;
-//   tree.init_tree();
-//
-//   std::vector<point_t> points;
-//   size_t N = 100;
-//   for (size_t ii = 0; ii < N; ++ii) {
-//     point_t v = M_PI * point_t::Random();
-//     points.push_back(point_t(v));
-//     tree.addPoint(point_t(v), ii);
-//   }
-//
-//   double radius = 1.;
-//
-//   for (size_t jj = 0; jj < 100; ++jj) {
-//
-//     point_t vv = M_PI * point_t::Random();
-//     auto lazyMonsterVictims = tree.searchBall(vv, radius);
-//     double min_distance = std::numeric_limits<double>::max();
-//     int counter = 0;
-//     for (size_t ii = 0; ii < points.size(); ++ii) {
-//       double d = tree.getStateSpace().distance(points[ii], vv);
-//       // double d = 0;
-//       if (d < radius) {
-//         counter++;
-//       }
-//     }
-//
-//     std::cout << "counter/size: " << counter << " " <<
-//     lazyMonsterVictims.size()
-//               << std::endl;
-//     if (counter != lazyMonsterVictims.size()) {
-//       std::cout << "Error: " << counter << " " << lazyMonsterVictims.size()
-//                 << std::endl;
-//       throw std::runtime_error("Error");
-//     }
-//   }
-// }
-//
-// template <typename Scalar> void __compile_vs_runtime() {
-//   using MatrixX = Eigen::Matrix<Scalar, -1, -1>;
-//   using Vector4 = Eigen::Matrix<Scalar, 4, 1>;
-//
-//   using TreeRX = dynotree::KDTree<int, -1, 32, Scalar>;
-//   using TreeR4 = dynotree::KDTree<int, 4, 32, Scalar>;
-//   using TreeVirtual =
-//       dynotree::KDTree<int, -1, 32, Scalar, dynotree::virtual_wrapper>;
-//
-//   TreeRX treex;
-//   treex.init_tree(4);
-//   TreeR4 tree4;
-//   tree4.init_tree();
-//
-//   // std::shared_ptr<dynotree::Vpure> space_v =
-//   // std::make_shared<dynotree::S4irtual>();
-//
-//   //
-//   dynotree::virtual_wrapper space;
-//   space.s4 = std::make_shared<dynotree::S4irtual>();
-//   // space.s4 = space_v;
-//
-//   TreeVirtual tree_virtual;
-//   tree_virtual.init_tree(4, space);
-//
-//   MatrixX X = MatrixX::Random(10000, 4);
-//
-//   for (size_t i = 0; i < X.rows(); ++i) {
-//     treex.addPoint(X.row(i), i);
-//     tree4.addPoint(X.row(i).template head<4>(), i);
-//     tree_virtual.addPoint(X.row(i), i);
-//   }
-//   int num_neighs = 10;
-//
-//   Vector4 x = Vector4::Random();
-//
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//
-//     for (size_t i = 0; i < 10; i++)
-//       tree4.searchBall(x, .5);
-//     // treex.searchKnn(x, num_neighs);
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "dt X:" << dt << std::endl;
-//   }
-//
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < 10; i++)
-//       tree4.searchBall(x, .5);
-//     // auto out =
-//     //      std::cout << out.size() << std::endl;
-//     // }
-//     // tree4.searchKnn(x, num_neighs);
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "dt 4:" << dt << std::endl;
-//   }
-//
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < 10; i++)
-//       tree_virtual.searchBall(x, .5);
-//
-//     // tree4.searchKnn(x, num_neighs);
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "dt virtual:" << dt << std::endl;
-//   }
-// }
-//
-// BOOST_AUTO_TEST_CASE(bench_run_vs_compile) {
-//   std::srand(0);
-//   std::cout << "benchmark in c++:double" << std::endl;
-//   __compile_vs_runtime<double>();
-//   // std::cout << "benchmark in c++:float" << std::endl;
-//   // std::srand(0);
-//   // __compile_vs_runtime<float>();
-// }
-//
-// // incremental benchmark
-//
-// BOOST_AUTO_TEST_CASE(bench_run_vs_compile2) {
-//   std::srand(0);
-//   std::cout << "benchmark in c++" << std::endl;
-//
-//   using TreeRX = dynotree::KDTree<int, -1>;
-//   using TreeR4 = dynotree::KDTree<int, 4>;
-//
-//   TreeRX treex;
-//   treex.init_tree(4);
-//   TreeR4 tree4;
-//   tree4.init_tree();
-//
-//   Eigen::VectorXd x = Eigen::VectorXd::Random(4);
-//   Eigen::Vector4d x4 = x;
-//
-//   auto X = Eigen::MatrixXd::Random(4, 10000);
-//   int num_neighs = 10;
-//
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       treex.searchKnn(X.col(i), num_neighs);
-//       treex.addPoint(X.col(i), i);
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "dt X:" << dt << std::endl;
-//   }
-//
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       tree4.searchKnn(X.col(i), num_neighs);
-//       tree4.addPoint(X.col(i), i);
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "dt X:" << dt << std::endl;
-//   }
-// }
-//
-// struct MyNode {
-//   int id;
-//   Eigen::Vector4d point_;
-//
-//   MyNode(const int &name, const Eigen::Vector4d &pt) : id(name), point_(pt)
-//   {}
-// };
-//
-// struct MyNodeKey {
-//   // The functor should return a constant reference to the data
-//   // member or a copy of it.
-//   const Eigen::Vector4d &operator()(const MyNode &node) const {
-//     return node.point_;
-//   }
-// };
-//
-// struct MyNodeQuat {
-//   int id;
-//   Eigen::Quaterniond point_;
-//   MyNodeQuat(const int &name, const Eigen::Quaterniond &pt)
-//       : id(name), point_(pt) {}
-// };
-//
-// struct MyNodeKeyQuat {
-//   // The functor should return a constant reference to the data
-//   // member or a copy of it.
-//   const Eigen::Quaterniond &operator()(const MyNodeQuat &node) const {
-//     return node.point_;
-//   }
-// };
-//
-// using namespace unc::robotics;
-//
-// BOOST_AUTO_TEST_CASE(t_against_nigh) {
-//
-//   nigh::Nigh<MyNode, nigh::L2Space<double, 4>, MyNodeKey,
-//   nigh::NoThreadSafety,
-//              nigh::KDTreeBatch<32>>
-//       nn;
-//
-//   std::srand(0);
-//   using TreeR4 = dynotree::KDTree<int, 4>;
-//
-//   TreeR4 tree4;
-//   tree4.init_tree();
-//
-//   Eigen::VectorXd x = Eigen::VectorXd::Random(4);
-//   Eigen::Vector4d x4 = x;
-//
-//   Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, 100000);
-//   int num_neighs = 10;
-//
-//   for (size_t i = 0; i < X.cols(); ++i) {
-//     nn.insert(MyNode(i, X.col(i)));
-//     tree4.addPoint(X.col(i), i);
-//   }
-//
-//   int best = -1;
-//   {
-//
-//     std::cout << "linear nn" << std::endl;
-//
-//     double dist = std::numeric_limits<double>::max();
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       double d = (X.col(i) - x).norm();
-//       if (d < dist) {
-//         dist = d;
-//         best = i;
-//       }
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//
-//     std::cout << " linear time " << dt << std::endl;
-//     std::cout << "best is " << best << " with dist " << dist << "dist2 "
-//               << dist * dist << std::endl;
-//   }
-//
-//   int num_experiments = 1;
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     int num_neighs = 10;
-//     std::vector<std::pair<MyNode, double>> nbh;
-//     for (size_t i = 0; i < num_experiments; i++) {
-//       nn.nearest(nbh, x4, num_neighs, 1e8);
-//     }
-//     // tree4.searchBall(x, .5);
-//     // treex.searchKnn(x, num_neighs);
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//
-//     for (size_t j = 0; j < nbh.size(); ++j) {
-//       std::cout << nbh[j].first.id << " " << nbh[j].second << std::endl;
-//     }
-//
-//     std::cout << "dt nigh:" << dt << std::endl;
-//   }
-//   std::vector<TreeR4::DistanceId> nnt;
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < num_experiments; i++) {
-//       nnt = tree4.searchKnn(x, num_neighs);
-//       // nnt = tree4.searchBall(x, 0.0162168 + 1e-4);
-//       // 0.0162168
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     for (size_t j = 0; j < nnt.size(); ++j) {
-//       std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
-//     }
-//     std::cout << "dt tree:" << dt << std::endl;
-//   }
-//
-//   BOOST_TEST(best, nnt[0].id);
-//
-//   {
-//
-//     using TreeR4 = dynotree::KDTree<int, 4>;
-//     TreeR4 tree4;
-//     tree4.init_tree();
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       auto out = tree4.searchKnn(X.col(i), num_neighs);
-//       tree4.addPoint(X.col(i), i);
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "dt nigh inc:" << dt << std::endl;
-//   }
-//   {
-//
-//     using TreeR4 = dynotree::KDTree<int, 4>;
-//     TreeR4 tree4;
-//     tree4.init_tree();
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     std::vector<std::pair<MyNode, double>> nbh;
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       nn.insert(MyNode(i, X.col(i)));
-//       nn.nearest(nbh, x4, num_neighs, 1e8);
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "dt tree inc:" << dt << std::endl;
-//   }
-// }
-//
-// BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
-//   // compare the two SO3 Implementations
-//
-//   std::srand(0);
-//   nigh::Nigh<MyNodeQuat, nigh::SO3Space<double>, MyNodeKeyQuat,
-//              nigh::NoThreadSafety, nigh::KDTreeBatch<32>>
-//       nn;
-//
-//   // using TreeQuat = dynotree::KDTree<int, 4, 32, double,
-//   // dynotree::SO3<double>>;
-//   using TreeQuat =
-//       dynotree::KDTree<int, 4, 32, double, dynotree::SO3Squared<double>>;
-//
-//   TreeQuat tree4;
-//   tree4.init_tree();
-//
-//   Eigen::VectorXd x = Eigen::VectorXd::Random(4);
-//   Eigen::Vector4d x4 = x;
-//   x4.normalize();
-//
-//   Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, 1000000);
-//
-//   bool real_part_positive = true;
-//   int index_real_part = 3;
-//
-//   if (real_part_positive) {
-//     if (x4(index_real_part) < 0) {
-//       x4 *= -1;
-//     }
-//   }
-//
-//   for (size_t i = 0; i < X.cols(); ++i) {
-//     X.col(i).normalize();
-//     if (real_part_positive) {
-//       if (X.col(i)(index_real_part) < 0) {
-//         X.col(i) *= -1;
-//       }
-//     }
-//   }
-//
-//   int num_neighs = 10;
-//
-//   for (size_t i = 0; i < X.cols(); ++i) {
-//     Eigen::Vector4d q = X.col(i);
-//     nn.insert(MyNodeQuat(i, Eigen::Quaterniond(q)));
-//     tree4.addPoint(q, i);
-//   }
-//
-//   int best = -1;
-//   {
-//
-//     std::cout << "linear nn" << std::endl;
-//
-//     double dist = std::numeric_limits<double>::max();
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       double d = std::min((X.col(i) - x4).norm(), (X.col(i) + x4).norm());
-//       if (d < dist) {
-//         dist = d;
-//         best = i;
-//       }
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//
-//     std::cout << " linear time " << dt << std::endl;
-//     std::cout << "best is " << best << " with dist " << dist << "dist2 "
-//               << dist * dist << std::endl;
-//   }
-//
-//   std::cout << "quaternion" << std::endl;
-//   int num_experiments = 1;
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     std::vector<std::pair<MyNodeQuat, double>> nbh;
-//     for (size_t i = 0; i < num_experiments; i++) {
-//       nn.nearest(nbh, x4, num_neighs, 1e8);
-//     }
-//     // tree4.searchBall(x, .5);
-//     // treex.searchKnn(x, num_neighs);
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     for (size_t j = 0; j < nbh.size(); ++j) {
-//       std::cout << nbh[j].first.id << " "
-//                 << nbh[j].first.point_.coeffs().transpose() << " "
-//                 << nbh[j].second << std::endl;
-//     }
-//     std::cout << "dt nigh:" << dt << std::endl;
-//   }
-//   std::vector<TreeQuat::DistanceId> nnt;
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < num_experiments; i++) {
-//       // nnt = tree4.searchKnn(x4, num_neighs);
-//       nnt = tree4.searchBall(x4, 0.000695807 + 1e-8);
-//       // 0.0263781 + 1e-5);
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//
-//     for (size_t j = 0; j < nnt.size(); ++j) {
-//       std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
-//     }
-//
-//     std::cout << "dt tree:" << dt << std::endl;
-//   }
-//
-//   std::cout << "best: " << best << " " << nnt[0].id << std::endl;
-//   BOOST_TEST(best == nnt[0].id);
-//
-//   // ompl
-//   {
-//     ompl::base::StateSpacePtr space(new ompl::base::SO3StateSpace());
-//
-//     std::vector<ompl::base::State *> states;
-//
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       ompl::base::State *state = space->allocState();
-//
-//       auto ptr = state->as<ompl::base::SO3StateSpace::StateType>();
-//       ptr->x = X.col(i)(0);
-//       ptr->y = X.col(i)(1);
-//       ptr->z = X.col(i)(2);
-//       ptr->w = X.col(i)(3);
-//       states.push_back(state);
-//     }
-//
-//     // state->setY(0.2);
-//     // state->setYaw(0.0);
-//
-//     ompl::NearestNeighbors<ompl::base::State *> *tt =
-//         new ompl::NearestNeighborsGNAT<ompl::base::State *>();
-//
-//     tt->setDistanceFunction(
-//         [&](auto &a, auto &b) { return space->distance(a, b); });
-//
-//     for (auto &s : states)
-//       tt->add(s);
-//
-//     ompl::base::State *query = space->allocState();
-//
-//     auto ptr = query->as<ompl::base::SO3StateSpace::StateType>();
-//     ptr->x = x4(0);
-//     ptr->y = x4(1);
-//     ptr->z = x4(2);
-//     ptr->w = x4(3);
-//
-//     std::vector<ompl::base::State *> nbh;
-//
-//     // free memory...
-//     // tt->nearestK(query, num_neighs, nbh);
-//     // ompl tree:5.4935e-05
-//
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < num_experiments; i++) {
-//       // tt->nearestR(query, 0.0263789 + 1e-5, nbh);
-//       tt->nearestK(query, 10, nbh);
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "nns " << std::endl;
-//     for (size_t j = 0; j < nbh.size(); ++j) {
-//       space->printState(nbh[j]);
-//       std::cout << tt->getDistanceFunction()(nbh[j], query) << std::endl;
-//     }
-//     //
-//     std::cout << "ompl tree:" << dt << std::endl;
-//
-//     for (size_t i = 0; i < states.size(); ++i) {
-//       space->freeState(states[i]);
-//     }
-//
-//     space->freeState(query);
-//
-//     // t
-//
-//     // ompl::base::SO3StateSpace space;
-//     //
-//     // using state_t = ompl::base::ScopedState<ompl::base::SO3StateSpace> ;
-//   }
-// }
-//
-// // 20 times faster...
-// BOOST_AUTO_TEST_CASE(t_se3) {
-//
-//   std::srand(0);
-//   // nigh::Nigh<MyNodeQuat, nigh::SO3Space<double>, MyNodeKeyQuat,
-//   //            nigh::NoThreadSafety, nigh::KDTreeBatch<32>>
-//   // nn;
-//
-//   // using TreeQuat = dynotree::KDTree<int, 4, 32, double,
-//   // dynotree::SO3<double>>;
-//   using TreeR3SO3 =
-//       dynotree::KDTree<int, 7, 32, double, dynotree::R3SO3<double>>;
-//
-//   using TreeR3SO3X =
-//       dynotree::KDTree<int, -1, 32, double, dynotree::Combined<double>>;
-//
-//   // template <class id, int Dimensions, std::size_t BucketSize = 32,
-//   //           typename Scalar = double,
-//   //           typename Distance = L2Squared<Scalar, Dimensions>>
-//   //
-//
-//   // SE3Squared<double>>;
-//   // SO3Squared<double>>;
-//
-//   TreeR3SO3 tree;
-//   tree.init_tree();
-//
-//   using Space = dynotree::Combined<double>::Space;
-//   //
-//   // std::vector<Space> spaces;
-//
-//   std::vector<Space> spaces;
-//   spaces.push_back(dynotree::Rn<double>());
-//   spaces.push_back(dynotree::SO3<double>());
-//   // dynotree::L2<double>());
-//   //
-//   // {dynotree::L2<double>(), dynotree::SO3<double>()}
-//
-//   // dynotree::Combined<double> combi_space(spaces, {3, 4});
-//   dynotree::Combined<double> combi_space({"Rn:3", "SO3"});
-//   // spaces, {3, 4});
-//   TreeR3SO3X treex;
-//   treex.init_tree(7, combi_space);
-//
-//   int nx = 7;
-//   Eigen::VectorXd x = Eigen::VectorXd::Random(nx);
-//   using V7d = Eigen::Matrix<double, 7, 1>;
-//   V7d x7;
-//   x7 = x;
-//   x7.tail(4).normalize();
-//
-//   int num_points = 1000000;
-//   Eigen::MatrixXd X = Eigen::MatrixXd::Random(nx, num_points);
-//
-//   bool real_part_positive = true;
-//   int index_real_part = 3;
-//
-//   if (real_part_positive) {
-//     if (x7.tail(4)(index_real_part) < 0) {
-//       x7.tail(4) *= -1;
-//     }
-//   }
-//
-//   for (size_t i = 0; i < X.cols(); ++i) {
-//     X.col(i).tail(4).normalize();
-//     if (real_part_positive) {
-//       if (X.col(i).tail(4)(index_real_part) < 0) {
-//         X.col(i).tail(4) *= -1;
-//       }
-//     }
-//   }
-//
-//   int num_neighs = 10;
-//
-//   for (size_t i = 0; i < X.cols(); ++i) {
-//     V7d q = X.col(i);
-//     tree.addPoint(q, i);
-//     treex.addPoint(q, i);
-//   }
-//
-//   int best = -1;
-//   {
-//
-//     std::cout << "linear nn" << std::endl;
-//
-//     double dist = std::numeric_limits<double>::max();
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       double d = tree.getStateSpace().distance(X.col(i), x7.head<7>());
-//       if (d < dist) {
-//         dist = d;
-//         best = i;
-//       }
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//
-//     std::cout << " linear time " << dt << std::endl;
-//     std::cout << "best is " << best << " with dist " << dist << "dist2 "
-//               << dist * dist << std::endl;
-//   }
-//
-//   int num_experiments = 1;
-// #if 0
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     std::vector<std::pair<MyNodeQuat, double>> nbh;
-//     for (size_t i = 0; i < num_experiments; i++) {
-//       nn.nearest(nbh, x4, num_neighs, 1e8);
-//     }
-//     // tree4.searchBall(x, .5);
-//     // treex.searchKnn(x, num_neighs);
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     for (size_t j = 0; j < nbh.size(); ++j) {
-//       std::cout << nbh[j].first.id << " "
-//                 << nbh[j].first.point_.coeffs().transpose() << " "
-//                 << nbh[j].second << std::endl;
-//     }
-//     std::cout << "dt nigh:" << dt << std::endl;
-//   }
-// #endif
-//
-//   double radius_search = .3;
-//   std::vector<TreeR3SO3::DistanceId> nnt;
-//   {
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < num_experiments; i++) {
-//       // nnt = tree.searchKnn(x7, num_neighs);
-//       nnt = tree.searchBall(x7, radius_search);
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//
-//     for (size_t j = 0; j < nnt.size(); ++j) {
-//       std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
-//     }
-//
-//     std::cout << "my tree:" << dt << std::endl;
-//   }
-//
-//   std::cout << "best: " << best << " " << nnt[0].id << std::endl;
-//   BOOST_TEST(best == nnt[0].id);
-//
-//   // my tree dynamic
-//   {
-//     std::vector<TreeR3SO3X::DistanceId> nntx;
-//     {
-//
-//       // std::cout << tree.getStateSpace().distance(x7, x7) <<std::endl;
-//       // std::cout << tree.getStateSpace().distance(x7, X.col(0))
-//       <<std::endl; std::cout << treex.getStateSpace().distance(x7,
-//       X.col(309717))
-//                 << std::endl;
-//       std::cout << treex.getStateSpace().distance_to_rectangle(
-//                        x7, X.col(309717), X.col(309717))
-//                 << std::endl;
-//       // 118527)) <<std::endl;
-//
-//       auto t0 = std::chrono::high_resolution_clock::now();
-//       for (size_t i = 0; i < num_experiments; i++) {
-//         // nnt = tree.searchKnn(x7, num_neighs);
-//         nntx = treex.searchBall(x7, radius_search);
-//       }
-//
-//       auto t1 = std::chrono::high_resolution_clock::now();
-//       auto dt =
-//           1.e-9 *
-//           std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//           t0).count();
-//
-//       for (size_t j = 0; j < nnt.size(); ++j) {
-//         std::cout << nntx[j].id << " " << nntx[j].distance << std::endl;
-//       }
-//
-//       std::cout << "my tree dynamic:" << dt << std::endl;
-//     }
-//
-//     std::cout << "best: " << best << " " << nnt[0].id << std::endl;
-//     BOOST_TEST(best == nntx[0].id);
-//
-//     for (size_t k = 0; k < std::min(int(nntx.size()), 5); k++) {
-//       BOOST_TEST(nntx[0].id == nnt[0].id);
-//       BOOST_TEST(nntx[0].distance == nnt[0].distance,
-//                  boost::test_tools::tolerance(1e-6));
-//     }
-//   }
-//
-//   // ompl
-//   {
-//     ompl::base::StateSpacePtr space(new ompl::base::SE3StateSpace());
-//
-//     std::vector<ompl::base::State *> states;
-//
-//     for (size_t i = 0; i < X.cols(); ++i) {
-//       ompl::base::State *state = space->allocState();
-//
-//       auto ptr = state->as<ompl::base::SE3StateSpace::StateType>();
-//       ptr->setXYZ(X.col(i)(0), X.col(i)(1), X.col(i)(2));
-//       ptr->rotation().x = X.col(i)(3 + 0);
-//       ptr->rotation().y = X.col(i)(3 + 1);
-//       ptr->rotation().z = X.col(i)(3 + 2);
-//       ptr->rotation().w = X.col(i)(3 + 3);
-//       states.push_back(state);
-//     }
-//
-//     // state->setY(0.2);
-//     // state->setYaw(0.0);
-//
-//     ompl::NearestNeighbors<ompl::base::State *> *tt =
-//         new ompl::NearestNeighborsGNAT<ompl::base::State *>();
-//
-//     tt->setDistanceFunction(
-//         [&](auto &a, auto &b) { return space->distance(a, b); });
-//
-//     for (auto &s : states)
-//       tt->add(s);
-//
-//     ompl::base::State *query = space->allocState();
-//
-//     auto ptr = query->as<ompl::base::SE3StateSpace::StateType>();
-//
-//     ptr->setXYZ(x7(0), x7(1), x7(2));
-//     ptr->rotation().x = x7(3 + 0);
-//     ptr->rotation().y = x7(3 + 1);
-//     ptr->rotation().z = x7(3 + 2);
-//     ptr->rotation().w = x7(3 + 3);
-//
-//     std::vector<ompl::base::State *> nbh;
-//
-//     auto t0 = std::chrono::high_resolution_clock::now();
-//     for (size_t i = 0; i < num_experiments; i++) {
-//       // tt->nearestK(query, num_neighs, nbh);
-//       tt->nearestR(query, radius_search, nbh);
-//       // .num_neighs, nbh);
-//     }
-//
-//     auto t1 = std::chrono::high_resolution_clock::now();
-//     auto dt =
-//         1.e-9 *
-//         std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
-//         t0).count();
-//     std::cout << "nns " << std::endl;
-//     for (size_t j = 0; j < nbh.size(); ++j) {
-//       space->printState(nbh[j]);
-//       std::cout << tt->getDistanceFunction()(nbh[j], query) << std::endl;
-//     }
-//     //
-//     std::cout << "ompl tree:" << dt << std::endl;
-//
-//     for (size_t i = 0; i < states.size(); ++i) {
-//       space->freeState(states[i]);
-//     }
-//     space->freeState(query);
-//   }
-// }
+
+BOOST_AUTO_TEST_CASE(t_hello3) {
+  std::srand(0);
+  using tree_t = dynotree::KDTree<size_t, 1, 4, double,
+  dynotree::SO2<double>>;
+
+  using V1d = Eigen::Matrix<double, 1, 1>;
+  using point_t = V1d;
+  tree_t tree;
+  tree.init_tree();
+
+  std::vector<point_t> points;
+  size_t N = 100;
+  for (size_t ii = 0; ii < N; ++ii) {
+    double i = M_PI * (-1 + 2 * static_cast<double>(rand()) /
+                                static_cast<double>(RAND_MAX));
+    points.push_back(point_t(V1d(i)));
+    tree.addPoint(point_t(V1d(i)), ii);
+  }
+  double radius = 1;
+
+  for (size_t jj = 0; jj < 100; ++jj) {
+    double j = M_PI * (-1 + 2 * static_cast<double>(rand()) /
+                                static_cast<double>(RAND_MAX));
+    point_t lazyMonsterLocation((V1d(j)));
+    auto lazyMonsterVictims = tree.searchBall(lazyMonsterLocation, radius);
+    double min_distance = std::numeric_limits<double>::max();
+    int counter = 0;
+    for (size_t ii = 0; ii < points.size(); ++ii) {
+      double d = tree.getStateSpace().distance(points[ii],
+      lazyMonsterLocation); if (d < radius) {
+        counter++;
+      }
+    }
+
+    std::cout << "counter/size: " << counter << " " <<
+    lazyMonsterVictims.size()
+              << std::endl;
+    if (counter != lazyMonsterVictims.size()) {
+      std::cout << "Error: " << counter << " " << lazyMonsterVictims.size()
+                << std::endl;
+      throw std::runtime_error("Error");
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(t_hello4) {
+  std::srand(0);
+  using tree_t =
+      dynotree::KDTree<size_t, 3, 4, double, dynotree::R2SO2Squared<double>>;
+
+  using point_t = Eigen::Vector3d;
+  tree_t tree;
+  tree.init_tree();
+
+  std::vector<point_t> points;
+  size_t N = 100;
+  for (size_t ii = 0; ii < N; ++ii) {
+    point_t v = M_PI * point_t::Random();
+    points.push_back(point_t(v));
+    tree.addPoint(point_t(v), ii);
+  }
+
+  double radius = 1.;
+
+  for (size_t jj = 0; jj < 100; ++jj) {
+
+    point_t vv = M_PI * point_t::Random();
+    auto lazyMonsterVictims = tree.searchBall(vv, radius);
+    double min_distance = std::numeric_limits<double>::max();
+    int counter = 0;
+    for (size_t ii = 0; ii < points.size(); ++ii) {
+      double d = tree.getStateSpace().distance(points[ii], vv);
+      // double d = 0;
+      if (d < radius) {
+        counter++;
+      }
+    }
+
+    std::cout << "counter/size: " << counter << " " <<
+    lazyMonsterVictims.size()
+              << std::endl;
+    if (counter != lazyMonsterVictims.size()) {
+      std::cout << "Error: " << counter << " " << lazyMonsterVictims.size()
+                << std::endl;
+      throw std::runtime_error("Error");
+    }
+  }
+}
+
+template <typename Scalar> void __compile_vs_runtime() {
+  using MatrixX = Eigen::Matrix<Scalar, -1, -1>;
+  using Vector4 = Eigen::Matrix<Scalar, 4, 1>;
+
+  using TreeRX = dynotree::KDTree<int, -1, 32, Scalar>;
+  using TreeR4 = dynotree::KDTree<int, 4, 32, Scalar>;
+  using TreeVirtual =
+      dynotree::KDTree<int, -1, 32, Scalar, dynotree::virtual_wrapper>;
+
+  TreeRX treex;
+  treex.init_tree(4);
+  TreeR4 tree4;
+  tree4.init_tree();
+
+  // std::shared_ptr<dynotree::Vpure> space_v =
+  // std::make_shared<dynotree::S4irtual>();
+
+  //
+  dynotree::virtual_wrapper space;
+  space.s4 = std::make_shared<dynotree::S4irtual>();
+  // space.s4 = space_v;
+
+  TreeVirtual tree_virtual;
+  tree_virtual.init_tree(4, space);
+
+  MatrixX X = MatrixX::Random(10000, 4);
+
+  for (size_t i = 0; i < X.rows(); ++i) {
+    treex.addPoint(X.row(i), i);
+    tree4.addPoint(X.row(i).template head<4>(), i);
+    tree_virtual.addPoint(X.row(i), i);
+  }
+  int num_neighs = 10;
+
+  Vector4 x = Vector4::Random();
+
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+
+    for (size_t i = 0; i < 10; i++)
+      tree4.searchBall(x, .5);
+    // treex.searchKnn(x, num_neighs);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "dt X:" << dt << std::endl;
+  }
+
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < 10; i++)
+      tree4.searchBall(x, .5);
+    // auto out =
+    //      std::cout << out.size() << std::endl;
+    // }
+    // tree4.searchKnn(x, num_neighs);
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "dt 4:" << dt << std::endl;
+  }
+
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < 10; i++)
+      tree_virtual.searchBall(x, .5);
+
+    // tree4.searchKnn(x, num_neighs);
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "dt virtual:" << dt << std::endl;
+  }
+}
+
+BOOST_AUTO_TEST_CASE(bench_run_vs_compile) {
+  std::srand(0);
+  std::cout << "benchmark in c++:double" << std::endl;
+  __compile_vs_runtime<double>();
+  // std::cout << "benchmark in c++:float" << std::endl;
+  // std::srand(0);
+  // __compile_vs_runtime<float>();
+}
+
+// incremental benchmark
+
+BOOST_AUTO_TEST_CASE(bench_run_vs_compile2) {
+  std::srand(0);
+  std::cout << "benchmark in c++" << std::endl;
+
+  using TreeRX = dynotree::KDTree<int, -1>;
+  using TreeR4 = dynotree::KDTree<int, 4>;
+
+  TreeRX treex;
+  treex.init_tree(4);
+  TreeR4 tree4;
+  tree4.init_tree();
+
+  Eigen::VectorXd x = Eigen::VectorXd::Random(4);
+  Eigen::Vector4d x4 = x;
+
+  auto X = Eigen::MatrixXd::Random(4, 10000);
+  int num_neighs = 10;
+
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < X.cols(); ++i) {
+      treex.searchKnn(X.col(i), num_neighs);
+      treex.addPoint(X.col(i), i);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "dt X:" << dt << std::endl;
+  }
+
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < X.cols(); ++i) {
+      tree4.searchKnn(X.col(i), num_neighs);
+      tree4.addPoint(X.col(i), i);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "dt X:" << dt << std::endl;
+  }
+}
+
+struct MyNode {
+  int id;
+  Eigen::Vector4d point_;
+
+  MyNode(const int &name, const Eigen::Vector4d &pt) : id(name), point_(pt)
+  {}
+};
+
+struct MyNodeKey {
+  // The functor should return a constant reference to the data
+  // member or a copy of it.
+  const Eigen::Vector4d &operator()(const MyNode &node) const {
+    return node.point_;
+  }
+};
+
+struct MyNodeQuat {
+  int id;
+  Eigen::Quaterniond point_;
+  MyNodeQuat(const int &name, const Eigen::Quaterniond &pt)
+      : id(name), point_(pt) {}
+};
+
+struct MyNodeKeyQuat {
+  // The functor should return a constant reference to the data
+  // member or a copy of it.
+  const Eigen::Quaterniond &operator()(const MyNodeQuat &node) const {
+    return node.point_;
+  }
+};
+
+using namespace unc::robotics;
+
+BOOST_AUTO_TEST_CASE(t_against_nigh) {
+
+  nigh::Nigh<MyNode, nigh::L2Space<double, 4>, MyNodeKey,
+  nigh::NoThreadSafety,
+             nigh::KDTreeBatch<32>>
+      nn;
+
+  std::srand(0);
+  using TreeR4 = dynotree::KDTree<int, 4>;
+
+  TreeR4 tree4;
+  tree4.init_tree();
+
+  Eigen::VectorXd x = Eigen::VectorXd::Random(4);
+  Eigen::Vector4d x4 = x;
+
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, 100000);
+  int num_neighs = 10;
+
+  for (size_t i = 0; i < X.cols(); ++i) {
+    nn.insert(MyNode(i, X.col(i)));
+    tree4.addPoint(X.col(i), i);
+  }
+
+  int best = -1;
+  {
+
+    std::cout << "linear nn" << std::endl;
+
+    double dist = std::numeric_limits<double>::max();
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < X.cols(); ++i) {
+      double d = (X.col(i) - x).norm();
+      if (d < dist) {
+        dist = d;
+        best = i;
+      }
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+
+    std::cout << " linear time " << dt << std::endl;
+    std::cout << "best is " << best << " with dist " << dist << "dist2 "
+              << dist * dist << std::endl;
+  }
+
+  int num_experiments = 1;
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    int num_neighs = 10;
+    std::vector<std::pair<MyNode, double>> nbh;
+    for (size_t i = 0; i < num_experiments; i++) {
+      nn.nearest(nbh, x4, num_neighs, 1e8);
+    }
+    // tree4.searchBall(x, .5);
+    // treex.searchKnn(x, num_neighs);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+
+    for (size_t j = 0; j < nbh.size(); ++j) {
+      std::cout << nbh[j].first.id << " " << nbh[j].second << std::endl;
+    }
+
+    std::cout << "dt nigh:" << dt << std::endl;
+  }
+  std::vector<TreeR4::DistanceId> nnt;
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < num_experiments; i++) {
+      nnt = tree4.searchKnn(x, num_neighs);
+      // nnt = tree4.searchBall(x, 0.0162168 + 1e-4);
+      // 0.0162168
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    for (size_t j = 0; j < nnt.size(); ++j) {
+      std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
+    }
+    std::cout << "dt tree:" << dt << std::endl;
+  }
+
+  BOOST_TEST(best, nnt[0].id);
+
+  {
+
+    using TreeR4 = dynotree::KDTree<int, 4>;
+    TreeR4 tree4;
+    tree4.init_tree();
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < X.cols(); ++i) {
+      auto out = tree4.searchKnn(X.col(i), num_neighs);
+      tree4.addPoint(X.col(i), i);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "dt nigh inc:" << dt << std::endl;
+  }
+  {
+
+    using TreeR4 = dynotree::KDTree<int, 4>;
+    TreeR4 tree4;
+    tree4.init_tree();
+    auto t0 = std::chrono::high_resolution_clock::now();
+    std::vector<std::pair<MyNode, double>> nbh;
+    for (size_t i = 0; i < X.cols(); ++i) {
+      nn.insert(MyNode(i, X.col(i)));
+      nn.nearest(nbh, x4, num_neighs, 1e8);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "dt tree inc:" << dt << std::endl;
+  }
+}
+
+BOOST_AUTO_TEST_CASE(t_against_nigh_so3) {
+  // compare the two SO3 Implementations
+
+  std::srand(0);
+  nigh::Nigh<MyNodeQuat, nigh::SO3Space<double>, MyNodeKeyQuat,
+             nigh::NoThreadSafety, nigh::KDTreeBatch<32>>
+      nn;
+
+  // using TreeQuat = dynotree::KDTree<int, 4, 32, double,
+  // dynotree::SO3<double>>;
+  using TreeQuat =
+      dynotree::KDTree<int, 4, 32, double, dynotree::SO3Squared<double>>;
+
+  TreeQuat tree4;
+  tree4.init_tree();
+
+  Eigen::VectorXd x = Eigen::VectorXd::Random(4);
+  Eigen::Vector4d x4 = x;
+  x4.normalize();
+
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, 1000000);
+
+  bool real_part_positive = true;
+  int index_real_part = 3;
+
+  if (real_part_positive) {
+    if (x4(index_real_part) < 0) {
+      x4 *= -1;
+    }
+  }
+
+  for (size_t i = 0; i < X.cols(); ++i) {
+    X.col(i).normalize();
+    if (real_part_positive) {
+      if (X.col(i)(index_real_part) < 0) {
+        X.col(i) *= -1;
+      }
+    }
+  }
+
+  int num_neighs = 10;
+
+  for (size_t i = 0; i < X.cols(); ++i) {
+    Eigen::Vector4d q = X.col(i);
+    nn.insert(MyNodeQuat(i, Eigen::Quaterniond(q)));
+    tree4.addPoint(q, i);
+  }
+
+  int best = -1;
+  {
+
+    std::cout << "linear nn" << std::endl;
+
+    double dist = std::numeric_limits<double>::max();
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < X.cols(); ++i) {
+      double d = std::min((X.col(i) - x4).norm(), (X.col(i) + x4).norm());
+      if (d < dist) {
+        dist = d;
+        best = i;
+      }
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+
+    std::cout << " linear time " << dt << std::endl;
+    std::cout << "best is " << best << " with dist " << dist << "dist2 "
+              << dist * dist << std::endl;
+  }
+
+  std::cout << "quaternion" << std::endl;
+  int num_experiments = 1;
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    std::vector<std::pair<MyNodeQuat, double>> nbh;
+    for (size_t i = 0; i < num_experiments; i++) {
+      nn.nearest(nbh, x4, num_neighs, 1e8);
+    }
+    // tree4.searchBall(x, .5);
+    // treex.searchKnn(x, num_neighs);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    for (size_t j = 0; j < nbh.size(); ++j) {
+      std::cout << nbh[j].first.id << " "
+                << nbh[j].first.point_.coeffs().transpose() << " "
+                << nbh[j].second << std::endl;
+    }
+    std::cout << "dt nigh:" << dt << std::endl;
+  }
+  std::vector<TreeQuat::DistanceId> nnt;
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < num_experiments; i++) {
+      // nnt = tree4.searchKnn(x4, num_neighs);
+      nnt = tree4.searchBall(x4, 0.000695807 + 1e-8);
+      // 0.0263781 + 1e-5);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+
+    for (size_t j = 0; j < nnt.size(); ++j) {
+      std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
+    }
+
+    std::cout << "dt tree:" << dt << std::endl;
+  }
+
+  std::cout << "best: " << best << " " << nnt[0].id << std::endl;
+  BOOST_TEST(best == nnt[0].id);
+
+  // ompl
+  {
+    ompl::base::StateSpacePtr space(new ompl::base::SO3StateSpace());
+
+    std::vector<ompl::base::State *> states;
+
+    for (size_t i = 0; i < X.cols(); ++i) {
+      ompl::base::State *state = space->allocState();
+
+      auto ptr = state->as<ompl::base::SO3StateSpace::StateType>();
+      ptr->x = X.col(i)(0);
+      ptr->y = X.col(i)(1);
+      ptr->z = X.col(i)(2);
+      ptr->w = X.col(i)(3);
+      states.push_back(state);
+    }
+
+    // state->setY(0.2);
+    // state->setYaw(0.0);
+
+    ompl::NearestNeighbors<ompl::base::State *> *tt =
+        new ompl::NearestNeighborsGNAT<ompl::base::State *>();
+
+    tt->setDistanceFunction(
+        [&](auto &a, auto &b) { return space->distance(a, b); });
+
+    for (auto &s : states)
+      tt->add(s);
+
+    ompl::base::State *query = space->allocState();
+
+    auto ptr = query->as<ompl::base::SO3StateSpace::StateType>();
+    ptr->x = x4(0);
+    ptr->y = x4(1);
+    ptr->z = x4(2);
+    ptr->w = x4(3);
+
+    std::vector<ompl::base::State *> nbh;
+
+    // free memory...
+    // tt->nearestK(query, num_neighs, nbh);
+    // ompl tree:5.4935e-05
+
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < num_experiments; i++) {
+      // tt->nearestR(query, 0.0263789 + 1e-5, nbh);
+      tt->nearestK(query, 10, nbh);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "nns " << std::endl;
+    for (size_t j = 0; j < nbh.size(); ++j) {
+      space->printState(nbh[j]);
+      std::cout << tt->getDistanceFunction()(nbh[j], query) << std::endl;
+    }
+    //
+    std::cout << "ompl tree:" << dt << std::endl;
+
+    for (size_t i = 0; i < states.size(); ++i) {
+      space->freeState(states[i]);
+    }
+
+    space->freeState(query);
+
+    // t
+
+    // ompl::base::SO3StateSpace space;
+    //
+    // using state_t = ompl::base::ScopedState<ompl::base::SO3StateSpace> ;
+  }
+}
+
+// 20 times faster...
+BOOST_AUTO_TEST_CASE(t_se3) {
+
+  std::srand(0);
+  // nigh::Nigh<MyNodeQuat, nigh::SO3Space<double>, MyNodeKeyQuat,
+  //            nigh::NoThreadSafety, nigh::KDTreeBatch<32>>
+  // nn;
+
+  // using TreeQuat = dynotree::KDTree<int, 4, 32, double,
+  // dynotree::SO3<double>>;
+  using TreeR3SO3 =
+      dynotree::KDTree<int, 7, 32, double, dynotree::R3SO3<double>>;
+
+  using TreeR3SO3X =
+      dynotree::KDTree<int, -1, 32, double, dynotree::Combined<double>>;
+
+  // template <class id, int Dimensions, std::size_t BucketSize = 32,
+  //           typename Scalar = double,
+  //           typename Distance = L2Squared<Scalar, Dimensions>>
+  //
+
+  // SE3Squared<double>>;
+  // SO3Squared<double>>;
+
+  TreeR3SO3 tree;
+  tree.init_tree();
+
+  using Space = dynotree::Combined<double>::Space;
+  //
+  // std::vector<Space> spaces;
+
+  std::vector<Space> spaces;
+  spaces.push_back(dynotree::Rn<double>());
+  spaces.push_back(dynotree::SO3<double>());
+  // dynotree::L2<double>());
+  //
+  // {dynotree::L2<double>(), dynotree::SO3<double>()}
+
+  // dynotree::Combined<double> combi_space(spaces, {3, 4});
+  dynotree::Combined<double> combi_space({"Rn:3", "SO3"});
+  // spaces, {3, 4});
+  TreeR3SO3X treex;
+  treex.init_tree(7, combi_space);
+
+  int nx = 7;
+  Eigen::VectorXd x = Eigen::VectorXd::Random(nx);
+  using V7d = Eigen::Matrix<double, 7, 1>;
+  V7d x7;
+  x7 = x;
+  x7.tail(4).normalize();
+
+  int num_points = 1000000;
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(nx, num_points);
+
+  bool real_part_positive = true;
+  int index_real_part = 3;
+
+  if (real_part_positive) {
+    if (x7.tail(4)(index_real_part) < 0) {
+      x7.tail(4) *= -1;
+    }
+  }
+
+  for (size_t i = 0; i < X.cols(); ++i) {
+    X.col(i).tail(4).normalize();
+    if (real_part_positive) {
+      if (X.col(i).tail(4)(index_real_part) < 0) {
+        X.col(i).tail(4) *= -1;
+      }
+    }
+  }
+
+  int num_neighs = 10;
+
+  for (size_t i = 0; i < X.cols(); ++i) {
+    V7d q = X.col(i);
+    tree.addPoint(q, i);
+    treex.addPoint(q, i);
+  }
+
+  int best = -1;
+  {
+
+    std::cout << "linear nn" << std::endl;
+
+    double dist = std::numeric_limits<double>::max();
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < X.cols(); ++i) {
+      double d = tree.getStateSpace().distance(X.col(i), x7.head<7>());
+      if (d < dist) {
+        dist = d;
+        best = i;
+      }
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+
+    std::cout << " linear time " << dt << std::endl;
+    std::cout << "best is " << best << " with dist " << dist << "dist2 "
+              << dist * dist << std::endl;
+  }
+
+  int num_experiments = 1;
+#if 0
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    std::vector<std::pair<MyNodeQuat, double>> nbh;
+    for (size_t i = 0; i < num_experiments; i++) {
+      nn.nearest(nbh, x4, num_neighs, 1e8);
+    }
+    // tree4.searchBall(x, .5);
+    // treex.searchKnn(x, num_neighs);
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    for (size_t j = 0; j < nbh.size(); ++j) {
+      std::cout << nbh[j].first.id << " "
+                << nbh[j].first.point_.coeffs().transpose() << " "
+                << nbh[j].second << std::endl;
+    }
+    std::cout << "dt nigh:" << dt << std::endl;
+  }
+#endif
+
+  double radius_search = .3;
+  std::vector<TreeR3SO3::DistanceId> nnt;
+  {
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < num_experiments; i++) {
+      // nnt = tree.searchKnn(x7, num_neighs);
+      nnt = tree.searchBall(x7, radius_search);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+
+    for (size_t j = 0; j < nnt.size(); ++j) {
+      std::cout << nnt[j].id << " " << nnt[j].distance << std::endl;
+    }
+
+    std::cout << "my tree:" << dt << std::endl;
+  }
+
+  std::cout << "best: " << best << " " << nnt[0].id << std::endl;
+  BOOST_TEST(best == nnt[0].id);
+
+  // my tree dynamic
+  {
+    std::vector<TreeR3SO3X::DistanceId> nntx;
+    {
+
+      // std::cout << tree.getStateSpace().distance(x7, x7) <<std::endl;
+      // std::cout << tree.getStateSpace().distance(x7, X.col(0))
+      <<std::endl; std::cout << treex.getStateSpace().distance(x7,
+      X.col(309717))
+                << std::endl;
+      std::cout << treex.getStateSpace().distance_to_rectangle(
+                       x7, X.col(309717), X.col(309717))
+                << std::endl;
+      // 118527)) <<std::endl;
+
+      auto t0 = std::chrono::high_resolution_clock::now();
+      for (size_t i = 0; i < num_experiments; i++) {
+        // nnt = tree.searchKnn(x7, num_neighs);
+        nntx = treex.searchBall(x7, radius_search);
+      }
+
+      auto t1 = std::chrono::high_resolution_clock::now();
+      auto dt =
+          1.e-9 *
+          std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+          t0).count();
+
+      for (size_t j = 0; j < nnt.size(); ++j) {
+        std::cout << nntx[j].id << " " << nntx[j].distance << std::endl;
+      }
+
+      std::cout << "my tree dynamic:" << dt << std::endl;
+    }
+
+    std::cout << "best: " << best << " " << nnt[0].id << std::endl;
+    BOOST_TEST(best == nntx[0].id);
+
+    for (size_t k = 0; k < std::min(int(nntx.size()), 5); k++) {
+      BOOST_TEST(nntx[0].id == nnt[0].id);
+      BOOST_TEST(nntx[0].distance == nnt[0].distance,
+                 boost::test_tools::tolerance(1e-6));
+    }
+  }
+
+  // ompl
+  {
+    ompl::base::StateSpacePtr space(new ompl::base::SE3StateSpace());
+
+    std::vector<ompl::base::State *> states;
+
+    for (size_t i = 0; i < X.cols(); ++i) {
+      ompl::base::State *state = space->allocState();
+
+      auto ptr = state->as<ompl::base::SE3StateSpace::StateType>();
+      ptr->setXYZ(X.col(i)(0), X.col(i)(1), X.col(i)(2));
+      ptr->rotation().x = X.col(i)(3 + 0);
+      ptr->rotation().y = X.col(i)(3 + 1);
+      ptr->rotation().z = X.col(i)(3 + 2);
+      ptr->rotation().w = X.col(i)(3 + 3);
+      states.push_back(state);
+    }
+
+    // state->setY(0.2);
+    // state->setYaw(0.0);
+
+    ompl::NearestNeighbors<ompl::base::State *> *tt =
+        new ompl::NearestNeighborsGNAT<ompl::base::State *>();
+
+    tt->setDistanceFunction(
+        [&](auto &a, auto &b) { return space->distance(a, b); });
+
+    for (auto &s : states)
+      tt->add(s);
+
+    ompl::base::State *query = space->allocState();
+
+    auto ptr = query->as<ompl::base::SE3StateSpace::StateType>();
+
+    ptr->setXYZ(x7(0), x7(1), x7(2));
+    ptr->rotation().x = x7(3 + 0);
+    ptr->rotation().y = x7(3 + 1);
+    ptr->rotation().z = x7(3 + 2);
+    ptr->rotation().w = x7(3 + 3);
+
+    std::vector<ompl::base::State *> nbh;
+
+    auto t0 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < num_experiments; i++) {
+      // tt->nearestK(query, num_neighs, nbh);
+      tt->nearestR(query, radius_search, nbh);
+      // .num_neighs, nbh);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    auto dt =
+        1.e-9 *
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t1 -
+        t0).count();
+    std::cout << "nns " << std::endl;
+    for (size_t j = 0; j < nbh.size(); ++j) {
+      space->printState(nbh[j]);
+      std::cout << tt->getDistanceFunction()(nbh[j], query) << std::endl;
+    }
+    //
+    std::cout << "ompl tree:" << dt << std::endl;
+
+    for (size_t i = 0; i < states.size(); ++i) {
+      space->freeState(states[i]);
+    }
+    space->freeState(query);
+  }
+}
 //
 // BOOST_AUTO_TEST_CASE(t_original_example) {
 //   std::cout << "Example starting..." << std::endl;
