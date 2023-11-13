@@ -80,7 +80,6 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
     std::cout << victim.id << " closest to lazy monster, with distance "
               << victim.distance << "!" << std::endl;
   }
-
 }
 
 BOOST_AUTO_TEST_CASE(t_hello3) {
@@ -1388,5 +1387,4 @@ BOOST_AUTO_TEST_CASE(t_scaling) {
 
 BOOST_AUTO_TEST_CASE(t_scaling_so2) {
   // TODO: continue here!!
-
 }
