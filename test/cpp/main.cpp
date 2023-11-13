@@ -73,7 +73,6 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
   point_t lazyMonsterLocation(V1d(3.1));
   // 6, 6)); // this monster will always try to eat the closest people
   const std::size_t monsterHeads = 2; // this monster can eat two people at
-                                      //  once
   auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation, monsterHeads);
   for (const auto &victim : lazyMonsterVictims) {
     std::cout << victim.id << " closest to lazy monster, with distance "
@@ -816,8 +815,7 @@ BOOST_AUTO_TEST_CASE(t_se3) {
     {
 
       // std::cout << tree.getStateSpace().distance(x7, x7) <<std::endl;
-      // std::cout << tree.getStateSpace().distance(x7, X.col(0))
-      << std::endl;
+      // std::cout << tree.getStateSpace().distance(x7, X.col(0)) <<std::endl;
       std::cout << treex.getStateSpace().distance(x7, X.col(309717))
                 << std::endl;
       std::cout << treex.getStateSpace().distance_to_rectangle(
@@ -920,484 +918,471 @@ BOOST_AUTO_TEST_CASE(t_se3) {
     space->freeState(query);
   }
 }
-//
-// BOOST_AUTO_TEST_CASE(t_original_example) {
-//   std::cout << "Example starting..." << std::endl;
-//   // setup
-//   using tree_t = dynotree::KDTree<std::string, 2>;
-//   using point_t = Eigen::Vector2d;
-//   tree_t tree;
-//   tree.init_tree();
-//   tree.addPoint(point_t(1, 2), "George");
-//   tree.addPoint(point_t(1, 3), "Harold");
-//   tree.addPoint(point_t(7, 7), "Melvin");
-//
-//   // KNN search
-//   point_t lazyMonsterLocation(
-//       6, 6); // this monster will always try to eat the closest people
-//   const std::size_t monsterHeads = 2; // this monster can eat two people at
-//   once auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation,
-//   monsterHeads); for (const auto &victim : lazyMonsterVictims) {
-//     std::cout << victim.id << " closest to lazy monster, with distance "
-//               << sqrt(victim.distance) << "!" << std::endl;
-//   }
-//
-//   // ball search
-//   point_t stationaryMonsterLocation(
-//       8, 8); // this monster doesn't move, so can only eat people that are
-//       close
-//   const double neckLength = 6.0; // it can only reach within this range
-//   auto potentialVictims =
-//       tree.searchBall(stationaryMonsterLocation,
-//                       neckLength * neckLength); // metric is SquaredL2
-//   std::cout << "Stationary monster can reach any of " <<
-//   potentialVictims.size()
-//             << " people!" << std::endl;
-//
-//   // hybrid KNN/ball search
-//   auto actualVictims = tree.searchCapacityLimitedBall(
-//       stationaryMonsterLocation, neckLength * neckLength, monsterHeads);
-//   std::cout << "The stationary monster will try to eat ";
-//   for (const auto &victim : actualVictims) {
-//     std::cout << victim.id << " and ";
-//   }
-//   std::cout << "nobody else." << std::endl;
-//   std::cout << "Example completed" << std::endl;
-// }
-//
-// BOOST_AUTO_TEST_CASE(t_orig_accuracy) {
-//   // GIVEN: a tree, a bunch of random points to put in it, and dumb brute
-//   force
-//   // methods to compare results to
-//
-//   std::cout << "Accuracy tests starting..." << std::endl;
-//   static const int dims = 4;
-//   std::vector<Eigen::Vector4d> points;
-//   using tree_t = dynotree::KDTree<int, dims>;
-//   tree_t tree;
-//   tree.init_tree();
-//   int count = 0;
-//   std::srand(1234567);
-//
-//   auto bruteforceKNN = [&](const Eigen::Vector4d searchLoc,
-//                            size_t K) -> std::vector<std::pair<double, int>> {
-//     std::vector<std::pair<double, int>> dists;
-//     for (std::size_t i = 0; i < points.size(); i++) {
-//       double distance = tree.getStateSpace().distance(searchLoc, points[i]);
-//       dists.emplace_back(distance, i);
-//     }
-//     size_t actualK = std::min(points.size(), K);
-//     std::partial_sort(dists.begin(), dists.begin() + actualK, dists.end());
-//     dists.resize(actualK);
-//     return dists;
-//   };
-//
-//   auto bruteforceRadius =
-//       [&](const Eigen::Vector4d &searchLoc,
-//           double radius) -> std::vector<std::pair<double, int>> {
-//     std::vector<std::pair<double, int>> dists;
-//     for (std::size_t i = 0; i < points.size(); i++) {
-//       double distance = tree.getStateSpace().distance(searchLoc, points[i]);
-//       dists.emplace_back(distance, i);
-//     }
-//     std::sort(dists.begin(), dists.end());
-//     auto iter = std::lower_bound(dists.begin(), dists.end(),
-//                                  std::make_pair(radius, int(0)));
-//     std::size_t inliers = std::distance(dists.begin(), iter);
-//     dists.resize(inliers);
-//     return dists;
-//   };
-//
-//   auto randomPoint = []() {
-//     // std::array<double, dims> loc;
-//     Eigen::Vector4d loc;
-//     for (std::size_t j = 0; j < dims; j++) {
-//       loc[j] = double(rand()) / RAND_MAX;
-//     }
-//     return loc;
-//   };
-//
-//   // THEN: the tree size should match
-//   if (tree.size() != 0) {
-//     std::cout << "Count doesn't match!!!" << std::endl;
-//   }
-//
-//   auto searcher = tree.searcher();
-//   for (std::size_t j = 0; j < 2000; j++) {
-//     Eigen::Vector4d loc = randomPoint();
-//
-//     // WHEN: we search for the KNN with the tree and the brute force
-//     const std::size_t k = 50;
-//     auto tnn = tree.searchKnn(loc, k);
-//     auto bnn = bruteforceKNN(loc, k);
-//     auto snn = searcher.search(loc, 1e9, k, tree.getStateSpace());
-//
-//     // THEN: the returned result sizes should match
-//     if (tnn.size() != bnn.size() || snn.size() != bnn.size() ||
-//         bnn.size() > std::min(k, points.size())) {
-//       std::cout << "Searched for " << k << ", found " << tnn.size()
-//                 << std::endl;
-//     }
-//
-//     if (bnn.size() > 0) {
-//       auto nn = tree.search(loc);
-//       if (nn.id != bnn[0].second) {
-//         std::cout << "1nn id not equal" << std::endl;
-//       }
-//       if (std::abs(bnn[0].first - nn.distance) > 1e-10) {
-//         std::cout << "1nn distances not equal" << std::endl;
-//       }
-//     }
-//
-//     // AND: the entries should match - both index, and distance
-//     for (std::size_t i = 0; i < tnn.size(); i++) {
-//       if (std::abs(bnn[i].first - tnn[i].distance) > 1e-10) {
-//         std::cout << "distances not equal" << std::endl;
-//       }
-//       if (std::abs(bnn[i].first - snn[i].distance) > 1e-10) {
-//         std::cout << "distances not equal" << std::endl;
-//       }
-//       if (bnn[i].second != tnn[i].id) {
-//         std::cout << "id not equal" << std::endl;
-//       }
-//       if (bnn[i].second != snn[i].id) {
-//         std::cout << "id not equal" << std::endl;
-//       }
-//     }
-//
-//     // WHEN: we add the point we searched for to the tree for next time
-//     tree.addPoint(loc, count++);
-//     points.push_back(loc);
-//
-//     // THEN: the tree size should match
-//     if (tree.size() != points.size()) {
-//       std::cout << "Count doesn't match!!!" << std::endl;
-//     }
-//   }
-//
-//   tree_t tree2;
-//   tree2.init_tree();
-//
-//   for (std::size_t j = 0; j < points.size(); j++) {
-//     tree2.addPoint(points[j], j, false);
-//   }
-//   tree2.splitOutstanding();
-//
-//   for (std::size_t j = 0; j < points.size(); j++) {
-//     Eigen::Vector4d loc = randomPoint();
-//     const double radius = 0.7;
-//
-//     auto tnn = tree2.searchBall(loc, radius);
-//     auto bnn = bruteforceRadius(loc, radius);
-//     if (tnn.size() != bnn.size()) {
-//       std::cout << "Brute force results are not the same size as tree
-//       results"
-//                 << std::endl;
-//       continue;
-//     }
-//
-//     if (tnn.size() && tnn.back().distance > radius) {
-//       std::cout << "Searched for max radius " << radius << ", found "
-//                 << tnn.back().distance << std::endl;
-//     }
-//     for (std::size_t i = 0; i < tnn.size(); i++) {
-//       if (std::abs(bnn[i].first - tnn[i].distance) > 1e-10) {
-//         std::cout << "distances not equal" << std::endl;
-//         BOOST_TEST(false);
-//       }
-//       if (bnn[i].second != tnn[i].id) {
-//         std::cout << "id not equal" << std::endl;
-//         BOOST_TEST(false);
-//       }
-//     }
-//   }
-//
-//   std::cout << "Accuracy tests completed" << std::endl;
-// }
-//
-// BOOST_AUTO_TEST_CASE(t_orig_duplicate) {
-//   std::cout << "Duplicate tests started" << std::endl;
-//   std::srand(0);
-//
-//   // GIVEN: the same point added to the tree lots and lots of times (multiple
-//   // buckets worth)
-//   static const int dims = -1;
-//   static const int runtime_dim = 11;
-//
-//   using point_t = Eigen::VectorXd;
-//
-//   auto randomPoint = []() {
-//     point_t loc(runtime_dim);
-//     // std::array<d/uble, dims> loc;
-//     for (std::size_t j = 0; j < runtime_dim; j++) {
-//       loc[j] = double(rand()) / RAND_MAX;
-//     }
-//     return loc;
-//   };
-//   using tree_t = dynotree::KDTree<int, dims>;
-//   tree_t tree;
-//
-//   tree.init_tree(runtime_dim);
-//
-//   point_t loc = randomPoint();
-//   for (int i = 0; i < 5000; i++) {
-//     tree.addPoint(loc, i, false);
-//   }
-//   auto almostLoc = loc;
-//   almostLoc[0] = std::nextafter(loc[0], 1e9);
-//   tree.addPoint(
-//       almostLoc, tree.size(),
-//       false); // and another point, just so not the entire treee is one point
-//
-//   // WHEN: the tree is split and queried
-//   tree.splitOutstanding();
-//   auto tnn = tree.searchKnn(loc, 80);
-//
-//   // THEN: it should still behave normally - correct K for KNN, no crashes,
-//   good
-//   // code coverage, etc
-//   if (tnn.size() != 80) {
-//     std::cout << "Incorrect K: " << tnn.size() << std::endl;
-//     BOOST_TEST(false);
-//   }
-//   std::cout << "Duplicate tests completed" << std::endl;
-// }
-//
-// // #define DURATION \
-// //   double(((previous = current) * 0 + (current = std::clock()) - previous)
-// /    \
-// //          double(CLOCKS_PER_SEC))
-//
-// BOOST_AUTO_TEST_CASE(t_orig_performance) {
-//
-//   std::cout << "Performance tests starting..." << std::endl;
-//   auto tic = std::chrono::high_resolution_clock::now();
-//
-//   static const int dims = 2;
-//   std::cout << "adding ";
-//   using point_t = Eigen::Vector2d;
-//   std::vector<point_t> points;
-//   dynotree::KDTree<int, dims, 8> tree;
-//   tree.init_tree();
-//
-//   int count = 0;
-//   std::srand(1234567);
-//
-//   auto randomPoint = []() {
-//     point_t loc;
-//     for (std::size_t j = 0; j < dims; j++) {
-//       loc[j] = double(rand()) / RAND_MAX;
-//     }
-//     return loc;
-//   };
-//
-//   for (int i = 0; i < 400 * 1000; i++) {
-//     point_t loc = randomPoint();
-//     tree.addPoint(loc, count++, false);
-//
-//     points.push_back(loc);
-//   }
-//
-//   std::vector<point_t> searchPoints;
-//   for (int i = 0; i < 100 * 1000; i++) {
-//     searchPoints.push_back(randomPoint());
-//   }
-//
-//   std::cout << time_since_s(tic) << std::endl;
-//   std::cout << "splitting ";
-//   tic = std::chrono::high_resolution_clock::now();
-//   tree.splitOutstanding();
-//   std::cout << time_since_s(tic) << "s" << std::endl;
-//
-//   for (int j = 0; j < 3; j++) {
-//     std::cout << "searching " << (j + 1) << " ";
-//
-//     tic = std::chrono::high_resolution_clock::now();
-//     for (auto p : searchPoints) {
-//       const int k = 3;
-//       auto nn = tree.searchKnn(p, k);
-//
-//       if (nn.size() != k) {
-//         std::cout << nn.size() << " instead of " << k << " ERROR" <<
-//         std::endl;
-//       }
-//     }
-//     std::cout << time_since_s(tic) << "s" << std::endl;
-//   }
-//   for (int j = 0; j < 3; j++) {
-//     std::cout << "bulk searching " << (j + 1) << " ";
-//     auto tic = std::chrono::high_resolution_clock::now();
-//
-//     const int k = 3;
-//     auto searcher = tree.searcher();
-//     tic = std::chrono::high_resolution_clock::now();
-//     for (auto p : searchPoints) {
-//       const auto &nn = searcher.search(p, std::numeric_limits<double>::max(),
-//       k,
-//                                        tree.getStateSpace());
-//
-//       if (nn.size() != k) {
-//         std::cout << nn.size() << " instead of " << k << " ERROR" <<
-//         std::endl;
-//       }
-//     }
-//     std::cout << time_since_s(tic) << "s" << std::endl;
-//   }
-//   std::cout << "Performance tests completed" << std::endl;
-// }
-//
-// template <typename Tree, typename Space>
-// void test_time(Tree &tree, Space &space) {
-//   int num_points = 100000;
-//   Eigen::MatrixXd X = Eigen::MatrixXd::Random(3, num_points);
-//
-//   X.row(2) = X.row(2).cwiseAbs(); // time should be positive
-//
-//   Eigen::Vector3d query(.8, 0, .3);
-//
-//   double min_d = std::numeric_limits<double>::max();
-//   int best_i = -1;
-//   for (size_t i = 0; i < X.cols(); i++) {
-//
-//     double d = space.distance(query, X.col(i).head<3>());
-//     if (d < min_d) {
-//       min_d = d;
-//       best_i = i;
-//     }
-//   }
-//
-//   // dynotree::KDTree<int, 3, 32, double, StateSpace>
-//
-//   for (size_t i = 0; i < X.cols(); i++) {
-//     tree.addPoint(X.col(i).head<3>(), i);
-//   }
-//
-//   auto nn = tree.search(query);
-//
-//   BOOST_TEST(nn.id == best_i);
-//   BOOST_TEST(nn.distance == min_d, boost::test_tools::tolerance(1e-6));
-// }
-//
-// BOOST_AUTO_TEST_CASE(t_space_time) {
-//
-//   // compile time
-//   using StateSpace = dynotree::RnTime<double, 2>;
-//   using Tree = dynotree::KDTree<int, 3, 32, double, StateSpace>;
-//   StateSpace space;
-//   Tree tree;
-//   tree.init_tree();
-//
-//   // run time
-//   using StateSpaceX = dynotree::RnTime<double, -1>;
-//   using TreeX = dynotree::KDTree<int, -1, 32, double, StateSpaceX>;
-//   StateSpaceX spacex;
-//   TreeX treex;
-//   treex.init_tree(3);
-//
-//   test_time(tree, space);
-//   test_time(treex, spacex);
-// }
-//
-// BOOST_AUTO_TEST_CASE(t_linear) {
-//
-//   dynotree::LinearKNN<int, 3> linear_knn;
-//   Eigen::Vector3d p0(1., 2., 3.);
-//   Eigen::Vector3d p1(1.1, 2., 3.);
-//   Eigen::Vector3d p2(0, 0, 0);
-//
-//   linear_knn.addPoint(p0, 0);
-//   linear_knn.addPoint(p1, 1);
-//
-//   auto n = linear_knn.searchNN(p2);
-//   std::cout << n.id << " " << n.distance << std::endl;
-//   {
-//     std::vector<dynotree::LinearKNN<int, 3>::DistanceId> nns;
-//     nns = linear_knn.searchBall(p2, .05);
-//
-//     for (size_t j = 0; j < nns.size(); ++j) {
-//       std::cout << nns[j].id << " " << nns[j].distance << std::endl;
-//     }
-//   }
-//   std::cout << n.id << n.distance << std::endl;
-//
-//   {
-//     std::vector<dynotree::LinearKNN<int, 3>::DistanceId> nns;
-//
-//     nns = linear_knn.searchKnn(p2, 1);
-//
-//     for (size_t j = 0; j < nns.size(); ++j) {
-//       std::cout << nns[j].id << " " << nns[j].distance << std::endl;
-//     }
-//   }
-// }
-//
-// BOOST_AUTO_TEST_CASE(t_scaling) {
-//
-//   using Scalar = double;
-//   using TreeR4 = dynotree::KDTree<int, 4, 32, Scalar>;
-//   using LinearR4 = dynotree::LinearKNN<int, 4, Scalar>;
-//
-//   dynotree::Rn<Scalar, 4> r4;
-//   r4.set_weights(Eigen::Vector4d(1, 1, .1, .1));
-//
-//   TreeR4 tree4;
-//   tree4.init_tree(4, r4);
-//
-//   LinearR4 linear4(-1, r4);
-//
-//   int num_points = 10000;
-//
-//   Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, num_points);
-//
-//   for (size_t i = 0; i < X.cols(); ++i) {
-//     tree4.addPoint(X.col(i), i);
-//     linear4.addPoint(X.col(i), i);
-//   }
-//
-//   Eigen::Vector4d x = Eigen::Vector4d::Random();
-//
-//   {
-//     auto out1 = tree4.search(x);
-//     auto out2 = linear4.searchNN(x);
-//     BOOST_TEST(out1.id == out2.id);
-//     BOOST_TEST(out1.distance == out2.distance,
-//                boost::test_tools::tolerance(1e-6));
-//     std::cout << out1.id << " " << out1.distance << std::endl;
-//     std::cout << out2.id << " " << out2.distance << std::endl;
-//     std::cout << r4.distance(X.col(out1.id), x) << std::endl;
-//     std::cout << r4.distance(X.col(out2.id), x) << std::endl;
-//   }
-//   {
-//
-//     double radius = 1.;
-//     auto out1 = tree4.searchBall(x, radius);
-//     auto out2 = linear4.searchBall(x, radius);
-//
-//     BOOST_TEST(out1.size() == out2.size());
-//
-//     for (auto &out : out1) {
-//       BOOST_TEST(r4.distance(x, X.col(out.id)) < radius);
-//     }
-//     for (auto &out : out2) {
-//       BOOST_TEST(r4.distance(x, X.col(out.id)) < radius);
-//     }
-//   }
-//   {
-//     int nn = 10;
-//
-//     auto out1 = tree4.searchKnn(x, nn);
-//     auto out2 = linear4.searchKnn(x, nn);
-//
-//     BOOST_TEST(out1.size() == out2.size());
-//
-//     for (size_t i = 0; i < out1.size(); i++) {
-//       BOOST_TEST(out1[i].id == out2[i].id);
-//       BOOST_TEST(out1[i].distance == out2[i].distance,
-//                  boost::test_tools::tolerance(1e-6));
-//     }
-//   }
-// }
-//
-// BOOST_AUTO_TEST_CASE(t_scaling_so2) {
-//   // TODO: continue here!!
-// }
+
+BOOST_AUTO_TEST_CASE(t_original_example) {
+  std::cout << "Example starting..." << std::endl;
+  // setup
+  using tree_t = dynotree::KDTree<std::string, 2>;
+  using point_t = Eigen::Vector2d;
+  tree_t tree;
+  tree.init_tree();
+  tree.addPoint(point_t(1, 2), "George");
+  tree.addPoint(point_t(1, 3), "Harold");
+  tree.addPoint(point_t(7, 7), "Melvin");
+
+  // KNN search
+  point_t lazyMonsterLocation(
+      6, 6); // this monster will always try to eat the closest people
+  const std::size_t monsterHeads = 2; // this monster can eat two people at
+  auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation, monsterHeads);
+  for (const auto &victim : lazyMonsterVictims) {
+    std::cout << victim.id << " closest to lazy monster, with distance "
+              << sqrt(victim.distance) << "!" << std::endl;
+  }
+
+  // ball search
+  point_t stationaryMonsterLocation(
+      8, 8); // this monster doesn't move, so can only eat people that are close
+  const double neckLength = 6.0; // it can only reach within this range
+  auto potentialVictims =
+      tree.searchBall(stationaryMonsterLocation,
+                      neckLength * neckLength); // metric is SquaredL2
+  std::cout << "Stationary monster can reach any of " << potentialVictims.size()
+            << " people!" << std::endl;
+
+  // hybrid KNN/ball search
+  auto actualVictims = tree.searchCapacityLimitedBall(
+      stationaryMonsterLocation, neckLength * neckLength, monsterHeads);
+  std::cout << "The stationary monster will try to eat ";
+  for (const auto &victim : actualVictims) {
+    std::cout << victim.id << " and ";
+  }
+  std::cout << "nobody else." << std::endl;
+  std::cout << "Example completed" << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(t_orig_accuracy) {
+  // GIVEN: a tree, a bunch of random points to put in it, and dumb brute force
+  // methods to compare results to
+
+  std::cout << "Accuracy tests starting..." << std::endl;
+  static const int dims = 4;
+  std::vector<Eigen::Vector4d> points;
+  using tree_t = dynotree::KDTree<int, dims>;
+  tree_t tree;
+  tree.init_tree();
+  int count = 0;
+  std::srand(1234567);
+
+  auto bruteforceKNN = [&](const Eigen::Vector4d searchLoc,
+                           size_t K) -> std::vector<std::pair<double, int>> {
+    std::vector<std::pair<double, int>> dists;
+    for (std::size_t i = 0; i < points.size(); i++) {
+      double distance = tree.getStateSpace().distance(searchLoc, points[i]);
+      dists.emplace_back(distance, i);
+    }
+    size_t actualK = std::min(points.size(), K);
+    std::partial_sort(dists.begin(), dists.begin() + actualK, dists.end());
+    dists.resize(actualK);
+    return dists;
+  };
+
+  auto bruteforceRadius =
+      [&](const Eigen::Vector4d &searchLoc,
+          double radius) -> std::vector<std::pair<double, int>> {
+    std::vector<std::pair<double, int>> dists;
+    for (std::size_t i = 0; i < points.size(); i++) {
+      double distance = tree.getStateSpace().distance(searchLoc, points[i]);
+      dists.emplace_back(distance, i);
+    }
+    std::sort(dists.begin(), dists.end());
+    auto iter = std::lower_bound(dists.begin(), dists.end(),
+                                 std::make_pair(radius, int(0)));
+    std::size_t inliers = std::distance(dists.begin(), iter);
+    dists.resize(inliers);
+    return dists;
+  };
+
+  auto randomPoint = []() {
+    // std::array<double, dims> loc;
+    Eigen::Vector4d loc;
+    for (std::size_t j = 0; j < dims; j++) {
+      loc[j] = double(rand()) / RAND_MAX;
+    }
+    return loc;
+  };
+
+  // THEN: the tree size should match
+  if (tree.size() != 0) {
+    std::cout << "Count doesn't match!!!" << std::endl;
+  }
+
+  auto searcher = tree.searcher();
+  for (std::size_t j = 0; j < 2000; j++) {
+    Eigen::Vector4d loc = randomPoint();
+
+    // WHEN: we search for the KNN with the tree and the brute force
+    const std::size_t k = 50;
+    auto tnn = tree.searchKnn(loc, k);
+    auto bnn = bruteforceKNN(loc, k);
+    auto snn = searcher.search(loc, 1e9, k, tree.getStateSpace());
+
+    // THEN: the returned result sizes should match
+    if (tnn.size() != bnn.size() || snn.size() != bnn.size() ||
+        bnn.size() > std::min(k, points.size())) {
+      std::cout << "Searched for " << k << ", found " << tnn.size()
+                << std::endl;
+    }
+
+    if (bnn.size() > 0) {
+      auto nn = tree.search(loc);
+      if (nn.id != bnn[0].second) {
+        std::cout << "1nn id not equal" << std::endl;
+      }
+      if (std::abs(bnn[0].first - nn.distance) > 1e-10) {
+        std::cout << "1nn distances not equal" << std::endl;
+      }
+    }
+
+    // AND: the entries should match - both index, and distance
+    for (std::size_t i = 0; i < tnn.size(); i++) {
+      if (std::abs(bnn[i].first - tnn[i].distance) > 1e-10) {
+        std::cout << "distances not equal" << std::endl;
+      }
+      if (std::abs(bnn[i].first - snn[i].distance) > 1e-10) {
+        std::cout << "distances not equal" << std::endl;
+      }
+      if (bnn[i].second != tnn[i].id) {
+        std::cout << "id not equal" << std::endl;
+      }
+      if (bnn[i].second != snn[i].id) {
+        std::cout << "id not equal" << std::endl;
+      }
+    }
+
+    // WHEN: we add the point we searched for to the tree for next time
+    tree.addPoint(loc, count++);
+    points.push_back(loc);
+
+    // THEN: the tree size should match
+    if (tree.size() != points.size()) {
+      std::cout << "Count doesn't match!!!" << std::endl;
+    }
+  }
+
+  tree_t tree2;
+  tree2.init_tree();
+
+  for (std::size_t j = 0; j < points.size(); j++) {
+    tree2.addPoint(points[j], j, false);
+  }
+  tree2.splitOutstanding();
+
+  for (std::size_t j = 0; j < points.size(); j++) {
+    Eigen::Vector4d loc = randomPoint();
+    const double radius = 0.7;
+
+    auto tnn = tree2.searchBall(loc, radius);
+    auto bnn = bruteforceRadius(loc, radius);
+    if (tnn.size() != bnn.size()) {
+      std::cout << "Brute force results are not the same size as treeresults"
+                << std::endl;
+      continue;
+    }
+
+    if (tnn.size() && tnn.back().distance > radius) {
+      std::cout << "Searched for max radius " << radius << ", found "
+                << tnn.back().distance << std::endl;
+    }
+    for (std::size_t i = 0; i < tnn.size(); i++) {
+      if (std::abs(bnn[i].first - tnn[i].distance) > 1e-10) {
+        std::cout << "distances not equal" << std::endl;
+        BOOST_TEST(false);
+      }
+      if (bnn[i].second != tnn[i].id) {
+        std::cout << "id not equal" << std::endl;
+        BOOST_TEST(false);
+      }
+    }
+  }
+
+  std::cout << "Accuracy tests completed" << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(t_orig_duplicate) {
+  std::cout << "Duplicate tests started" << std::endl;
+  std::srand(0);
+
+  // GIVEN: the same point added to the tree lots and lots of times (multiple
+  // buckets worth)
+  static const int dims = -1;
+  static const int runtime_dim = 11;
+
+  using point_t = Eigen::VectorXd;
+
+  auto randomPoint = []() {
+    point_t loc(runtime_dim);
+    // std::array<d/uble, dims> loc;
+    for (std::size_t j = 0; j < runtime_dim; j++) {
+      loc[j] = double(rand()) / RAND_MAX;
+    }
+    return loc;
+  };
+  using tree_t = dynotree::KDTree<int, dims>;
+  tree_t tree;
+
+  tree.init_tree(runtime_dim);
+
+  point_t loc = randomPoint();
+  for (int i = 0; i < 5000; i++) {
+    tree.addPoint(loc, i, false);
+  }
+  auto almostLoc = loc;
+  almostLoc[0] = std::nextafter(loc[0], 1e9);
+  tree.addPoint(
+      almostLoc, tree.size(),
+      false); // and another point, just so not the entire treee is one point
+
+  // WHEN: the tree is split and queried
+  tree.splitOutstanding();
+  auto tnn = tree.searchKnn(loc, 80);
+
+  // THEN: it should still behave normally - correct K for KNN, no crashes, good
+  // code coverage, etc
+  if (tnn.size() != 80) {
+    std::cout << "Incorrect K: " << tnn.size() << std::endl;
+    BOOST_TEST(false);
+  }
+  std::cout << "Duplicate tests completed" << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(t_orig_performance) {
+
+  std::cout << "Performance tests starting..." << std::endl;
+  auto tic = std::chrono::high_resolution_clock::now();
+
+  static const int dims = 2;
+  std::cout << "adding ";
+  using point_t = Eigen::Vector2d;
+  std::vector<point_t> points;
+  dynotree::KDTree<int, dims, 8> tree;
+  tree.init_tree();
+
+  int count = 0;
+  std::srand(1234567);
+
+  auto randomPoint = []() {
+    point_t loc;
+    for (std::size_t j = 0; j < dims; j++) {
+      loc[j] = double(rand()) / RAND_MAX;
+    }
+    return loc;
+  };
+
+  for (int i = 0; i < 400 * 1000; i++) {
+    point_t loc = randomPoint();
+    tree.addPoint(loc, count++, false);
+
+    points.push_back(loc);
+  }
+
+  std::vector<point_t> searchPoints;
+  for (int i = 0; i < 100 * 1000; i++) {
+    searchPoints.push_back(randomPoint());
+  }
+
+  std::cout << time_since_s(tic) << std::endl;
+  std::cout << "splitting ";
+  tic = std::chrono::high_resolution_clock::now();
+  tree.splitOutstanding();
+  std::cout << time_since_s(tic) << "s" << std::endl;
+
+  for (int j = 0; j < 3; j++) {
+    std::cout << "searching " << (j + 1) << " ";
+
+    tic = std::chrono::high_resolution_clock::now();
+    for (auto p : searchPoints) {
+      const int k = 3;
+      auto nn = tree.searchKnn(p, k);
+
+      if (nn.size() != k) {
+        std::cout << nn.size() << " instead of " << k << " ERROR" << std::endl;
+      }
+    }
+    std::cout << time_since_s(tic) << "s" << std::endl;
+  }
+  for (int j = 0; j < 3; j++) {
+    std::cout << "bulk searching " << (j + 1) << " ";
+    auto tic = std::chrono::high_resolution_clock::now();
+
+    const int k = 3;
+    auto searcher = tree.searcher();
+    tic = std::chrono::high_resolution_clock::now();
+    for (auto p : searchPoints) {
+      const auto &nn = searcher.search(p, std::numeric_limits<double>::max(), k,
+                                       tree.getStateSpace());
+
+      if (nn.size() != k) {
+        std::cout << nn.size() << " instead of " << k << " ERROR" << std::endl;
+      }
+    }
+    std::cout << time_since_s(tic) << "s" << std::endl;
+  }
+  std::cout << "Performance tests completed" << std::endl;
+}
+
+template <typename Tree, typename Space>
+void test_time(Tree &tree, Space &space) {
+  int num_points = 100000;
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(3, num_points);
+
+  X.row(2) = X.row(2).cwiseAbs(); // time should be positive
+
+  Eigen::Vector3d query(.8, 0, .3);
+
+  double min_d = std::numeric_limits<double>::max();
+  int best_i = -1;
+  for (size_t i = 0; i < X.cols(); i++) {
+
+    double d = space.distance(query, X.col(i).head<3>());
+    if (d < min_d) {
+      min_d = d;
+      best_i = i;
+    }
+  }
+
+  // dynotree::KDTree<int, 3, 32, double, StateSpace>
+
+  for (size_t i = 0; i < X.cols(); i++) {
+    tree.addPoint(X.col(i).head<3>(), i);
+  }
+
+  auto nn = tree.search(query);
+
+  BOOST_TEST(nn.id == best_i);
+  BOOST_TEST(nn.distance == min_d, boost::test_tools::tolerance(1e-6));
+}
+
+BOOST_AUTO_TEST_CASE(t_space_time) {
+
+  // compile time
+  using StateSpace = dynotree::RnTime<double, 2>;
+  using Tree = dynotree::KDTree<int, 3, 32, double, StateSpace>;
+  StateSpace space;
+  Tree tree;
+  tree.init_tree();
+
+  // run time
+  using StateSpaceX = dynotree::RnTime<double, -1>;
+  using TreeX = dynotree::KDTree<int, -1, 32, double, StateSpaceX>;
+  StateSpaceX spacex;
+  TreeX treex;
+  treex.init_tree(3);
+
+  test_time(tree, space);
+  test_time(treex, spacex);
+}
+
+BOOST_AUTO_TEST_CASE(t_linear) {
+
+  dynotree::LinearKNN<int, 3> linear_knn;
+  Eigen::Vector3d p0(1., 2., 3.);
+  Eigen::Vector3d p1(1.1, 2., 3.);
+  Eigen::Vector3d p2(0, 0, 0);
+
+  linear_knn.addPoint(p0, 0);
+  linear_knn.addPoint(p1, 1);
+
+  auto n = linear_knn.searchNN(p2);
+  std::cout << n.id << " " << n.distance << std::endl;
+  {
+    std::vector<dynotree::LinearKNN<int, 3>::DistanceId> nns;
+    nns = linear_knn.searchBall(p2, .05);
+
+    for (size_t j = 0; j < nns.size(); ++j) {
+      std::cout << nns[j].id << " " << nns[j].distance << std::endl;
+    }
+  }
+  std::cout << n.id << n.distance << std::endl;
+
+  {
+    std::vector<dynotree::LinearKNN<int, 3>::DistanceId> nns;
+
+    nns = linear_knn.searchKnn(p2, 1);
+
+    for (size_t j = 0; j < nns.size(); ++j) {
+      std::cout << nns[j].id << " " << nns[j].distance << std::endl;
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(t_scaling) {
+
+  using Scalar = double;
+  using TreeR4 = dynotree::KDTree<int, 4, 32, Scalar>;
+  using LinearR4 = dynotree::LinearKNN<int, 4, Scalar>;
+
+  dynotree::Rn<Scalar, 4> r4;
+  r4.set_weights(Eigen::Vector4d(1, 1, .1, .1));
+
+  TreeR4 tree4;
+  tree4.init_tree(4, r4);
+
+  LinearR4 linear4(-1, r4);
+
+  int num_points = 10000;
+
+  Eigen::MatrixXd X = Eigen::MatrixXd::Random(4, num_points);
+
+  for (size_t i = 0; i < X.cols(); ++i) {
+    tree4.addPoint(X.col(i), i);
+    linear4.addPoint(X.col(i), i);
+  }
+
+  Eigen::Vector4d x = Eigen::Vector4d::Random();
+
+  {
+    auto out1 = tree4.search(x);
+    auto out2 = linear4.searchNN(x);
+    BOOST_TEST(out1.id == out2.id);
+    BOOST_TEST(out1.distance == out2.distance,
+               boost::test_tools::tolerance(1e-6));
+    std::cout << out1.id << " " << out1.distance << std::endl;
+    std::cout << out2.id << " " << out2.distance << std::endl;
+    std::cout << r4.distance(X.col(out1.id), x) << std::endl;
+    std::cout << r4.distance(X.col(out2.id), x) << std::endl;
+  }
+  {
+
+    double radius = 1.;
+    auto out1 = tree4.searchBall(x, radius);
+    auto out2 = linear4.searchBall(x, radius);
+
+    BOOST_TEST(out1.size() == out2.size());
+
+    for (auto &out : out1) {
+      BOOST_TEST(r4.distance(x, X.col(out.id)) < radius);
+    }
+    for (auto &out : out2) {
+      BOOST_TEST(r4.distance(x, X.col(out.id)) < radius);
+    }
+  }
+  {
+    int nn = 10;
+
+    auto out1 = tree4.searchKnn(x, nn);
+    auto out2 = linear4.searchKnn(x, nn);
+
+    BOOST_TEST(out1.size() == out2.size());
+
+    for (size_t i = 0; i < out1.size(); i++) {
+      BOOST_TEST(out1[i].id == out2[i].id);
+      BOOST_TEST(out1[i].distance == out2[i].distance,
+                 boost::test_tools::tolerance(1e-6));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(t_scaling_so2) {
+  // TODO: continue here!!
+}
