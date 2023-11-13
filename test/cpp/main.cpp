@@ -21,7 +21,7 @@
 
 #include <nigh/kdtree_batch.hpp>
 
-double time_since_s(    std::chrono::high_resolution_clock::time_point t0) {
+double time_since_s(std::chrono::high_resolution_clock::time_point t0) {
   auto t1 = std::chrono::high_resolution_clock::now();
   double dt =
       1.e-6 *
@@ -70,14 +70,15 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
   tree.addPoint(point_t(V1d(-3.)), "Melvin");
 
   // KNN search
-  point_t lazyMonsterLocation(     V1d(3.1));
+  point_t lazyMonsterLocation(V1d(3.1));
   // 6, 6)); // this monster will always try to eat the closest people
   const std::size_t monsterHeads = 2; // this monster can eat two people at
-  once auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation,
-  monsterHeads); for (const auto &victim : lazyMonsterVictims) {
+  once auto lazyMonsterVictims =
+      tree.searchKnn(lazyMonsterLocation, monsterHeads);
+  for (const auto &victim : lazyMonsterVictims) {
     std::cout << victim.id << " closest to lazy monster, with distance "
               << victim.distance << "!" << std::endl;
-           }
+  }
 }
 //
 // BOOST_AUTO_TEST_CASE(t_hello3) {
