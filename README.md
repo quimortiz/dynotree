@@ -8,6 +8,7 @@
 [![pre-commit](https://github.com/quimortiz/dynotree/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/quimortiz/dynotree/actions/workflows/pre-commit.yml)
 [![C/C++ CI](https://github.com/quimortiz/dynotree/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/quimortiz/dynotree/actions/workflows/c-cpp.yml)
 [![PyPI version](https://badge.fury.io/py/pydynotree.svg)](https://pypi.org/project/pydynotree/)
+[![codecov](https://codecov.io/gh/quimortiz/dynotree/graph/badge.svg?token=AFQEOG7QKW)](https://codecov.io/gh/quimortiz/dynotree)
 
 A Dynamic Kd-Tree written in C++ with Python Bindings, supporting Euclidean, SO(2), SO(3), and more!
 
