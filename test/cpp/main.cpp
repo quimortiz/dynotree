@@ -21,7 +21,7 @@
 
 #include <nigh/kdtree_batch.hpp>
 
-double time_since_s(std::chrono::high_resolution_clock::time_point t0) {
+double time_since_s(    std::chrono::high_resolution_clock::time_point t0) {
   auto t1 = std::chrono::high_resolution_clock::now();
   double dt =
       1.e-6 *
