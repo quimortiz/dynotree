@@ -34,7 +34,7 @@ jobs:
           mkdir build
           cd build
           # cmake -DCMAKE_PREFIX_PATH="~/__local;" -DBUILD_TESTING=1 -DBUILD_PYTHON_BINDINGS=1 ..
-          cmake -DBUILD_TESTING=1 -DBUILD_PYTHON_BINDINGS=1 ..
+          cmake -DBUILD_TESTING=1 -DENABLE_TEST_COVERAGE=1 -DBUILD_PYTHON_BINDINGS=1 ..
 
     - name: Make
       run: |
@@ -71,4 +71,3 @@ jobs:
       uses: codecov/codecov-action@v3
       env:
            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
