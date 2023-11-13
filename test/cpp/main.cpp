@@ -73,11 +73,14 @@ BOOST_AUTO_TEST_CASE(t_hello2) {
   point_t lazyMonsterLocation(V1d(3.1));
   // 6, 6)); // this monster will always try to eat the closest people
   const std::size_t monsterHeads = 2; // this monster can eat two people at
+
   auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation, monsterHeads);
+
   for (const auto &victim : lazyMonsterVictims) {
     std::cout << victim.id << " closest to lazy monster, with distance "
               << victim.distance << "!" << std::endl;
   }
+
 }
 
 BOOST_AUTO_TEST_CASE(t_hello3) {
@@ -1385,4 +1388,5 @@ BOOST_AUTO_TEST_CASE(t_scaling) {
 
 BOOST_AUTO_TEST_CASE(t_scaling_so2) {
   // TODO: continue here!!
+
 }
