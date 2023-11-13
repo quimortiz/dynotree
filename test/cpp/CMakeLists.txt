@@ -23,4 +23,12 @@ target_link_libraries(
   main PRIVATE dynotree::dynotree Eigen3::Eigen Boost::unit_test_framework
                nigh::nigh Boost::filesystem ${OMPL_LIBRARIES})
 
+enable_testing()
+
 add_test(NAME test COMMAND main)
+
+if(ENABLE_TEST_COVERAGE)
+  target_compile_options(dynotree INTERFACE -O0 -g -fprofile-arcs
+                                            -ftest-coverage)
+  target_link_options(dynotree INTERFACE -fprofile-arcs -ftest-coverage)
+endif()
