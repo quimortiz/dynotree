@@ -57,28 +57,28 @@ BOOST_AUTO_TEST_CASE(t_hello) {
 //
 // // SO2
 //
-// BOOST_AUTO_TEST_CASE(t_hello2) {
-//   using tree_t =
-//       dynotree::KDTree<std::string, 1, 32, double, dynotree::SO2<double>>;
-//
-//   using point_t = Eigen::VectorXd;
-//   using V1d = Eigen::Matrix<double, 1, 1>;
-//   tree_t tree;
-//   tree.init_tree();
-//   tree.addPoint(point_t(V1d(0)), "George");
-//   tree.addPoint(point_t(V1d(3.)), "Harold");
-//   tree.addPoint(point_t(V1d(-3.)), "Melvin");
-//
-//   // KNN search
-//   point_t lazyMonsterLocation(V1d(3.1));
-//   // 6, 6)); // this monster will always try to eat the closest people
-//   const std::size_t monsterHeads = 2; // this monster can eat two people at
-//   once auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation,
-//   monsterHeads); for (const auto &victim : lazyMonsterVictims) {
-//     std::cout << victim.id << " closest to lazy monster, with distance "
-//               << victim.distance << "!" << std::endl;
-//   }
-// }
+BOOST_AUTO_TEST_CASE(t_hello2) {
+  using tree_t =
+      dynotree::KDTree<std::string, 1, 32, double, dynotree::SO2<double>>;
+
+  using point_t = Eigen::VectorXd;
+  using V1d = Eigen::Matrix<double, 1, 1>;
+  tree_t tree;
+  tree.init_tree();
+  tree.addPoint(point_t(V1d(0)), "George");
+  tree.addPoint(point_t(V1d(3.)), "Harold");
+  tree.addPoint(point_t(V1d(-3.)), "Melvin");
+
+  // KNN search
+  point_t lazyMonsterLocation(     V1d(3.1));
+  // 6, 6)); // this monster will always try to eat the closest people
+  const std::size_t monsterHeads = 2; // this monster can eat two people at
+  once auto lazyMonsterVictims = tree.searchKnn(lazyMonsterLocation,
+  monsterHeads); for (const auto &victim : lazyMonsterVictims) {
+    std::cout << victim.id << " closest to lazy monster, with distance "
+              << victim.distance << "!" << std::endl;
+           }
+}
 //
 // BOOST_AUTO_TEST_CASE(t_hello3) {
 //   std::srand(0);
