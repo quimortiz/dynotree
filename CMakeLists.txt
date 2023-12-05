@@ -26,13 +26,13 @@ target_include_directories(
 target_compile_features(dynotree INTERFACE cxx_std_17)
 
 # add_library(dynobench::dynobench ALIAS dynobench)
-option(BUILD_PYTHON_BINDINGS OFF)
+option(BUILD_PYDYNOTREE OFF)
 option(BUILD_TESTING OFF)
 option(BUILD_EXAMPLES OFF)
 
 #
 message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
-message(STATUS "BUILD_PYTHON_BINDINGS ${BUILD_PYTHON_BINDINGS}")
+message(STATUS "BUILD_PYDYNOTREE ${BUILD_PYDYNOTREE}")
 message(STATUS "BUILD_EXAMPLES: ${BUILD_EXAMPLES}")
 #
 
@@ -75,6 +75,6 @@ if(BUILD_TESTING)
   add_subdirectory(test/cpp)
 endif()
 
-if(BUILD_PYTHON_BINDINGS)
+if(BUILD_PYDYNOTREE)
   add_subdirectory(bindings/python)
 endif()
