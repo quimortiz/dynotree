@@ -31,6 +31,7 @@ public:
   using point_t = Eigen::Matrix<Scalar, Dimensions, 1>;
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
+  using state_space_t = StateSpace;
   int m_dimensions = Dimensions;
   static const std::size_t bucketSize = BucketSize;
   using tree_t = KDTree<Id, Dimensions, BucketSize, Scalar, StateSpace>;

@@ -1,0 +1,41 @@
+name: Python test pip package
+
+on:
+  push:
+    branches: [ "main","dev" ]
+  pull_request:
+    branches: [ "main","dev" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v3
+    - name: Install Dependencies
+      run: sudo apt update |
+           sudo apt install python3-pip -y
+
+    - name: Check Install package from PIP
+      run: |
+           pip install pydynotree
+           python3 -c "import pydynotree"
+    - name: Python Install Dependencies
+      run: |
+           pip3 install numpy
+           pip3 install matplotlib
+    - name: Run Python Basic
+      run: |
+           cd test/python/
+           python3 main.py
+    - name: Run Python RRT
+      run: |
+           cd test/python/
+           python3 rrt.py
+           python3 rrt_free.py
+    - name: Run Test all
+      run: |
+           cd test/python
+           python3 all.py

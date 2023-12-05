@@ -70,6 +70,7 @@ install(FILES "${PROJECT_BINARY_DIR}/dynotreeConfig.cmake"
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/dynotree DESTINATION include)
 
+option(ENABLE_TEST_COVERAGE OFF)
 if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(test/cpp)

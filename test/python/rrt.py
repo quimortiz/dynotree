@@ -1,4 +1,5 @@
 import sys
+import os
 
 sys.path.append(".")
 
@@ -74,11 +75,13 @@ def is_collision(x: np.ndarray) -> bool:
 static = False
 
 if static:
-    tree = dynotree.TreeR2SO2(-1)
+    tree = dynotree.TreeR2SO2()
+    tree.init_tree()
     state_space = tree.getStateSpace()
     state_space.set_bounds(np.array([0, 0]), np.array([3, 3]))
 else:
-    tree = dynotree.TreeX(3, ["Rn:2", "SO2"])
+    tree = dynotree.TreeX()
+    tree.init_tree(3, dynotree.SpaceX(["Rn:2", "SO2"]))
     state_space = tree.getStateSpace()
     state_space.set_bounds(
         [np.array([0, 0]), np.array([])], [np.array([3, 3]), np.array([])]
@@ -103,7 +106,8 @@ ax.set_aspect("equal")
 ax.set_title("env, start and goal configurations")
 
 
-plt.show()
+if os.environ.get("CI") != "1":
+    plt.show()
 
 # new plot
 
@@ -132,7 +136,9 @@ ax.set_ylim(ylim)
 ax.set_aspect("equal")
 ax.set_title("random configurations - collisions")
 
-plt.show()
+
+if os.environ.get("CI") != "1":
+    plt.show()
 
 # now lets do rrt
 
@@ -154,7 +160,9 @@ for i in range(N):
     interpolate_fun(start, goal, i / N, out)
     plot_robot(ax, out, color="gray")
 
-plt.show()
+
+if os.environ.get("CI") != "1":
+    plt.show()
 
 # now lets solve rrt!
 goal_bias = 0.1
@@ -181,7 +189,7 @@ for i in range(max_steps):
     if np.random.rand() < goal_bias:
         xrand = np.copy(goal)
     # find nearest neighbor
-    nn = tree.searchKnn(xrand, 1)[0]
+    nn = tree.search(xrand)
     xnear = valid_configs[nn.id]
     advance_rate = min(max_expansion / nn.distance, 1.0)
     print("advance_rate", advance_rate)
@@ -266,7 +274,9 @@ for p in path:
 print("path", path)
 
 ax.set_title("rrt solution")
-plt.show()
+
+if os.environ.get("CI") != "1":
+    plt.show()
 
 
 # just build rrt

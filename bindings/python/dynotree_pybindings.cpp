@@ -17,13 +17,15 @@ void declare_tree(py::module &m, const std::string &name) {
       .def_readonly("id", &T::DistanceId::id);
 
   py::class_<T>(m, name.c_str())
-      .def(py::init<int>())
+      .def(py::init<>())
+      .def("init_tree", &T::init_tree, py::arg("runtime_dimension") = -1,
+           py::arg("t_state_space") = typename T::state_space_t())
       .def("addPoint", &T::addPoint)
       .def("search", &T::search)
       .def("searchKnn", &T::searchKnn)
-      .def("getStateSpace", &T::getStateSpace);
-  // .def("interpolate", &T::interpolate);
-  //
+      .def("searchBall", &T::searchBall)
+      .def("getStateSpace", &T::getStateSpace)
+      .def("splitOutstanding", &T::splitOutstanding);
 }
 
 template <typename T>
@@ -35,15 +37,16 @@ void declare_treex(py::module &m, const std::string &name) {
       .def_readonly("id", &T::DistanceId::id);
 
   py::class_<T>(m, name.c_str())
-      .def(py::init<int, const std::vector<std::string>>())
-      .def("addPoint", &T::addPoint)            // add point
-      .def("search", &T::search)                // search
-      .def("searchKnn", &T::searchKnn)          // search
-      .def("getStateSpace", &T::getStateSpace); //
+      .def(py::init<>())
+      .def("init_tree", &T::init_tree) // init tree
+      .def("addPoint", &T::addPoint)   // add point
+      .def("search", &T::search)       // search
+      .def("searchKnn", &T::searchKnn) // search
+      .def("searchBall", &T::searchBall)
+      .def("getStateSpace", &T::getStateSpace)
+      .def("splitOutstanding", &T::splitOutstanding);
+
   //
-  //
-  //
-  // .def("interpolate", &T::interpolate);
   //
 }
 
@@ -58,25 +61,18 @@ void declare_state_space_x(py::module &m, const std::string &name) {
       .def("sample_uniform", &T::sample_uniform) // search
       .def("distance", &T::distance)
       .def("distance_to_rectangle", &T::distance_to_rectangle);
-
-  // search
-  //
 }
 
 template <typename T>
 void declare_state_space(py::module &m, const std::string &name) {
 
   py::class_<T>(m, name.c_str())
-      // .def(py::init<int, const std::vector<std::string>>())
       .def(py::init<>())
       .def("interpolate", &T::interpolate)
       .def("set_bounds", &T::set_bounds)
       .def("sample_uniform", &T::sample_uniform)
       .def("distance", &T::distance)
       .def("distance_to_rectangle", &T::distance_to_rectangle);
-
-  // search
-  //
 }
 
 PYBIND11_MODULE(pydynotree, m) {
@@ -142,4 +138,6 @@ PYBIND11_MODULE(pydynotree, m) {
   declare_treex<TreeX>(m, "TreeX");
 
   m.def("srand", [](int seed) { srand(seed); });
+  m.def("rand", []() { return rand(); });
+  m.def("rand01", []() { return double(rand()) / RAND_MAX; });
 }

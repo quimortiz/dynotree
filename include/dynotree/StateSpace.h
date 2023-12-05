@@ -1144,6 +1144,8 @@ template <typename Scalar> struct Combined {
     }
   }
 
+  Combined() = default;
+
   Combined(const std::vector<Space> &spaces, const std::vector<int> &dims)
       : spaces(spaces), dims(dims) {
     assert(spaces.size() == dims.size());
