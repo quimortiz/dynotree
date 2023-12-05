@@ -1,14 +1,10 @@
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <cwchar>
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <numeric>
-#include <queue>
-#include <set>
 #include <variant>
 #include <vector>
 
@@ -1151,7 +1147,6 @@ template <typename Scalar> struct Combined {
     assert(spaces.size() == dims.size());
   }
 
-  Combined() = default;
 
   void print(std::ostream &out) {
 
