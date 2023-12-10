@@ -12,6 +12,9 @@
 #include <eigen3/Eigen/Dense>
 
 namespace dynotree {
+
+inline Eigen::IOFormat __CleanFmt(4, 0, ", ", "\n", "[", "]");
+
 template <typename T, typename Scalar>
 void choose_split_dimension_default(const T &lb, const T &ub, int &ii,
                                     Scalar &width) {
@@ -51,10 +54,22 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
   }
 
   void print(std::ostream &out) {
-    out << "RnL1: " << lb.transpose() << " " << ub.transpose() << std::endl;
+    out << "State Space: RnL1"
+        << " RuntimeDIM: " << lb.size() << " CompileTimeDIM: " << Dimensions
+        << std::endl
+        << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
+        << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
   }
 
   bool check_bounds(cref_t x) const {
+
+    if (lb.size() != x.size()) {
+      throw std::runtime_error("lb.size() != x.size()");
+    }
+    if (ub.size() != x.size()) {
+      throw std::runtime_error("ub.size() != x.size()");
+    }
+
     for (size_t i = 0; i < x.size(); i++) {
       if (x(i) < lb(i)) {
         return false;
@@ -127,6 +142,14 @@ template <typename Scalar> struct Time {
   Eigen::Matrix<Scalar, 1, 1> ub;
 
   bool check_bounds(cref_t x) const {
+
+    if (lb.size() != x.size()) {
+      throw std::runtime_error("lb.size() != x.size()");
+    }
+    if (ub.size() != x.size()) {
+      throw std::runtime_error("ub.size() != x.size()");
+    }
+
     for (size_t i = 0; i < x.size(); i++) {
       if (x(i) < lb(i)) {
         return false;
@@ -368,11 +391,22 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
   bool use_weights = false;
 
   void print(std::ostream &out) {
-    out << "RnSquared: " << lb.transpose() << " " << ub.transpose()
-        << std::endl;
+    out << "State Space: RnSquared"
+        << " RuntimeDIM: " << lb.size() << " CompileTimeDIM: " << Dimensions
+        << std::endl
+        << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
+        << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
   }
 
   bool check_bounds(cref_t x) const {
+
+    if (lb.size() != x.size()) {
+      throw std::runtime_error("lb.size() != x.size()");
+    }
+    if (ub.size() != x.size()) {
+      throw std::runtime_error("ub.size() != x.size()");
+    }
+
     for (size_t i = 0; i < x.size(); i++) {
       if (x(i) < -M_PI) {
         return false;
@@ -469,9 +503,11 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   bool use_weights = false;
 
   void print(std::ostream &out) {
-    out << "Rn: "
-        << "lb: " << lb.transpose() << " "
-        << "ub: " << ub.transpose() << std::endl;
+    out << "State Space: Rn"
+        << " RuntimeDIM: " << lb.size() << " CompileTimeDIM: " << Dimensions
+        << std::endl
+        << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
+        << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
   }
 
   void set_weights(cref_t weights_) {
@@ -487,6 +523,13 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   }
 
   bool check_bounds(cref_t x) const {
+    if (lb.size() != x.size()) {
+      throw std::runtime_error("lb.size() != x.size()");
+    }
+    if (ub.size() != x.size()) {
+      throw std::runtime_error("ub.size() != x.size()");
+    }
+
     for (size_t i = 0; i < x.size(); i++) {
       if (x(i) < lb(i)) {
         return false;
@@ -1146,7 +1189,6 @@ template <typename Scalar> struct Combined {
       : spaces(spaces), dims(dims) {
     assert(spaces.size() == dims.size());
   }
-
 
   void print(std::ostream &out) {
 
