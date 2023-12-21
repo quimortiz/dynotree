@@ -11,6 +11,8 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
 
+#include "dynotree_macros.h"
+
 namespace dynotree {
 
 inline Eigen::IOFormat __CleanFmt(4, 0, ", ", "\n", "[", "]");
@@ -47,10 +49,18 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
 
   Eigen::Matrix<Scalar, Dimensions, 1> lb;
   Eigen::Matrix<Scalar, Dimensions, 1> ub;
+  Eigen::Matrix<Scalar, Dimensions, 1> weights;
+  bool use_weights = false;
 
   void set_bounds(cref_t lb_, cref_t ub_) {
     lb = lb_;
     ub = ub_;
+  }
+
+  void set_weights(cref_t weights_) {
+    assert(weights_.size() == weights.size());
+    weights = weights_;
+    use_weights = true;
   }
 
   void print(std::ostream &out) {
@@ -63,12 +73,8 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
 
   bool check_bounds(cref_t x) const {
 
-    if (lb.size() != x.size()) {
-      throw std::runtime_error("lb.size() != x.size()");
-    }
-    if (ub.size() != x.size()) {
-      throw std::runtime_error("ub.size() != x.size()");
-    }
+    CHECK_PRETTY_DYNOTREE__(lb.size() == x.size());
+    CHECK_PRETTY_DYNOTREE__(ub.size() == x.size());
 
     for (size_t i = 0; i < x.size(); i++) {
       if (x(i) < lb(i)) {
@@ -94,8 +100,12 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
     out = from + t * (to - from);
   }
 
-  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
-    choose_split_dimension_default(lb, ub, ii, width);
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                              Scalar &width) const {
+    if (use_weights)
+      choose_split_dimension_weights(lb, ub, weights, ii, width);
+    else
+      choose_split_dimension_default(lb, ub, ii, width);
   }
 
   inline Scalar distance_to_rectangle(cref_t &x, cref_t &lb, cref_t &ub) const {
@@ -114,13 +124,13 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
       for (size_t i = 0; i < x.size(); i++) {
         Scalar xx = std::max(lb(i), std::min(ub(i), x(i)));
         Scalar dif = xx - x(i);
-        dist += std::abs(dif);
+        dist += std::abs(dif) * (use_weights ? weights(i) : 1.);
       }
     } else {
       for (size_t i = 0; i < Dimensions; i++) {
         Scalar xx = std::max(lb(i), std::min(ub(i), x(i)));
         Scalar dif = xx - x(i);
-        dist += std::abs(dif);
+        dist += std::abs(dif) * (use_weights ? weights(i) : 1.);
       }
     }
     return dist;
@@ -130,7 +140,11 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
 
     assert(x.size());
     assert(y.size());
-    return (x - y).cwiseAbs().sum();
+
+    if (use_weights)
+      return (x - y).cwiseAbs().cwiseProduct(weights).sum();
+    else
+      return (x - y).cwiseAbs().sum();
   }
 };
 
@@ -143,12 +157,8 @@ template <typename Scalar> struct Time {
 
   bool check_bounds(cref_t x) const {
 
-    if (lb.size() != x.size()) {
-      throw std::runtime_error("lb.size() != x.size()");
-    }
-    if (ub.size() != x.size()) {
-      throw std::runtime_error("ub.size() != x.size()");
-    }
+    CHECK_PRETTY_DYNOTREE__(lb.size() == x.size());
+    CHECK_PRETTY_DYNOTREE__(ub.size() == x.size());
 
     for (size_t i = 0; i < x.size(); i++) {
       if (x(i) < lb(i)) {
@@ -236,7 +246,11 @@ template <typename Scalar> struct SO2 {
     return true;
   }
 
-  void print(std::ostream &out) { out << "SO2: " << std::endl; }
+  void print(std::ostream &out) {
+    out << "SO2: " << std::endl
+        << "weight: " << weight << std::endl
+        << "use_weights: " << use_weights << std::endl;
+  }
 
   void sample_uniform(ref_t x) const {
 
@@ -244,9 +258,14 @@ template <typename Scalar> struct SO2 {
   }
 
   void set_bounds(cref_t lb_, cref_t ub_) {
-    std::stringstream ss;
-    ss << "so2 has no bounds " << __FILE__ << ":" << __LINE__;
-    throw std::runtime_error(ss.str());
+
+    THROW_PRETTY_DYNOTREE("so2 has no bounds");
+  }
+
+  void set_weights(cref_t weights_) {
+    assert(weights_.size() == 1);
+    weight = weights_(0);
+    use_weights = true;
   }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
@@ -353,12 +372,15 @@ template <typename Scalar> struct SO2Squared {
     so2.interpolate(from, to, t, out);
   }
 
+  void set_weights(cref_t weights_) {
+    THROW_PRETTY_DYNOTREE("so2 weights not implemented");
+  }
+
   inline void sample_uniform(ref_t x) const { so2.sample_uniform(x); }
 
   inline void set_bounds(cref_t lb_, cref_t ub_) {
-    std::stringstream ss;
-    ss << "so2 has no bounds " << __FILE__ << ":" << __LINE__;
-    throw std::runtime_error(ss.str());
+
+    THROW_PRETTY_DYNOTREE("so2 has no bounds");
   }
 
   inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
@@ -400,12 +422,8 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
 
   bool check_bounds(cref_t x) const {
 
-    if (lb.size() != x.size()) {
-      throw std::runtime_error("lb.size() != x.size()");
-    }
-    if (ub.size() != x.size()) {
-      throw std::runtime_error("ub.size() != x.size()");
-    }
+    CHECK_PRETTY_DYNOTREE__(lb.size() == x.size());
+    CHECK_PRETTY_DYNOTREE__(ub.size() == x.size());
 
     for (size_t i = 0; i < x.size(); i++) {
       if (x(i) < -M_PI) {
@@ -419,7 +437,7 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
   }
 
   void set_weights(cref_t weights_) {
-    assert(weights_.size() == weights.size());
+    // assert(weights_.size() == weights.size());
     weights = weights_;
     use_weights = true;
   }
@@ -511,7 +529,6 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   }
 
   void set_weights(cref_t weights_) {
-    assert(weights_.size() == weights.size());
     weights = weights_;
     use_weights = true;
     rn_squared.set_weights(weights);
@@ -523,12 +540,9 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   }
 
   bool check_bounds(cref_t x) const {
-    if (lb.size() != x.size()) {
-      throw std::runtime_error("lb.size() != x.size()");
-    }
-    if (ub.size() != x.size()) {
-      throw std::runtime_error("ub.size() != x.size()");
-    }
+
+    CHECK_PRETTY_DYNOTREE__(lb.size() == x.size());
+    CHECK_PRETTY_DYNOTREE__(ub.size() == x.size());
 
     for (size_t i = 0; i < x.size(); i++) {
       if (x(i) < lb(i)) {
@@ -937,15 +951,17 @@ template <typename Scalar> struct SO3Squared {
     out << "SO3Squared: " << std::endl;
     rn_squared.print(out);
   }
+  void set_weights(cref_t weights_) {
+    THROW_PRETTY_DYNOTREE("so3 weights not implemented");
+  }
 
   void set_bounds(cref_t lb_, cref_t ub_) {
-    std::stringstream ss;
-    ss << "so3 has no bounds " << __FILE__ << ":" << __LINE__;
-    throw std::runtime_error(ss.str());
+
+    THROW_PRETTY_DYNOTREE("so3 has no bounds");
   }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
-    throw std::runtime_error("not implemented interpolate in so3");
+    THROW_PRETTY_DYNOTREE("so3 has no interpolate implmented");
   }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
@@ -992,9 +1008,11 @@ template <typename Scalar> struct SO3 {
   void sample_uniform(ref_t x) const { so3squared.sample_uniform(x); }
 
   void set_bounds(cref_t lb_, cref_t ub_) {
-    std::stringstream ss;
-    ss << "so3 has no bounds " << __FILE__ << ":" << __LINE__;
-    throw std::runtime_error(ss.str());
+    THROW_PRETTY_DYNOTREE("so3 has no bounds");
+  }
+
+  void set_weights(cref_t weights_) {
+    THROW_PRETTY_DYNOTREE("so3 weights not implemented");
   }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
@@ -1081,8 +1099,6 @@ template <typename Scalar> struct R3SO3 {
                    out.template head<3>());
     so3.interpolate(from.template tail<4>(), to.template tail<4>(), t,
                     out.template tail<4>());
-    // error_msg << "not implemented interpolate in " << __PRETTY_FUNCTION__;
-    // throw std::runtime_error(error_msg.str());
   }
 
   Rn<Scalar, 3> l2;
@@ -1143,7 +1159,7 @@ inline int get_number(const std::string &str) {
   // while ((
   pos = str.find(delimiter);
   if (pos == std::string::npos) {
-    throw std::runtime_error("delimiter not found");
+    THROW_PRETTY_DYNOTREE("delimiter not found");
   }
 
   token = str.substr(pos + delimiter.length(), str.size());
@@ -1183,6 +1199,19 @@ template <typename Scalar> struct Combined {
     }
   }
 
+  int get_runtime_dim() {
+    int out = 0;
+    for (size_t i = 0; i < spaces.size(); i++) {
+      out += dims[i];
+      // std::visit(
+      //     [&](auto &obj) {
+      //       out += obj.get_runtime_dim();
+      //     },
+      //     spaces[i]);
+    }
+    return out;
+  }
+
   Combined() = default;
 
   Combined(const std::vector<Space> &spaces, const std::vector<int> &dims)
@@ -1199,9 +1228,9 @@ template <typename Scalar> struct Combined {
       std::visit([&](auto &obj) { obj.print(out); }, s);
     for (auto &d : dims)
       out << d << std::endl;
-    out << "lb " << lb.transpose() << std::endl;
-    out << "ub " << ub.transpose() << std::endl;
-    out << "weights " << weights.transpose() << std::endl;
+    out << "lb " << lb.transpose().format(__CleanFmt) << std::endl;
+    out << "ub " << ub.transpose().format(__CleanFmt) << std::endl;
+    out << "weights " << weights.transpose().format(__CleanFmt) << std::endl;
   }
 
   Combined(const std::vector<std::string> &spaces_str) {
@@ -1240,11 +1269,7 @@ template <typename Scalar> struct Combined {
         int dim = get_number(spaces_str.at(i));
         dims.push_back(dim);
       } else {
-        std::stringstream error_msg;
-        error_msg << "Unknown space " << spaces_str.at(i) << " in "
-                  << __PRETTY_FUNCTION__ << std::endl
-                  << __FILE__ << ":" << __LINE__;
-        throw std::runtime_error(error_msg.str());
+        THROW_PRETTY_DYNOTREE("Unknown space:" + spaces_str.at(i));
       }
     }
     assert(spaces.size() == dims.size());
