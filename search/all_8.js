@@ -5,5 +5,5 @@ var searchData=
   ['lambda_5ft_2',['lambda_t',['../structdynotree_1_1RnTime.html#a53ea6a7b56ad9cc6e49055e510dc907f',1,'dynotree::RnTime']]],
   ['lb_3',['lb',['../structdynotree_1_1RnL1.html#af44c5048b776144ab49d69b5065b05e0',1,'dynotree::RnL1::lb'],['../structdynotree_1_1Time.html#a17df6bb127c52b8fec768688b3ff5acb',1,'dynotree::Time::lb'],['../structdynotree_1_1SO2Squared.html#ade214457abfed9808f8d09ca0d2fed97',1,'dynotree::SO2Squared::lb'],['../structdynotree_1_1RnSquared.html#aa4905efbd4ffc9b7a76c02ed3ea5b5ad',1,'dynotree::RnSquared::lb'],['../structdynotree_1_1Rn.html#a51b0ba07a1a99eaba213a496e75ae9b1',1,'dynotree::Rn::lb']]],
   ['linear_5fnn_2eh_4',['linear_nn.h',['../linear__nn_8h.html',1,'']]],
-  ['linearknn_5',['linearknn',['../classdynotree_1_1LinearKNN.html',1,'dynotree::LinearKNN&lt; Id, Dimensions, Scalar, StateSpace &gt;'],['../classdynotree_1_1LinearKNN.html#a2b45ceb860205f3959b228b104217aed',1,'dynotree::LinearKNN::LinearKNN()']]]
+  ['linearknn_5',['LinearKNN',['../classdynotree_1_1LinearKNN.html',1,'dynotree::LinearKNN&lt; Id, Dimensions, Scalar, StateSpace &gt;'],['../classdynotree_1_1LinearKNN.html#a2b45ceb860205f3959b228b104217aed',1,'dynotree::LinearKNN::LinearKNN()']]]
 ];
