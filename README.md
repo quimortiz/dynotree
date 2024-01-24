@@ -34,6 +34,16 @@ The base KD-tree implementation derives from [bucket-pr-kdtree](https://github.c
 ```bash
 pip3 install pydynotree
 ```
+Check Package 
+```bash
+```
+
+One line tests
+```
+python3 -c 'import pydynotree'
+python3 -c 'import pydynotree; import numpy as np; tree = pydynotree.TreeR2(); tree.init_tree(); tree.addPoint(np.zeros(2), 0,True); nn = tree.search(np.ones(2)); print("id distance" , nn.id,nn.distance) '
+```
+
 
 First example:
 [rrt_free.py](test/python/rrt_free.py)
