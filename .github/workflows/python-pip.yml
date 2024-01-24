@@ -21,10 +21,11 @@ jobs:
     - name: Check Install package from PIP
       run: |
            pip install pydynotree
-           python3 -c "import pydynotree"
+           pip install numpy
+           python3 -c 'import pydynotree'
+           python3 -c 'import pydynotree; import numpy as np; tree = pydynotree.TreeR2(); tree.init_tree(); tree.addPoint(np.zeros(2), 0,True); nn = tree.search(np.ones(2)); print("id distance" , nn.id,nn.distance) '
     - name: Python Install Dependencies
       run: |
-           pip3 install numpy
            pip3 install matplotlib
     - name: Run Python Basic
       run: |
