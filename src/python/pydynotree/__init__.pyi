@@ -1,6 +1,7 @@
 """
 pybind11 example plugin
 """
+
 from __future__ import annotations
 import numpy
 
