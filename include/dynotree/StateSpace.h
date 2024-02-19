@@ -1187,12 +1187,15 @@ template <typename Scalar> struct Combined {
   Eigen::VectorXd ub;
 
   void set_weights(cref_t weights_) {
+    int total_dim = get_runtime_dim();
+    CHECK_PRETTY_DYNOTREE(weights_.size() == total_dim, "");
+    weights = weights_;
+    use_weights = true;
     int counter = 0;
     for (size_t i = 0; i < spaces.size(); i++) {
       std::visit(
           [&](auto &obj) {
-            if (weights_.size())
-              obj.set_weights(weights_.segment(counter, dims[i]));
+            obj.set_weights(weights_.segment(counter, dims[i]));
           },
           spaces[i]);
       counter += dims[i];
