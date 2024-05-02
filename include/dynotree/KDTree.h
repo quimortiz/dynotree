@@ -12,6 +12,7 @@
 #include <eigen3/Eigen/Dense>
 
 #include "StateSpace.h"
+#include "dynotree/dynotree_macros.h"
 
 namespace dynotree {
 
@@ -137,6 +138,9 @@ public:
         if (result.distance > node.distance_to_rectangle(x, state_space)) {
           if (node.m_splitDimension == m_dimensions) {
             for (const auto &lp : node.m_locationId) {
+              // Allow to have inactive nodes in the tree
+              if (!lp.active)
+                continue;
               Scalar nodeDist = state_space.distance(x, lp.x);
               if (nodeDist < result.distance) {
                 result = DistanceId{nodeDist, lp.id};
@@ -149,6 +153,49 @@ public:
       }
     }
     return result;
+  }
+
+  void set_inactive(const point_t &x) {
+    DistanceId result;
+    result.distance = std::numeric_limits<Scalar>::infinity();
+
+    bool found = false;
+    if (m_nodes[0].m_entries > 0) {
+      std::vector<std::size_t> searchStack;
+      searchStack.reserve(
+          1 +
+          std::size_t(1.5 * std::log2(1 + m_nodes[0].m_entries / BucketSize)));
+      searchStack.push_back(0);
+
+      while (!found && searchStack.size() > 0) {
+        std::size_t nodeIndex = searchStack.back();
+        searchStack.pop_back();
+        Node &node = m_nodes[nodeIndex];
+        if (result.distance > node.distance_to_rectangle(x, state_space)) {
+          if (node.m_splitDimension == m_dimensions) {
+            for (auto &lp : node.m_locationId) {
+              // Allow to have inactive nodes in the tree
+              if (!lp.active)
+                continue;
+              Scalar nodeDist = state_space.distance(x, lp.x);
+              if (nodeDist < result.distance) {
+                result = DistanceId{nodeDist, lp.id};
+                if (result.distance < 1e-8) {
+                  found = true;
+                  lp.active = false;
+                  break;
+                }
+              }
+            }
+          } else {
+            node.queueChildren(x, searchStack);
+          }
+        }
+      }
+
+    }
+      CHECK_PRETTY_DYNOTREE__(found);
+    // return result;
   }
 
   class Searcher {
@@ -200,6 +247,7 @@ private:
   struct PointId {
     point_t x;
     Id id;
+    bool active = true;
   };
   std::vector<PointId> m_bucketRecycle;
 
