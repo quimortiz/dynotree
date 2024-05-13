@@ -28,22 +28,22 @@ public:
 private:
   std::string msg;
 };
-} // namespace dynorrt
+} // namespace dynotree
 
-#define THROW_PRETTY_DYNOTREE(arg)                                              \
+#define THROW_PRETTY_DYNOTREE(arg)                                             \
   throw pretty_runtime_exception(arg, __FILE__, __LINE__, __FUNCTION__);
 
-#define CHECK_PRETTY_DYNOTREE(condition, arg)                                   \
+#define CHECK_PRETTY_DYNOTREE(condition, arg)                                  \
   if (!(condition)) {                                                          \
     throw pretty_runtime_exception(arg, __FILE__, __LINE__, __FUNCTION__);     \
   }
 
-#define CHECK_PRETTY_DYNOTREE__(condition)                                      \
+#define CHECK_PRETTY_DYNOTREE__(condition)                                     \
   if (!(condition)) {                                                          \
     throw pretty_runtime_exception(#condition, __FILE__, __LINE__,             \
                                    __FUNCTION__);                              \
   }
 
-#define MESSAGE_PRETTY_DYNOTREE(arg)                                            \
+#define MESSAGE_PRETTY_DYNOTREE(arg)                                           \
   std::cout << "Message in " << __FUNCTION__ << " (" << __FILE__ << ":"        \
             << __LINE__ << ") --" << arg << std::endl;

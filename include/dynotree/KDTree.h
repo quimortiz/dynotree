@@ -192,9 +192,8 @@ public:
           }
         }
       }
-
     }
-      CHECK_PRETTY_DYNOTREE__(found);
+    CHECK_PRETTY_DYNOTREE__(found);
     // return result;
   }
 

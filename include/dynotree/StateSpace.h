@@ -64,9 +64,8 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
   }
 
   void print(std::ostream &out) {
-    out << "State Space: RnL1"
-        << " RuntimeDIM: " << lb.size() << " CompileTimeDIM: " << Dimensions
-        << std::endl
+    out << "State Space: RnL1" << " RuntimeDIM: " << lb.size()
+        << " CompileTimeDIM: " << Dimensions << std::endl
         << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
         << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
   }
@@ -413,9 +412,8 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
   bool use_weights = false;
 
   void print(std::ostream &out) {
-    out << "State Space: RnSquared"
-        << " RuntimeDIM: " << lb.size() << " CompileTimeDIM: " << Dimensions
-        << std::endl
+    out << "State Space: RnSquared" << " RuntimeDIM: " << lb.size()
+        << " CompileTimeDIM: " << Dimensions << std::endl
         << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
         << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
   }
@@ -521,9 +519,8 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   bool use_weights = false;
 
   void print(std::ostream &out) {
-    out << "State Space: Rn"
-        << " RuntimeDIM: " << lb.size() << " CompileTimeDIM: " << Dimensions
-        << std::endl
+    out << "State Space: Rn" << " RuntimeDIM: " << lb.size()
+        << " CompileTimeDIM: " << Dimensions << std::endl
         << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
         << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
   }

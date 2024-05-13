@@ -29,8 +29,7 @@ public:
   size_t size() const { return m_points.size(); }
 
   void addPoint(const point_t &x, const Id &id, bool dummy) {
-    (void) dummy; // unused, only to match interface of kdtree
-
+    (void)dummy; // unused, only to match interface of kdtree
 
     std::size_t addNode = 0;
     m_points.emplace_back(PointId{x, id});
