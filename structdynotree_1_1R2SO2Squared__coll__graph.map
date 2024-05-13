@@ -1,13 +1,13 @@
 <map id="dynotree::R2SO2Squared&lt; Scalar &gt;" name="dynotree::R2SO2Squared&lt; Scalar &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="89,427,259,587"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="15,231,64,296"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="44,296,53,347,61,375,73,401,81,414,76,417,68,404,56,377,48,348,39,297"/>
-<area shape="rect" id="Node000003" href="$structdynotree_1_1RnSquared.html" title=" " alt="" coords="89,164,259,364"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="177,363,177,410,171,410,171,363"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="89,467,259,647"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="15,251,64,316"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="43,316,51,376,60,410,73,442,82,457,77,460,68,444,55,411,46,377,38,317"/>
+<area shape="rect" id="Node000003" href="$structdynotree_1_1RnSquared.html" title=" " alt="" coords="89,164,259,404"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="177,404,177,450,171,450,171,404"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="5,5,201,71"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="116,70,140,147,135,148,111,71"/>
-<area shape="rect" id="Node000005" href="$classbool.html" title=" " alt="" coords="226,5,263,71"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="237,71,213,148,208,147,232,70"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="284,231,429,296"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="336,298,256,404,248,415,244,412,252,401,331,295"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="115,70,137,146,132,148,110,71"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="226,5,263,71"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="238,71,216,148,211,146,233,70"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="284,251,429,316"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="339,318,256,444,249,454,245,451,252,441,335,315"/>
 </map>

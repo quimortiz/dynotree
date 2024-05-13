@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['point_5ft_0',['point_t',['../classdynotree_1_1KDTree.html#a2b64bd90b04a3f33ac98f02990f5e787',1,'dynotree::KDTree::point_t'],['../classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3',1,'dynotree::LinearKNN::point_t']]]
+  ['id_5ft_0',['id_t',['../classdynotree_1_1KDTree.html#a4df3f3c6bfd99a3558bfc4979c359be6',1,'dynotree::KDTree::id_t'],['../classdynotree_1_1LinearKNN.html#a2972c8c934b63919db910d36d65731d1',1,'dynotree::LinearKNN::id_t']]]
 ];

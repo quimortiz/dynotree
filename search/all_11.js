@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['weight_0',['weight',['../structdynotree_1_1SO2.html#a9626fca63f476849b41dd651ef7ec36f',1,'dynotree::SO2']]],
-  ['weights_1',['weights',['../structdynotree_1_1RnSquared.html#ad9dac4bfdb2f0bb382afc8f45f3293ec',1,'dynotree::RnSquared::weights'],['../structdynotree_1_1Rn.html#aca08fe48df731b8bae85178bdc7adf41',1,'dynotree::Rn::weights'],['../structdynotree_1_1R2SO2.html#aa66c291ca1e8ce4b30f9b5440dd9a874',1,'dynotree::R2SO2::weights']]]
+  ['value_0',['value',['../structdynotree_1_1AddOneOrKeepMinusOne.html#ac527b2e33b5ef956bdeb69d0d5bff14c',1,'dynotree::AddOneOrKeepMinusOne::value'],['../structdynotree_1_1AddOneOrKeepMinusOne_3-1_01_4.html#aea5f314b27133ee4c4b00a2b1e700b76',1,'dynotree::AddOneOrKeepMinusOne&lt;-1 &gt;::value']]],
+  ['vec_5ft_1',['vec_t',['../structdynotree_1_1RnSquared.html#a8e63226c359d7eb738222be26dbb42b4',1,'dynotree::RnSquared::vec_t'],['../structdynotree_1_1Rn.html#a994a386f6fbf579b50a842ff52d9b02f',1,'dynotree::Rn::vec_t'],['../structdynotree_1_1R2SO2.html#ade7b710757312357f6aab0c1289b2868',1,'dynotree::R2SO2::vec_t']]],
+  ['virtual_5fwrapper_2',['virtual_wrapper',['../structdynotree_1_1virtual__wrapper.html',1,'dynotree']]],
+  ['vpure_3',['Vpure',['../structdynotree_1_1Vpure.html',1,'dynotree']]]
 ];

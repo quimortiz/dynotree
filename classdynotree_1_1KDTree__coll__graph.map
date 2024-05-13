@@ -1,7 +1,7 @@
 <map id="dynotree::KDTree&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;" name="dynotree::KDTree&lt; Id, Dimensions, BucketSize, Scalar, StateSpace &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,134,191,428"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,134,191,448"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="22,5,49,71"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="36,70,39,109,40,117,35,118,34,110,31,71"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="137,5,184,71"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,71,143,118,138,117,150,70"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,71,144,118,138,117,150,70"/>
 </map>

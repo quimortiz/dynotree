@@ -117,95 +117,97 @@ $(function() { codefold.init(0); });
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#a32977c37e5fde140b3c811960119e459">   29</a></span>  <span class="keywordtype">size_t</span> <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#a32977c37e5fde140b3c811960119e459">size</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_points.size(); }</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
 <div class="foldopen" id="foldopen00031" data-start="{" data-end="}">
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#a9a36d7858794aecba88f59334e4432c3">   31</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#a9a36d7858794aecba88f59334e4432c3">addPoint</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> &amp;x, <span class="keyword">const</span> Id &amp;<span class="keywordtype">id</span>) {</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    std::size_t addNode = 0;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    m_points.emplace_back(PointId{x, <span class="keywordtype">id</span>});</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  }</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#ad3a2372f7f031ed71f4e237078f86b17">   31</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#ad3a2372f7f031ed71f4e237078f86b17">addPoint</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> &amp;x, <span class="keyword">const</span> Id &amp;<span class="keywordtype">id</span>, <span class="keywordtype">bool</span> dummy) {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    (void)dummy; <span class="comment">// unused, only to match interface of kdtree</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    std::size_t addNode = 0;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    m_points.emplace_back(PointId{x, <span class="keywordtype">id</span>});</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  }</div>
 </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="foldopen" id="foldopen00036" data-start="{" data-end="};">
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">   36</a></span>  <span class="keyword">struct </span><a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a> {</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">   37</a></span>    Scalar <a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a>;</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a837b8c8f55f0b54ebd792e2653d19c63">   38</a></span>    Id <a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a837b8c8f55f0b54ebd792e2653d19c63">id</a>;</div>
-<div class="foldopen" id="foldopen00039" data-start="{" data-end="}">
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#af54e19021333703d865a8be61f1196d0">   39</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#af54e19021333703d865a8be61f1196d0">operator&lt;</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a> &amp;dp)<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a> &lt; dp.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a>;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    }</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="};">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">   38</a></span>  <span class="keyword">struct </span><a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a> {</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">   39</a></span>    Scalar <a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a837b8c8f55f0b54ebd792e2653d19c63">   40</a></span>    Id <a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a837b8c8f55f0b54ebd792e2653d19c63">id</a>;</div>
+<div class="foldopen" id="foldopen00041" data-start="{" data-end="}">
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#af54e19021333703d865a8be61f1196d0">   41</a></span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#af54e19021333703d865a8be61f1196d0">operator&lt;</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a> &amp;dp)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>      <span class="keywordflow">return</span> <a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a> &lt; dp.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a>;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    }</div>
 </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  };</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  };</div>
 </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="foldopen" id="foldopen00044" data-start="{" data-end="}">
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#a5a76d85847a65dcaeee99e5d11fa6acd">   44</a></span>  std::vector&lt;DistanceId&gt; <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#a5a76d85847a65dcaeee99e5d11fa6acd">searchKnn</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> &amp;x,</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                                    std::size_t maxPoints)<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    std::priority_queue&lt;DistanceId&gt; max_heap;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="foldopen" id="foldopen00046" data-start="{" data-end="}">
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#a5a76d85847a65dcaeee99e5d11fa6acd">   46</a></span>  std::vector&lt;DistanceId&gt; <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#a5a76d85847a65dcaeee99e5d11fa6acd">searchKnn</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> &amp;x,</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                                    std::size_t maxPoints)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;point : m_points) {</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>      Scalar distance = state_space.distance(x, point.point);</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>      <span class="keywordflow">if</span> (max_heap.size() &lt; maxPoints) {</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>        max_heap.push({distance, point.id});</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (distance &lt; max_heap.top().distance) {</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        max_heap.pop();</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        max_heap.push({distance, point.id});</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>      }</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    }</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    std::vector&lt;DistanceId&gt; neighbors;</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="keywordflow">while</span> (!max_heap.empty()) {</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>      neighbors.push_back(max_heap.top());</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>      max_heap.pop();</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    }</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    std::reverse(neighbors.begin(), neighbors.end());</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    std::priority_queue&lt;DistanceId&gt; max_heap;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;point : m_points) {</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>      Scalar distance = state_space.distance(x, point.point);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>      <span class="keywordflow">if</span> (max_heap.size() &lt; maxPoints) {</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        max_heap.push({distance, point.id});</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (distance &lt; max_heap.top().distance) {</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        max_heap.pop();</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        max_heap.push({distance, point.id});</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>      }</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    }</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    std::vector&lt;DistanceId&gt; neighbors;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordflow">while</span> (!max_heap.empty()) {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>      neighbors.push_back(max_heap.top());</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>      max_heap.pop();</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    }</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordflow">return</span> neighbors;</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>  }</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    std::reverse(neighbors.begin(), neighbors.end());</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordflow">return</span> neighbors;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  }</div>
 </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
-<div class="foldopen" id="foldopen00070" data-start="{" data-end="}">
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#ac081febe5f3ce66b608a1650b4e38a0d">   70</a></span>  std::vector&lt;DistanceId&gt; <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#ac081febe5f3ce66b608a1650b4e38a0d">searchBall</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> &amp;x, Scalar maxRadius)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    std::vector&lt;DistanceId&gt; out;</div>
+<div class="foldopen" id="foldopen00072" data-start="{" data-end="}">
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#ac081febe5f3ce66b608a1650b4e38a0d">   72</a></span>  std::vector&lt;DistanceId&gt; <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#ac081febe5f3ce66b608a1650b4e38a0d">searchBall</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> &amp;x, Scalar maxRadius)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;point : m_points) {</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      Scalar distance = state_space.distance(x, point.point);</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      <span class="keywordflow">if</span> (distance &lt; maxRadius) {</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        out.emplace_back(<a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a>{distance, point.id});</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>      }</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    }</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keywordflow">return</span> out;</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  }</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    std::vector&lt;DistanceId&gt; out;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;point : m_points) {</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>      Scalar distance = state_space.distance(x, point.point);</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>      <span class="keywordflow">if</span> (distance &lt; maxRadius) {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        out.emplace_back(<a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a>{distance, point.id});</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>      }</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    }</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordflow">return</span> out;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  }</div>
 </div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
-<div class="foldopen" id="foldopen00083" data-start="{" data-end="}">
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#a7789e71732e3ed9c076df9b35fd3093f">   83</a></span>  <a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a> <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#a7789e71732e3ed9c076df9b35fd3093f">searchNN</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> &amp;x)<span class="keyword"> const </span>{</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordtype">double</span> min_dist = std::numeric_limits&lt;double&gt;::max();</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a> out;</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    out.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a> = std::numeric_limits&lt;double&gt;::max();</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;point : m_points) {</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>      Scalar distance = state_space.distance(x, point.point);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>      <span class="keywordflow">if</span> (distance &lt; out.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a>) {</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        out.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a837b8c8f55f0b54ebd792e2653d19c63">id</a> = point.id;</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        out.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a> = distance;</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>      }</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    }</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keywordflow">return</span> out;</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  }</div>
+<div class="foldopen" id="foldopen00085" data-start="{" data-end="}">
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classdynotree_1_1LinearKNN.html#a7789e71732e3ed9c076df9b35fd3093f">   85</a></span>  <a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a> <a class="code hl_function" href="classdynotree_1_1LinearKNN.html#a7789e71732e3ed9c076df9b35fd3093f">searchNN</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> &amp;x)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keywordtype">double</span> min_dist = std::numeric_limits&lt;double&gt;::max();</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <a class="code hl_struct" href="structdynotree_1_1LinearKNN_1_1DistanceId.html">DistanceId</a> out;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    out.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a> = std::numeric_limits&lt;double&gt;::max();</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;point : m_points) {</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>      Scalar distance = state_space.distance(x, point.point);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>      <span class="keywordflow">if</span> (distance &lt; out.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a>) {</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        out.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a837b8c8f55f0b54ebd792e2653d19c63">id</a> = point.id;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        out.<a class="code hl_variable" href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">distance</a> = distance;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>      }</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    }</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keywordflow">return</span> out;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>  }</div>
 </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>  <span class="keyword">struct </span>PointId {</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> point;</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    Id id;</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>  };</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>  std::vector&lt;PointId&gt; m_points;</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>  StateSpace state_space;</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>};</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>  <span class="keyword">struct </span>PointId {</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <a class="code hl_typedef" href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">point_t</a> point;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    Id id;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>  };</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>  std::vector&lt;PointId&gt; m_points;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>  StateSpace state_space;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>};</div>
 </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>} <span class="comment">// namespace dynotree</span></div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>} <span class="comment">// namespace dynotree</span></div>
 <div class="ttc" id="aKDTree_8h_html"><div class="ttname"><a href="KDTree_8h.html">KDTree.h</a></div></div>
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html">dynotree::LinearKNN</a></div><div class="ttdef"><b>Definition</b> linear_nn.h:7</div></div>
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a195464ed4c3205639636097f34a15d84"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a195464ed4c3205639636097f34a15d84">dynotree::LinearKNN::cref_t</a></div><div class="ttdeci">const Eigen::Ref&lt; const Eigen::Matrix&lt; Scalar, Dimensions, 1 &gt; &gt; &amp; cref_t</div><div class="ttdef"><b>Definition</b> linear_nn.h:13</div></div>
@@ -213,19 +215,19 @@ $(function() { codefold.init(0); });
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a2b45ceb860205f3959b228b104217aed"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a2b45ceb860205f3959b228b104217aed">dynotree::LinearKNN::LinearKNN</a></div><div class="ttdeci">LinearKNN(int runtime_dimension=-1, const StateSpace &amp;state_space=StateSpace())</div><div class="ttdef"><b>Definition</b> linear_nn.h:19</div></div>
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a32977c37e5fde140b3c811960119e459"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a32977c37e5fde140b3c811960119e459">dynotree::LinearKNN::size</a></div><div class="ttdeci">size_t size() const</div><div class="ttdef"><b>Definition</b> linear_nn.h:29</div></div>
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a4b473c8d5ba9784bd4bafbded042e30a"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a4b473c8d5ba9784bd4bafbded042e30a">dynotree::LinearKNN::m_dimensions</a></div><div class="ttdeci">int m_dimensions</div><div class="ttdef"><b>Definition</b> linear_nn.h:15</div></div>
-<div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a5a76d85847a65dcaeee99e5d11fa6acd"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a5a76d85847a65dcaeee99e5d11fa6acd">dynotree::LinearKNN::searchKnn</a></div><div class="ttdeci">std::vector&lt; DistanceId &gt; searchKnn(const point_t &amp;x, std::size_t maxPoints) const</div><div class="ttdef"><b>Definition</b> linear_nn.h:44</div></div>
-<div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a7789e71732e3ed9c076df9b35fd3093f"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a7789e71732e3ed9c076df9b35fd3093f">dynotree::LinearKNN::searchNN</a></div><div class="ttdeci">DistanceId searchNN(const point_t &amp;x) const</div><div class="ttdef"><b>Definition</b> linear_nn.h:83</div></div>
+<div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a5a76d85847a65dcaeee99e5d11fa6acd"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a5a76d85847a65dcaeee99e5d11fa6acd">dynotree::LinearKNN::searchKnn</a></div><div class="ttdeci">std::vector&lt; DistanceId &gt; searchKnn(const point_t &amp;x, std::size_t maxPoints) const</div><div class="ttdef"><b>Definition</b> linear_nn.h:46</div></div>
+<div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a7789e71732e3ed9c076df9b35fd3093f"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a7789e71732e3ed9c076df9b35fd3093f">dynotree::LinearKNN::searchNN</a></div><div class="ttdeci">DistanceId searchNN(const point_t &amp;x) const</div><div class="ttdef"><b>Definition</b> linear_nn.h:85</div></div>
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a85f8b15a4964405366e42130490a4bc3"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a85f8b15a4964405366e42130490a4bc3">dynotree::LinearKNN::point_t</a></div><div class="ttdeci">Eigen::Matrix&lt; Scalar, Dimensions, 1 &gt; point_t</div><div class="ttdef"><b>Definition</b> linear_nn.h:12</div></div>
-<div class="ttc" id="aclassdynotree_1_1LinearKNN_html_a9a36d7858794aecba88f59334e4432c3"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#a9a36d7858794aecba88f59334e4432c3">dynotree::LinearKNN::addPoint</a></div><div class="ttdeci">void addPoint(const point_t &amp;x, const Id &amp;id)</div><div class="ttdef"><b>Definition</b> linear_nn.h:31</div></div>
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html_ab92ca247c78742386373a78d8a8a335e"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#ab92ca247c78742386373a78d8a8a335e">dynotree::LinearKNN::ref_t</a></div><div class="ttdeci">Eigen::Ref&lt; Eigen::Matrix&lt; Scalar, Dimensions, 1 &gt; &gt; ref_t</div><div class="ttdef"><b>Definition</b> linear_nn.h:14</div></div>
-<div class="ttc" id="aclassdynotree_1_1LinearKNN_html_ac081febe5f3ce66b608a1650b4e38a0d"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#ac081febe5f3ce66b608a1650b4e38a0d">dynotree::LinearKNN::searchBall</a></div><div class="ttdeci">std::vector&lt; DistanceId &gt; searchBall(const point_t &amp;x, Scalar maxRadius) const</div><div class="ttdef"><b>Definition</b> linear_nn.h:70</div></div>
+<div class="ttc" id="aclassdynotree_1_1LinearKNN_html_ac081febe5f3ce66b608a1650b4e38a0d"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#ac081febe5f3ce66b608a1650b4e38a0d">dynotree::LinearKNN::searchBall</a></div><div class="ttdeci">std::vector&lt; DistanceId &gt; searchBall(const point_t &amp;x, Scalar maxRadius) const</div><div class="ttdef"><b>Definition</b> linear_nn.h:72</div></div>
+<div class="ttc" id="aclassdynotree_1_1LinearKNN_html_ad3a2372f7f031ed71f4e237078f86b17"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#ad3a2372f7f031ed71f4e237078f86b17">dynotree::LinearKNN::addPoint</a></div><div class="ttdeci">void addPoint(const point_t &amp;x, const Id &amp;id, bool dummy)</div><div class="ttdef"><b>Definition</b> linear_nn.h:31</div></div>
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html_af0eba6167ba18fcf7e3972a72ce8320c"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#af0eba6167ba18fcf7e3972a72ce8320c">dynotree::LinearKNN::scalar_t</a></div><div class="ttdeci">Scalar scalar_t</div><div class="ttdef"><b>Definition</b> linear_nn.h:10</div></div>
 <div class="ttc" id="aclassdynotree_1_1LinearKNN_html_af667e078c266309e417f7bb0c9e3415b"><div class="ttname"><a href="classdynotree_1_1LinearKNN.html#af667e078c266309e417f7bb0c9e3415b">dynotree::LinearKNN::getStateSpace</a></div><div class="ttdeci">StateSpace &amp; getStateSpace()</div><div class="ttdef"><b>Definition</b> linear_nn.h:17</div></div>
-<div class="ttc" id="anamespacedynotree_html"><div class="ttname"><a href="namespacedynotree.html">dynotree</a></div><div class="ttdef"><b>Definition</b> KDTree.h:20</div></div>
-<div class="ttc" id="astructdynotree_1_1LinearKNN_1_1DistanceId_html"><div class="ttname"><a href="structdynotree_1_1LinearKNN_1_1DistanceId.html">dynotree::LinearKNN::DistanceId</a></div><div class="ttdef"><b>Definition</b> linear_nn.h:36</div></div>
-<div class="ttc" id="astructdynotree_1_1LinearKNN_1_1DistanceId_html_a559e88a78e12bd30e2af37314fd51867"><div class="ttname"><a href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">dynotree::LinearKNN::DistanceId::distance</a></div><div class="ttdeci">Scalar distance</div><div class="ttdef"><b>Definition</b> linear_nn.h:37</div></div>
-<div class="ttc" id="astructdynotree_1_1LinearKNN_1_1DistanceId_html_a837b8c8f55f0b54ebd792e2653d19c63"><div class="ttname"><a href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a837b8c8f55f0b54ebd792e2653d19c63">dynotree::LinearKNN::DistanceId::id</a></div><div class="ttdeci">Id id</div><div class="ttdef"><b>Definition</b> linear_nn.h:38</div></div>
-<div class="ttc" id="astructdynotree_1_1LinearKNN_1_1DistanceId_html_af54e19021333703d865a8be61f1196d0"><div class="ttname"><a href="structdynotree_1_1LinearKNN_1_1DistanceId.html#af54e19021333703d865a8be61f1196d0">dynotree::LinearKNN::DistanceId::operator&lt;</a></div><div class="ttdeci">bool operator&lt;(const DistanceId &amp;dp) const</div><div class="ttdef"><b>Definition</b> linear_nn.h:39</div></div>
+<div class="ttc" id="anamespacedynotree_html"><div class="ttname"><a href="namespacedynotree.html">dynotree</a></div><div class="ttdef"><b>Definition</b> dynotree_macros.h:9</div></div>
+<div class="ttc" id="astructdynotree_1_1LinearKNN_1_1DistanceId_html"><div class="ttname"><a href="structdynotree_1_1LinearKNN_1_1DistanceId.html">dynotree::LinearKNN::DistanceId</a></div><div class="ttdef"><b>Definition</b> linear_nn.h:38</div></div>
+<div class="ttc" id="astructdynotree_1_1LinearKNN_1_1DistanceId_html_a559e88a78e12bd30e2af37314fd51867"><div class="ttname"><a href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a559e88a78e12bd30e2af37314fd51867">dynotree::LinearKNN::DistanceId::distance</a></div><div class="ttdeci">Scalar distance</div><div class="ttdef"><b>Definition</b> linear_nn.h:39</div></div>
+<div class="ttc" id="astructdynotree_1_1LinearKNN_1_1DistanceId_html_a837b8c8f55f0b54ebd792e2653d19c63"><div class="ttname"><a href="structdynotree_1_1LinearKNN_1_1DistanceId.html#a837b8c8f55f0b54ebd792e2653d19c63">dynotree::LinearKNN::DistanceId::id</a></div><div class="ttdeci">Id id</div><div class="ttdef"><b>Definition</b> linear_nn.h:40</div></div>
+<div class="ttc" id="astructdynotree_1_1LinearKNN_1_1DistanceId_html_af54e19021333703d865a8be61f1196d0"><div class="ttname"><a href="structdynotree_1_1LinearKNN_1_1DistanceId.html#af54e19021333703d865a8be61f1196d0">dynotree::LinearKNN::DistanceId::operator&lt;</a></div><div class="ttdeci">bool operator&lt;(const DistanceId &amp;dp) const</div><div class="ttdef"><b>Definition</b> linear_nn.h:41</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
