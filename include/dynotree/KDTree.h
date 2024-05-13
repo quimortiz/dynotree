@@ -1,21 +1,18 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <cwchar>
-#include <iostream>
 #include <limits>
-#include <memory>
 #include <queue>
 #include <set>
-#include <variant>
 #include <vector>
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
 
 #include "StateSpace.h"
+#include "dynotree/dynotree_macros.h"
 
 namespace dynotree {
 
@@ -38,29 +35,10 @@ public:
   using state_space_t = StateSpace;
   int m_dimensions = Dimensions;
   static const std::size_t bucketSize = BucketSize;
-  // TODO: I also want Dimensions at runtime!!
   using tree_t = KDTree<Id, Dimensions, BucketSize, Scalar, StateSpace>;
 
-  // void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
-  //   state_space.interpolate(from, to, t, out);
-  // }
-  //
   StateSpace &getStateSpace() { return state_space; }
 
-  // KDTree(int runtime_dimension = -1,
-  //        const StateSpace &state_space = StateSpace())
-  //     : state_space(state_space) {
-  //
-  //   if constexpr (Dimensions == Eigen::Dynamic) {
-  //     assert(runtime_dimension > 0);
-  //     m_dimensions = runtime_dimension;
-  //     m_nodes.emplace_back(BucketSize, m_dimensions);
-  //   } else {
-  //     m_nodes.emplace_back(BucketSize, -1);
-  //   }
-  // }
-
-  // TODO: decide if I want this
   KDTree() = default;
 
   void init_tree(int runtime_dimension = -1,
@@ -160,6 +138,9 @@ public:
         if (result.distance > node.distance_to_rectangle(x, state_space)) {
           if (node.m_splitDimension == m_dimensions) {
             for (const auto &lp : node.m_locationId) {
+              // Allow to have inactive nodes in the tree
+              if (!lp.active)
+                continue;
               Scalar nodeDist = state_space.distance(x, lp.x);
               if (nodeDist < result.distance) {
                 result = DistanceId{nodeDist, lp.id};
@@ -172,6 +153,48 @@ public:
       }
     }
     return result;
+  }
+
+  void set_inactive(const point_t &x) {
+    DistanceId result;
+    result.distance = std::numeric_limits<Scalar>::infinity();
+
+    bool found = false;
+    if (m_nodes[0].m_entries > 0) {
+      std::vector<std::size_t> searchStack;
+      searchStack.reserve(
+          1 +
+          std::size_t(1.5 * std::log2(1 + m_nodes[0].m_entries / BucketSize)));
+      searchStack.push_back(0);
+
+      while (!found && searchStack.size() > 0) {
+        std::size_t nodeIndex = searchStack.back();
+        searchStack.pop_back();
+        Node &node = m_nodes[nodeIndex];
+        if (result.distance > node.distance_to_rectangle(x, state_space)) {
+          if (node.m_splitDimension == m_dimensions) {
+            for (auto &lp : node.m_locationId) {
+              // Allow to have inactive nodes in the tree
+              if (!lp.active)
+                continue;
+              Scalar nodeDist = state_space.distance(x, lp.x);
+              if (nodeDist < result.distance) {
+                result = DistanceId{nodeDist, lp.id};
+                if (result.distance < 1e-8) {
+                  found = true;
+                  lp.active = false;
+                  break;
+                }
+              }
+            }
+          } else {
+            node.queueChildren(x, searchStack);
+          }
+        }
+      }
+    }
+    CHECK_PRETTY_DYNOTREE__(found);
+    // return result;
   }
 
   class Searcher {
@@ -223,6 +246,7 @@ private:
   struct PointId {
     point_t x;
     Id id;
+    bool active = true;
   };
   std::vector<PointId> m_bucketRecycle;
 

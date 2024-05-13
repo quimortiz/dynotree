@@ -1,20 +1,22 @@
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <cwchar>
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <queue>
-#include <set>
 #include <variant>
 #include <vector>
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
 
+#include "dynotree_macros.h"
+
 namespace dynotree {
+
+inline Eigen::IOFormat __CleanFmt(4, 0, ", ", "\n", "[", "]");
+
 template <typename T, typename Scalar>
 void choose_split_dimension_default(const T &lb, const T &ub, int &ii,
                                     Scalar &width) {
@@ -47,10 +49,41 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
 
   Eigen::Matrix<Scalar, Dimensions, 1> lb;
   Eigen::Matrix<Scalar, Dimensions, 1> ub;
+  Eigen::Matrix<Scalar, Dimensions, 1> weights;
+  bool use_weights = false;
 
   void set_bounds(cref_t lb_, cref_t ub_) {
     lb = lb_;
     ub = ub_;
+  }
+
+  void set_weights(cref_t weights_) {
+    assert(weights_.size() == weights.size());
+    weights = weights_;
+    use_weights = true;
+  }
+
+  void print(std::ostream &out) {
+    out << "State Space: RnL1" << " RuntimeDIM: " << lb.size()
+        << " CompileTimeDIM: " << Dimensions << std::endl
+        << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
+        << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
+  }
+
+  bool check_bounds(cref_t x) const {
+
+    CHECK_PRETTY_DYNOTREE__(lb.size() == x.size());
+    CHECK_PRETTY_DYNOTREE__(ub.size() == x.size());
+
+    for (size_t i = 0; i < x.size(); i++) {
+      if (x(i) < lb(i)) {
+        return false;
+      }
+      if (x(i) > ub(i)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   inline void sample_uniform(ref_t x) const {
@@ -66,8 +99,12 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
     out = from + t * (to - from);
   }
 
-  void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
-    choose_split_dimension_default(lb, ub, ii, width);
+  void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
+                              Scalar &width) const {
+    if (use_weights)
+      choose_split_dimension_weights(lb, ub, weights, ii, width);
+    else
+      choose_split_dimension_default(lb, ub, ii, width);
   }
 
   inline Scalar distance_to_rectangle(cref_t &x, cref_t &lb, cref_t &ub) const {
@@ -86,13 +123,13 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
       for (size_t i = 0; i < x.size(); i++) {
         Scalar xx = std::max(lb(i), std::min(ub(i), x(i)));
         Scalar dif = xx - x(i);
-        dist += std::abs(dif);
+        dist += std::abs(dif) * (use_weights ? weights(i) : 1.);
       }
     } else {
       for (size_t i = 0; i < Dimensions; i++) {
         Scalar xx = std::max(lb(i), std::min(ub(i), x(i)));
         Scalar dif = xx - x(i);
-        dist += std::abs(dif);
+        dist += std::abs(dif) * (use_weights ? weights(i) : 1.);
       }
     }
     return dist;
@@ -102,7 +139,11 @@ template <typename Scalar, int Dimensions = -1> struct RnL1 {
 
     assert(x.size());
     assert(y.size());
-    return (x - y).cwiseAbs().sum();
+
+    if (use_weights)
+      return (x - y).cwiseAbs().cwiseProduct(weights).sum();
+    else
+      return (x - y).cwiseAbs().sum();
   }
 };
 
@@ -112,6 +153,26 @@ template <typename Scalar> struct Time {
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, 1, 1>>;
   Eigen::Matrix<Scalar, 1, 1> lb;
   Eigen::Matrix<Scalar, 1, 1> ub;
+
+  bool check_bounds(cref_t x) const {
+
+    CHECK_PRETTY_DYNOTREE__(lb.size() == x.size());
+    CHECK_PRETTY_DYNOTREE__(ub.size() == x.size());
+
+    for (size_t i = 0; i < x.size(); i++) {
+      if (x(i) < lb(i)) {
+        return false;
+      }
+      if (x(i) > ub(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void print(std::ostream &out) {
+    out << "Time: " << lb(0) << " " << ub(0) << std::endl;
+  }
 
   void sample_uniform(ref_t x) const {
     assert(lb(0) >= 0);
@@ -172,15 +233,38 @@ template <typename Scalar> struct SO2 {
   double weight = 1.0;
   bool use_weights = false;
 
+  bool check_bounds(cref_t x) const {
+    for (size_t i = 0; i < x.size(); i++) {
+      if (x(i) < -M_PI) {
+        return false;
+      }
+      if (x(i) > +M_PI) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void print(std::ostream &out) {
+    out << "SO2: " << std::endl
+        << "weight: " << weight << std::endl
+        << "use_weights: " << use_weights << std::endl;
+  }
+
   void sample_uniform(ref_t x) const {
 
     x(0) = (double(rand()) / (RAND_MAX + 1.)) * 2. * M_PI - M_PI;
   }
 
   void set_bounds(cref_t lb_, cref_t ub_) {
-    std::stringstream ss;
-    ss << "so2 has no bounds " << __FILE__ << ":" << __LINE__;
-    throw std::runtime_error(ss.str());
+
+    THROW_PRETTY_DYNOTREE("so2 has no bounds");
+  }
+
+  void set_weights(cref_t weights_) {
+    assert(weights_.size() == 1);
+    weight = weights_(0);
+    use_weights = true;
   }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
@@ -269,16 +353,33 @@ template <typename Scalar> struct SO2Squared {
 
   SO2<Scalar> so2;
 
+  void print(std::ostream &out) { out << "SO2Squared: " << std::endl; }
+
+  bool check_bounds(cref_t x) const {
+    for (size_t i = 0; i < x.size(); i++) {
+      if (x(i) < -M_PI) {
+        return false;
+      }
+      if (x(i) > +M_PI) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   inline void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     so2.interpolate(from, to, t, out);
+  }
+
+  void set_weights(cref_t weights_) {
+    THROW_PRETTY_DYNOTREE("so2 weights not implemented");
   }
 
   inline void sample_uniform(ref_t x) const { so2.sample_uniform(x); }
 
   inline void set_bounds(cref_t lb_, cref_t ub_) {
-    std::stringstream ss;
-    ss << "so2 has no bounds " << __FILE__ << ":" << __LINE__;
-    throw std::runtime_error(ss.str());
+
+    THROW_PRETTY_DYNOTREE("so2 has no bounds");
   }
 
   inline void choose_split_dimension(cref_t lb, cref_t ub, int &ii,
@@ -310,8 +411,31 @@ template <typename Scalar, int Dimensions = -1> struct RnSquared {
   vec_t weights;
   bool use_weights = false;
 
+  void print(std::ostream &out) {
+    out << "State Space: RnSquared" << " RuntimeDIM: " << lb.size()
+        << " CompileTimeDIM: " << Dimensions << std::endl
+        << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
+        << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
+  }
+
+  bool check_bounds(cref_t x) const {
+
+    CHECK_PRETTY_DYNOTREE__(lb.size() == x.size());
+    CHECK_PRETTY_DYNOTREE__(ub.size() == x.size());
+
+    for (size_t i = 0; i < x.size(); i++) {
+      if (x(i) < -M_PI) {
+        return false;
+      }
+      if (x(i) > +M_PI) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   void set_weights(cref_t weights_) {
-    assert(weights_.size() == weights.size());
+    // assert(weights_.size() == weights.size());
     weights = weights_;
     use_weights = true;
   }
@@ -386,6 +510,7 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, Dimensions, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, Dimensions, 1>>;
   using vec_t = Eigen::Matrix<Scalar, Dimensions, 1>;
+  using DIM = std::integral_constant<int, Dimensions>;
 
   RnSquared<Scalar, Dimensions> rn_squared;
   Eigen::Matrix<Scalar, Dimensions, 1> lb;
@@ -393,8 +518,14 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   vec_t weights;
   bool use_weights = false;
 
+  void print(std::ostream &out) {
+    out << "State Space: Rn" << " RuntimeDIM: " << lb.size()
+        << " CompileTimeDIM: " << Dimensions << std::endl
+        << "lb: " << lb.transpose().format(__CleanFmt) << "\n"
+        << "ub: " << ub.transpose().format(__CleanFmt) << std::endl;
+  }
+
   void set_weights(cref_t weights_) {
-    assert(weights_.size() == weights.size());
     weights = weights_;
     use_weights = true;
     rn_squared.set_weights(weights);
@@ -403,6 +534,22 @@ template <typename Scalar, int Dimensions = -1> struct Rn {
   void set_bounds(cref_t lb_, cref_t ub_) {
     lb = lb_;
     ub = ub_;
+  }
+
+  bool check_bounds(cref_t x) const {
+
+    CHECK_PRETTY_DYNOTREE__(lb.size() == x.size());
+    CHECK_PRETTY_DYNOTREE__(ub.size() == x.size());
+
+    for (size_t i = 0; i < x.size(); i++) {
+      if (x(i) < lb(i)) {
+        return false;
+      }
+      if (x(i) > ub(i)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   inline void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
@@ -563,6 +710,12 @@ template <typename Scalar, int Dimensions> struct RnTime {
     lambda_r = lambda_r_;
   }
 
+  void print(std::ostream &out) {
+    out << "RnTime: " << std::endl;
+    time.print(out);
+    rn.print(out);
+  }
+
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
     assert(t >= 0);
     assert(t <= 1);
@@ -676,6 +829,13 @@ template <typename Scalar> struct R2SO2 {
 
   Rn<Scalar, 2> l2;
   SO2<Scalar> so2;
+
+  void print(std::ostream &out) {
+    out << "R2SO2: " << std::endl;
+    l2.print(out);
+    so2.print(out);
+  }
+
   vec_t weights;
   bool use_weights = false;
 
@@ -687,6 +847,11 @@ template <typename Scalar> struct R2SO2 {
   }
 
   void set_bounds(cref2_t lb_, cref2_t ub_) { l2.set_bounds(lb_, ub_); }
+
+  bool check_bounds(cref_t x) const {
+    return l2.check_bounds(x.template head<2>()) &&
+           so2.check_bounds(x.template tail<1>());
+  }
 
   inline void sample_uniform(ref_t x) const {
     l2.sample_uniform(x.template head<2>());
@@ -736,6 +901,12 @@ template <typename Scalar> struct R2SO2Squared {
   RnSquared<Scalar, 2> rn_squared;
   SO2Squared<Scalar> so2squared;
 
+  void print(std::ostream &out) {
+    out << "R2SO2Squared: " << std::endl;
+    rn_squared.print(out);
+    so2squared.print(out);
+  }
+
   void set_bounds(cref2_t lb_, cref2_t ub_) { rn_squared.set_bounds(lb_, ub_); }
 
   void sample_uniform(ref_t x) const {
@@ -771,14 +942,23 @@ template <typename Scalar> struct SO3Squared {
     x = Eigen::Quaterniond().UnitRandom().coeffs();
   }
 
+  bool check_bounds(cref_t x) const { return std::abs(x.norm() - 1) < 1e-6; }
+
+  void print(std::ostream &out) {
+    out << "SO3Squared: " << std::endl;
+    rn_squared.print(out);
+  }
+  void set_weights(cref_t weights_) {
+    THROW_PRETTY_DYNOTREE("so3 weights not implemented");
+  }
+
   void set_bounds(cref_t lb_, cref_t ub_) {
-    std::stringstream ss;
-    ss << "so3 has no bounds " << __FILE__ << ":" << __LINE__;
-    throw std::runtime_error(ss.str());
+
+    THROW_PRETTY_DYNOTREE("so3 has no bounds");
   }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
-    throw std::runtime_error("not implemented interpolate in so3");
+    THROW_PRETTY_DYNOTREE("so3 has no interpolate implmented");
   }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
@@ -815,12 +995,21 @@ template <typename Scalar> struct SO3 {
 
   SO3Squared<Scalar> so3squared;
 
+  void print(std::ostream &out) {
+    out << "SO3: " << std::endl;
+    so3squared.print(out);
+  }
+
+  bool check_bounds(cref_t x) const { return std::abs(x.norm() - 1) < 1e-6; }
+
   void sample_uniform(ref_t x) const { so3squared.sample_uniform(x); }
 
   void set_bounds(cref_t lb_, cref_t ub_) {
-    std::stringstream ss;
-    ss << "so3 has no bounds " << __FILE__ << ":" << __LINE__;
-    throw std::runtime_error(ss.str());
+    THROW_PRETTY_DYNOTREE("so3 has no bounds");
+  }
+
+  void set_weights(cref_t weights_) {
+    THROW_PRETTY_DYNOTREE("so3 weights not implemented");
   }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
@@ -828,7 +1017,7 @@ template <typename Scalar> struct SO3 {
   }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
-    throw std::runtime_error("not implemented interpolate in so3");
+    out = Eigen::Quaterniond(from).slerp(t, Eigen::Quaterniond(to)).coeffs();
   }
 
   inline Scalar distance_to_rectangle(cref_t &x, cref_t &lb, cref_t &ub) const {
@@ -859,6 +1048,11 @@ template <typename Scalar> struct R3SO3Squared {
   RnSquared<Scalar, 3> l2;
   SO3Squared<Scalar> so3;
 
+  void print(std::ostream &out) {
+    out << "R3SO3Squared: " << std::endl;
+    l2.print(out);
+    so3.print(out);
+  }
   void set_bounds(cref3_t lb_, cref3_t ub_) { l2.set_bounds(lb_, ub_); }
 
   inline void sample_uniform(cref3_t lb, cref3_t ub, ref_t x) const {
@@ -898,14 +1092,20 @@ template <typename Scalar> struct R3SO3 {
   }
 
   void interpolate(cref_t from, cref_t to, Scalar t, ref_t out) const {
-
-    std::stringstream error_msg;
-    error_msg << "not implemented interpolate in " << __PRETTY_FUNCTION__;
-    throw std::runtime_error(error_msg.str());
+    l2.interpolate(from.template head<3>(), to.template head<3>(), t,
+                   out.template head<3>());
+    so3.interpolate(from.template tail<4>(), to.template tail<4>(), t,
+                    out.template tail<4>());
   }
 
   Rn<Scalar, 3> l2;
   SO3<Scalar> so3;
+
+  void print(std::ostream &out) {
+    out << "R3SO3: " << std::endl;
+    l2.print(out);
+    so3.print(out);
+  }
 
   void set_bounds(cref3_t lb_, cref3_t ub_) { l2.set_bounds(lb_, ub_); }
 
@@ -956,7 +1156,7 @@ inline int get_number(const std::string &str) {
   // while ((
   pos = str.find(delimiter);
   if (pos == std::string::npos) {
-    throw std::runtime_error("delimiter not found");
+    THROW_PRETTY_DYNOTREE("delimiter not found");
   }
 
   token = str.substr(pos + delimiter.length(), str.size());
@@ -966,8 +1166,6 @@ inline int get_number(const std::string &str) {
 }
 
 template <typename Scalar> struct Combined {
-  // TODO: test this!! How i am going to give this as input? -- it is not a
-  // static function anymore...
   using cref_t = const Eigen::Ref<const Eigen::Matrix<Scalar, -1, 1>> &;
   using ref_t = Eigen::Ref<Eigen::Matrix<Scalar, -1, 1>>;
 
@@ -976,6 +1174,43 @@ template <typename Scalar> struct Combined {
                    SO2Squared<Scalar>, SO3<Scalar>, SO3Squared<Scalar>>;
   std::vector<Space> spaces;
   std::vector<int> dims; // TODO: remove this and get auto from spaces
+  // std::vector<double>
+  //     weights; // Only supported: one weight per space -- TODO: allow both!
+  Eigen::Matrix<Scalar, -1, 1>
+      weights; // one weight per dimension, created from weights
+  bool use_weights = false;
+  std::vector<std::string> spaces_names;
+  Eigen::VectorXd lb;
+  Eigen::VectorXd ub;
+
+  void set_weights(cref_t weights_) {
+    int total_dim = get_runtime_dim();
+    CHECK_PRETTY_DYNOTREE(weights_.size() == total_dim, "");
+    weights = weights_;
+    use_weights = true;
+    int counter = 0;
+    for (size_t i = 0; i < spaces.size(); i++) {
+      std::visit(
+          [&](auto &obj) {
+            obj.set_weights(weights_.segment(counter, dims[i]));
+          },
+          spaces[i]);
+      counter += dims[i];
+    }
+  }
+
+  int get_runtime_dim() {
+    int out = 0;
+    for (size_t i = 0; i < spaces.size(); i++) {
+      out += dims[i];
+      // std::visit(
+      //     [&](auto &obj) {
+      //       out += obj.get_runtime_dim();
+      //     },
+      //     spaces[i]);
+    }
+    return out;
+  }
 
   Combined() = default;
 
@@ -984,48 +1219,112 @@ template <typename Scalar> struct Combined {
     assert(spaces.size() == dims.size());
   }
 
+  void print(std::ostream &out) {
+
+    out << "Combined: " << std::endl;
+    for (auto &a : spaces_names)
+      out << a << std::endl;
+    for (auto &s : spaces)
+      std::visit([&](auto &obj) { obj.print(out); }, s);
+    for (auto &d : dims)
+      out << d << std::endl;
+    out << "lb " << lb.transpose().format(__CleanFmt) << std::endl;
+    out << "ub " << ub.transpose().format(__CleanFmt) << std::endl;
+    out << "weights " << weights.transpose().format(__CleanFmt) << std::endl;
+  }
+
   Combined(const std::vector<std::string> &spaces_str) {
-    // throw std::runtime_error("not implemented " + __PRETTY_FUNCTION__);
 
     for (size_t i = 0; i < spaces_str.size(); i++) {
-
       if (spaces_str.at(i) == "SO2") {
         spaces.push_back(SO2<Scalar>());
+        spaces_names.push_back("SO2");
         dims.push_back(1);
       } else if (spaces_str.at(i) == "SO2Squared") {
         spaces.push_back(SO2Squared<Scalar>());
+        spaces_names.push_back("SO2Squared");
         dims.push_back(1);
       } else if (spaces_str.at(i) == "SO3") {
         spaces.push_back(SO3<Scalar>());
+        spaces_names.push_back("SO3");
         dims.push_back(4);
       } else if (spaces_str.at(i) == "SO3Squared") {
         spaces.push_back(SO3Squared<Scalar>());
+        spaces_names.push_back("SO3Squared");
+        dims.push_back(4);
       } else if (starts_with(spaces_str.at(i), "RnL1")) {
         spaces.push_back(RnL1<Scalar>());
+        spaces_names.push_back("RnL1");
         int dim = get_number(spaces_str.at(i));
         dims.push_back(dim);
       } else if (starts_with(spaces_str.at(i), "Rn") &&
                  !starts_with(spaces_str.at(i), "RnSquared")) {
         spaces.push_back(Rn<Scalar>());
+        spaces_names.push_back("Rn");
         int dim = get_number(spaces_str.at(i));
         dims.push_back(dim);
       } else if (starts_with(spaces_str.at(i), "RnSquared")) {
         spaces.push_back(RnSquared<Scalar>());
+        spaces_names.push_back("RnSquared");
         int dim = get_number(spaces_str.at(i));
         dims.push_back(dim);
       } else {
-        std::stringstream error_msg;
-        error_msg << "Unknown space " << spaces_str.at(i) << " in "
-                  << __PRETTY_FUNCTION__ << std::endl
-                  << __FILE__ << ":" << __LINE__;
-        throw std::runtime_error(error_msg.str());
+        THROW_PRETTY_DYNOTREE("Unknown space:" + spaces_str.at(i));
       }
     }
     assert(spaces.size() == dims.size());
   }
 
   void choose_split_dimension(cref_t lb, cref_t ub, int &ii, Scalar &width) {
-    choose_split_dimension_default(lb, ub, ii, width);
+    if (use_weights) {
+      choose_split_dimension_weights(lb, ub, weights, ii, width);
+    } else
+      choose_split_dimension_default(lb, ub, ii, width);
+  }
+
+  bool check_bounds(cref_t x) const {
+    int counter = 0;
+    for (size_t i = 0; i < spaces.size(); i++) {
+      if (!std::visit(
+              [&](const auto &obj) {
+                return obj.check_bounds(x.segment(counter, dims[i]));
+              },
+              spaces[i]))
+        return false;
+
+      counter += dims[i];
+    }
+    return true;
+  }
+
+  void set_bounds(cref_t &lbs, cref_t &ubs) {
+
+    assert(lbs.size() == ubs.size());
+    lb = lbs;
+    ub = ubs;
+    int counter = 0;
+    for (size_t i = 0; i < spaces_names.size(); i++) {
+
+      auto &space_name = spaces_names.at(i);
+
+      if (space_name == "SO2")
+        continue;
+      if (space_name == "SO2Squared")
+        continue;
+      if (space_name == "SO3")
+        continue;
+      if (space_name == "SO3Squared")
+        continue;
+
+      std::visit(
+          [&](auto &obj) {
+            if (lbs.size())
+              obj.set_bounds(lbs.segment(counter, dims[i]),
+                             ubs.segment(counter, dims[i]));
+          },
+          spaces[i]);
+      counter += dims[i];
+    }
   }
 
   void set_bounds(const std::vector<Eigen::VectorXd> &lbs,
@@ -1082,12 +1381,14 @@ template <typename Scalar> struct Combined {
     assert(spaces.size());
     Scalar d = 0;
     int counter = 0;
-    for (size_t i = 0; i < spaces.size(); i++) {
-      auto caller = [&](const auto &obj) {
-        return obj.distance(x.segment(counter, dims[i]),
-                            y.segment(counter, dims[i]));
-      };
+    int dim_index = -1;
+    auto caller = [&](const auto &obj) {
+      return obj.distance(x.segment(counter, dims[dim_index]),
+                          y.segment(counter, dims[dim_index]));
+    };
 
+    for (size_t i = 0; i < spaces.size(); i++) {
+      dim_index = i;
       d += std::visit(caller, spaces[i]);
       counter += dims[i];
     }
@@ -1101,14 +1402,16 @@ template <typename Scalar> struct Combined {
 
     Scalar d = 0;
     int counter = 0;
+
+    int dim_index = 0;
+    auto caller = [&](const auto &obj) {
+      return obj.distance_to_rectangle(x.segment(counter, dims[dim_index]),
+                                       lb.segment(counter, dims[dim_index]),
+                                       ub.segment(counter, dims[dim_index]));
+    };
+
     for (size_t i = 0; i < spaces.size(); i++) {
-
-      auto caller = [&](const auto &obj) {
-        return obj.distance_to_rectangle(x.segment(counter, dims[i]),
-                                         lb.segment(counter, dims[i]),
-                                         ub.segment(counter, dims[i]));
-      };
-
+      dim_index = i;
       d += std::visit(caller, spaces[i]);
       counter += dims[i];
     }
