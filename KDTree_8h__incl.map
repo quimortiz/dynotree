@@ -1,11 +1,11 @@
 <map id="include/dynotree/KDTree.h" name="include/dynotree/KDTree.h">
 <area shape="rect" id="Node000001" title=" " alt="" coords="328,5,502,31"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="37,153,111,178"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="382,34,257,81,112,148,110,143,255,77,380,29"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="381,34,256,81,112,148,110,143,254,77,379,29"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="134,153,192,178"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="393,34,306,81,197,146,194,142,303,77,391,29"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="392,34,304,81,196,146,193,142,302,77,390,29"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="215,153,279,178"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="400,33,339,81,271,144,268,140,336,77,397,29"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="400,33,338,81,271,144,267,140,335,77,397,29"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="302,153,355,178"/>
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="400,33,377,54,356,80,343,109,335,138,330,137,338,108,351,78,373,50,397,29"/>
 <area shape="rect" id="Node000006" title=" " alt="" coords="640,79,697,105"/>
@@ -15,9 +15,9 @@
 <area shape="rect" id="Node000008" title=" " alt="" coords="364,226,421,252"/>
 <area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="328,28,209,42,147,54,91,69,45,89,29,101,17,113,10,127,9,142,14,158,26,176,48,192,81,205,169,223,266,232,348,235,348,240,266,237,168,228,79,210,45,197,22,180,9,161,3,142,5,126,12,110,25,97,43,85,89,64,146,49,208,37,328,22"/>
 <area shape="rect" id="Node000009" title=" " alt="" coords="811,153,937,178"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="440,29,585,102,678,125,796,148,795,153,677,130,583,107,438,34"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="440,29,585,102,678,125,796,148,795,153,677,130,583,107,437,34"/>
 <area shape="rect" id="Node000010" title=" " alt="" coords="962,153,1098,178"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="454,29,580,77,605,90,629,102,946,149,946,155,628,107,602,95,578,81,452,34"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="453,29,579,77,604,90,629,102,946,149,946,155,628,107,601,95,577,81,451,34"/>
 <area shape="rect" id="Node000011" href="$StateSpace_8h.html" title=" " alt="" coords="365,79,465,105"/>
 <area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="418,31,418,63,412,63,412,31"/>
 <area shape="rect" id="Node000015" href="$dynotree__macros_8h.html" title=" " alt="" coords="657,153,787,178"/>

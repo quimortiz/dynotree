@@ -1,9 +1,9 @@
 <map id="dynotree::Rn::print" name="dynotree::Rn::print">
 <area shape="rect" id="Node000001" title=" " alt="" coords="206,55,329,80"/>
-<area shape="rect" id="Node000002" href="$structdynotree_1_1RnTime.html#a5f27a852b795f69bd43456e41af6c3ea" title=" " alt="" coords="5,5,158,31"/>
+<area shape="rect" id="Node000002" href="$structdynotree_1_1R2SO2.html#a730bfd176566cdaa9e3d4d6d199292a6" title=" " alt="" coords="7,5,156,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,53,132,34,134,29,202,48"/>
-<area shape="rect" id="Node000003" href="$structdynotree_1_1R2SO2.html#a730bfd176566cdaa9e3d4d6d199292a6" title=" " alt="" coords="7,55,156,80"/>
+<area shape="rect" id="Node000003" href="$structdynotree_1_1R3SO3.html#ac1d6dc7c54b9c657256b16c2f08716df" title=" " alt="" coords="7,55,156,80"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,70,156,70,156,65,190,65"/>
-<area shape="rect" id="Node000004" href="$structdynotree_1_1R3SO3.html#ac1d6dc7c54b9c657256b16c2f08716df" title=" " alt="" coords="7,104,156,130"/>
+<area shape="rect" id="Node000004" href="$structdynotree_1_1RnTime.html#a5f27a852b795f69bd43456e41af6c3ea" title=" " alt="" coords="5,104,158,130"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="202,87,134,106,132,101,201,82"/>
 </map>

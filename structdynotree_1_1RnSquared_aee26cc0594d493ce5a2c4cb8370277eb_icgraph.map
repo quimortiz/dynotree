@@ -2,8 +2,8 @@
 <area shape="rect" id="Node000001" title=" " alt="" coords="220,71,360,111"/>
 <area shape="rect" id="Node000002" href="$structdynotree_1_1R2SO2Squared.html#a6c72a950c4570e06da246846c972a7e6" title=" " alt="" coords="5,5,172,46"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,68,153,49,154,44,212,63"/>
-<area shape="rect" id="Node000003" href="$structdynotree_1_1SO3Squared.html#a0ea8bd8d10c04d5d51db4592183388bb" title=" " alt="" coords="13,71,164,111"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="204,94,164,94,164,88,204,88"/>
-<area shape="rect" id="Node000004" href="$structdynotree_1_1R3SO3Squared.html#aeaa704cf9074a38a0a07650e0a33d540" title=" " alt="" coords="5,136,172,177"/>
+<area shape="rect" id="Node000003" href="$structdynotree_1_1R3SO3Squared.html#aeaa704cf9074a38a0a07650e0a33d540" title=" " alt="" coords="5,71,172,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="204,94,172,94,172,88,204,88"/>
+<area shape="rect" id="Node000004" href="$structdynotree_1_1SO3Squared.html#a0ea8bd8d10c04d5d51db4592183388bb" title=" " alt="" coords="13,136,164,177"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="212,119,154,138,153,133,210,114"/>
 </map>

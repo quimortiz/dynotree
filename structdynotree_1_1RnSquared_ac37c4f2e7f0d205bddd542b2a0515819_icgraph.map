@@ -1,19 +1,19 @@
 <map id="dynotree::RnSquared::distance" name="dynotree::RnSquared::distance">
-<area shape="rect" id="Node000001" title=" " alt="" coords="444,179,584,219"/>
-<area shape="rect" id="Node000002" href="$structdynotree_1_1Rn.html#a3d66ac4dca23fc39fb3cf9e65f0b9a4d" title=" " alt="" coords="239,96,387,121"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="466,173,395,136,363,124,365,119,397,131,468,168"/>
-<area shape="rect" id="Node000007" href="$structdynotree_1_1R2SO2Squared.html#a037f2dfab1aa398bc37d2220e14cdc23" title=" " alt="" coords="230,145,396,186"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="428,187,396,182,397,177,429,182"/>
-<area shape="rect" id="Node000008" href="$structdynotree_1_1SO3Squared.html#a2f95870372b32ce25438c8dd51413976" title=" " alt="" coords="238,211,388,251"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="429,215,389,222,388,216,428,210"/>
-<area shape="rect" id="Node000009" href="$structdynotree_1_1R3SO3Squared.html#afda405c207941c8ed54c35bc7c6da7d3" title=" " alt="" coords="230,276,396,317"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="465,230,397,265,369,278,367,273,395,261,463,225"/>
-<area shape="rect" id="Node000003" href="$structdynotree_1_1S4irtual.html#a44b59e24abbfdecfaf4682d843a91334" title=" " alt="" coords="33,5,154,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="263,92,181,60,151,49,153,44,183,55,265,87"/>
-<area shape="rect" id="Node000004" href="$structdynotree_1_1RnTime.html#ab085db5e545c1497b3cf115391bc79c0" title=" " alt="" coords="5,70,182,96"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="223,101,182,96,182,91,224,95"/>
-<area shape="rect" id="Node000005" href="$structdynotree_1_1R2SO2.html#a8d5707641f535d46d2b34bea2df71a2b" title=" " alt="" coords="7,120,180,145"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="224,121,181,125,180,120,223,115"/>
-<area shape="rect" id="Node000006" href="$structdynotree_1_1R3SO3.html#a9952bd45e5efb17c734f730504d38896" title=" " alt="" coords="7,169,180,195"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="250,129,231,136,183,160,150,171,149,166,181,155,229,131,248,124"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="444,100,584,141"/>
+<area shape="rect" id="Node000002" href="$structdynotree_1_1R2SO2Squared.html#a037f2dfab1aa398bc37d2220e14cdc23" title=" " alt="" coords="230,5,396,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="461,95,395,61,367,49,369,44,397,57,463,90"/>
+<area shape="rect" id="Node000003" href="$structdynotree_1_1R3SO3Squared.html#afda405c207941c8ed54c35bc7c6da7d3" title=" " alt="" coords="230,71,396,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="428,110,396,106,397,101,429,105"/>
+<area shape="rect" id="Node000004" href="$structdynotree_1_1Rn.html#a3d66ac4dca23fc39fb3cf9e65f0b9a4d" title=" " alt="" coords="239,136,386,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="429,135,387,141,387,135,428,130"/>
+<area shape="rect" id="Node000009" href="$structdynotree_1_1SO3Squared.html#a2f95870372b32ce25438c8dd51413976" title=" " alt="" coords="238,185,388,226"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="456,150,397,176,370,187,368,182,395,171,454,145"/>
+<area shape="rect" id="Node000005" href="$structdynotree_1_1R2SO2.html#a8d5707641f535d46d2b34bea2df71a2b" title=" " alt="" coords="7,61,180,86"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="248,133,229,125,181,100,150,90,151,85,183,95,231,121,250,128"/>
+<area shape="rect" id="Node000006" href="$structdynotree_1_1R3SO3.html#a9952bd45e5efb17c734f730504d38896" title=" " alt="" coords="7,110,180,136"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="223,141,180,136,181,130,224,135"/>
+<area shape="rect" id="Node000007" href="$structdynotree_1_1RnTime.html#ab085db5e545c1497b3cf115391bc79c0" title=" " alt="" coords="5,160,182,185"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="224,161,182,165,182,160,223,155"/>
+<area shape="rect" id="Node000008" href="$structdynotree_1_1S4irtual.html#a44b59e24abbfdecfaf4682d843a91334" title=" " alt="" coords="33,209,154,250"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="250,169,231,176,183,200,155,211,153,206,181,195,229,171,248,164"/>
 </map>
