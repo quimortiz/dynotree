@@ -1,9 +1,9 @@
 """
 
-        pydynotree
-        -----------------------
+pydynotree
+-----------------------
 
-        .. currentmodule:: pydynotree
+.. currentmodule:: pydynotree
 
 
 """
