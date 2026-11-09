@@ -11,7 +11,6 @@ print(dynotree.__dict__)
 import numpy as np
 import time
 
-
 num_points = 10000
 
 a = dynotree.TreeRX()
